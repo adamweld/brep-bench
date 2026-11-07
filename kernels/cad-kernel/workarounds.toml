@@ -35,3 +35,6 @@
 "sweep/mitered-pipe-on-cube-edges" = "no sweep along a path with corners"
 "sweep/round-cornered-pipe" = "no sweep along a path with corners"
 "swept/ball-along-spline-groove" = "no sweep of a solid along a curve"
+"swept/ellipsoid-pushed-aslant-through-plate" = "no sweep of an ellipsoid (a ball's sweep, stretched)"
+"swept/rounded-block-slid-aslant" = "no sweep of a rounded block (the box's sweep, grown)"
+"swept/square-thread-with-a-run-out" = "no sweep along a path with a screw among its pieces"
