@@ -1,11 +1,12 @@
 //! The brep-bench runner for cad-kernel (https://crates.io/crates/cad-kernel).
 //!
-//!     brep-bench-cad-kernel CASE OUT.stl      (CASE as `boolean/napkin-ring`)
+//!     brep-bench-cad-kernel CASE OUT.stl [OUT.step]      (CASE as `boolean/napkin-ring`)
 //!     brep-bench-cad-kernel --version
 //!
 //! Builds the case with its own file, `src/cases/<category>/<name_snake>.rs`, then measures the
 //! solid with the kernel (exact volume and area, faces by surface, its validity check), meshes it
-//! into OUT.stl and prints one line of JSON. A case that refuses, or a kernel operation that
+//! into OUT.stl, writes it as STEP into OUT.step if asked (the kernel's own writer, `step::write`)
+//! and prints one line of JSON. A case that refuses, or a kernel operation that
 //! declines, is a refusal saying why. The runner never reads the case's description.
 use cad_kernel::geom::{tolerance, Surface};
 use cad_kernel::mesh::mesh;
@@ -62,8 +63,9 @@ fn refused(why: String) -> String {
     format!("{{\"status\":\"refused\",\"reason\":{}}}", Json::Str(why).dump(None))
 }
 
-/// The reply for a solid built: its measures, once its triangles are written.
-fn measured(b: &Brep, out: &str) -> String {
+/// The reply for a solid built: its measures, once its triangles are written (and its STEP, if
+/// asked for: where the writer declines, the reply says why in `step_error`).
+fn measured(b: &Brep, out: &str, out_step: Option<&str>, case: &str) -> String {
     let mut faces = BTreeMap::new();
     for f in &b.faces {
         *faces.entry(kind(&f.surface)).or_insert(0) += 1;
@@ -72,9 +74,17 @@ fn measured(b: &Brep, out: &str) -> String {
     let a: f64 = b.faces.iter().map(|f| area(b, f)).sum();
     let valid = b.check(tolerance(b.size())).is_ok();
     let v = volume(b);
+    let step_error = out_step.and_then(|path| {
+        cad_kernel::step::write(b, case, tolerance(b.size()))
+            .and_then(|text| std::fs::write(path, text).map_err(|e| e.to_string()))
+            .err()
+    });
+    let step_error = step_error
+        .map(|e| format!(",\"step_error\":{}", Json::Str(e).dump(None)))
+        .unwrap_or_default();
     match stl(b, out, v, a) {
         Ok(()) => format!(
-            "{{\"status\":\"ok\",\"volume\":{v:e},\"area\":{a:e},\"faces\":{{{faces}}},\"valid\":{valid}}}"
+            "{{\"status\":\"ok\",\"volume\":{v:e},\"area\":{a:e},\"faces\":{{{faces}}},\"valid\":{valid}{step_error}}}"
         ),
         Err(e) => refused(format!("not meshed: {e}")),
     }
@@ -86,16 +96,20 @@ fn main() {
         println!("cad-kernel {} (brep-bench runner {})", env!("CAD_KERNEL_REV"), env!("CARGO_PKG_VERSION"));
         return;
     }
-    let [_, case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-cad-kernel CASE OUT.stl");
-        std::process::exit(2);
+    let (case, out, out_step) = match &args[..] {
+        [_, case, out] => (case, out, None),
+        [_, case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-cad-kernel CASE OUT.stl [OUT.step]");
+            std::process::exit(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         std::process::exit(2);
     };
     let reply = match build() {
-        Ok(solid) => measured(&solid, out),
+        Ok(solid) => measured(&solid, out, out_step, case),
         Err(why) => refused(why),
     };
     println!("{reply}");

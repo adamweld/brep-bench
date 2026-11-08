@@ -105,11 +105,14 @@ FACETED_LEAST = 50
 
 
 def face_count(row):
-    """How many faces a result's solid has, by its runner's word, or None where it built none or
-    did not say."""
-    if not row or row["outcome"] not in ("pass", "built", "wrong") or not row.get("faces"):
+    """How many faces a result's solid has: by its STEP file where it wrote one (harness/step.py),
+    else by its runner's word; None where it built none or neither says."""
+    if not row or row["outcome"] not in ("pass", "built", "wrong"):
         return None
-    return sum(row["faces"].values())
+    made = row.get("step") or {}
+    if made.get("faces"):
+        return made["faces"]
+    return sum(row["faces"].values()) if row.get("faces") else None
 
 
 def faceting(results):
@@ -193,7 +196,7 @@ def board(registry, results, cases, drawings):
         k = {"name": name}
         for field, key in (("kernel", "home"), ("license", "license"), ("backend", "backend"),
                            ("frontend", "frontend"), ("note", "note"),
-                           ("reference", "reference")):
+                           ("reference", "reference"), ("step", "step")):
             if a.get(field):
                 k[key] = a[field]
         r = ran.get(name)
@@ -486,6 +489,49 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
 
 KEYS = ("volume", "area")
 
+# how a STEP file represents its solid (harness/step.py's `form`), in words
+FORMS = {"advanced": "B-rep of advanced faces, each on a surface",
+         "faceted": "faceted B-rep: polygons, no surfaces",
+         "tessellated": "triangles (AP242 tessellated), no B-rep",
+         "surfaces": "faces on surfaces, but no solid",
+         "none": "no solid and no faces"}
+
+
+def size_text(mb):
+    return f"{mb:.1f} MB" if mb >= 0.1 else f"{mb * 1e3:.0f} kB"
+
+
+def counted(counts):
+    return ", ".join(f"{n} {k}" for k, n in counts.items())
+
+
+def step_facts(made, faces):
+    """The data rows for what a result's STEP file says its solid is made of (harness/step.py),
+    or why it has none; `faces` its runner's own count, set beside the file's."""
+    e = html.escape
+    if "error" in made:
+        return [("STEP", f"<span class=muted>none: {e(made['error'])}</span>")]
+    form = f"{e(FORMS.get(made['form'], made['form']))}"
+    if made.get("schema"):
+        form += f" <span class=muted>{e(made['schema'])}</span>"
+    rows = [("STEP", form)]
+    said = sum(faces.values()) if faces else None
+    surfaces = f"{made['faces']}: {e(counted(made['surfaces']))}" if made["faces"] else "none"
+    if made.get("triangles"):
+        surfaces += f"; {made['triangles']} flat triangles"
+    if said is not None and said != made["faces"]:
+        surfaces += f" <span class=muted>(its runner counts {said})</span>"
+    rows.append(("STEP faces", surfaces))
+    if made["edges"]:
+        rows.append(("STEP edges", f"{made['edges']}: {e(counted(made['curves']))}"))
+    rows.append(("STEP topology", f"{made['solids']} solid{'' if made['solids'] == 1 else 's'}, "
+                 f"{made['shells']} shell{'' if made['shells'] == 1 else 's'}, "
+                 f"{made['faces']} faces, {made['loops']} loops, {made['edges']} edges, "
+                 f"{made['vertices']} vertices"))
+    if made.get("tessellated"):
+        rows.append(("STEP triangles", f"{made['tessellated']} tessellated faces"))
+    return rows
+
 
 def measures(row):
     """A result's (volume, area, from its mesh), or None where it built no solid to measure."""
@@ -581,9 +627,11 @@ def entry(en, exp):
             bits.append(f"{m['degenerate']} degenerate")
         facts.append(("mesh", ", ".join(bits)))
     if en["stl"]:
-        size = f"{en['mb']:.1f} MB" if en["mb"] >= 0.1 else f"{en['mb'] * 1e3:.0f} kB"
         facts.append(("STL", f"<a href='{en['stl']}' download>download</a> "
-                             f"<span class=muted>{size}</span>"))
+                             f"<span class=muted>{size_text(en['mb'])}</span>"))
+    made = (row or {}).get("step")
+    if made:
+        facts += step_facts(made, faces)
     if facts:
         out.append("<table class=facts>" + "".join(
             f"<tr><th scope=row>{k}</th><td>{v}</td></tr>" for k, v in facts) + "</table>")

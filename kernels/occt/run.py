@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """The brep-bench runner for Open CASCADE (OCCT), through the OCP Python bindings.
 
-    python3 kernels/occt/run.py CASE OUT.stl     # CASE is an id, e.g. boolean/napkin-ring
+    python3 kernels/occt/run.py CASE OUT.stl [OUT.step]   # CASE is an id, e.g. boolean/napkin-ring
     python3 kernels/occt/run.py --version
 
 Loads the case's implementation, `cases/<category>/<name_snake>.py` beside this file, calls its
 `build()`, and measures the solid it returns with OCCT's own tools: its volume and area
 (BRepGProp), its faces by surface kind, its validity (BRepCheck_Analyzer). It meshes the solid
-and writes the triangles to OUT.stl, then prints one line of JSON (SPEC.md, "A runner"). The
+and writes the triangles to OUT.stl, and if asked the solid to OUT.step (STEPControl_Writer, AP214),
+then prints one line of JSON (SPEC.md, "A runner"). The
 runner never reads the case's description: the implementation is the whole of the case here.
 Needs `cadquery-ocp`.
 """
@@ -101,12 +102,40 @@ def measure(shape, out_stl):
     return reply
 
 
+def step(shape, out_step):
+    """Writes the solid to `out_step` as STEP (AP214) with OCCT's own writer; why not, or None.
+    Its modules are loaded here, only when a STEP is asked for, so a timed run does not load them."""
+    from OCP.IFSelect import IFSelect_ReturnStatus
+    from OCP.Interface import Interface_Static
+    from OCP.Message import Message
+    from OCP.STEPControl import STEPControl_StepModelType, STEPControl_Writer
+    # the writer reports its transfer on standard output, after the reply: its printers removed,
+    # the reply stays the last line
+    messenger = Message.DefaultMessenger_s()
+    while messenger.Printers().Size():
+        messenger.RemovePrinter(messenger.Printers().First())
+    Interface_Static.SetCVal_s("write.step.schema", "AP214IS")
+    writer = STEPControl_Writer()
+    if writer.Transfer(shape, STEPControl_StepModelType.STEPControl_AsIs) != \
+            IFSelect_ReturnStatus.IFSelect_RetDone:
+        return "STEPControl_Writer could not transfer the solid"
+    if writer.Write(out_step) != IFSelect_ReturnStatus.IFSelect_RetDone:
+        return f"STEPControl_Writer could not write {out_step}"
+    return None
+
+
 def main():
-    if len(sys.argv) != 3:
-        sys.exit("usage: run.py CASE OUT.stl")
+    if len(sys.argv) not in (3, 4):
+        sys.exit("usage: run.py CASE OUT.stl [OUT.step]")
     case_id, out_stl = sys.argv[1], sys.argv[2]
+    out_step = sys.argv[3] if len(sys.argv) == 4 else None
     try:
-        reply = measure(implementation(case_id).build(), out_stl)
+        shape = implementation(case_id).build()
+        reply = measure(shape, out_stl)
+        if out_step:
+            why = step(shape, out_step)
+            if why:
+                reply["step_error"] = why
     except Refused as why:
         reply = {"status": "refused", "reason": str(why)}
     print(json.dumps(reply))

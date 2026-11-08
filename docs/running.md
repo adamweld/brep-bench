@@ -25,7 +25,12 @@ under a millisecond. In its means and ratios the board takes any time under 0.1 
 spread of a runner's start-up, as 0.1 ms; a time recorded only to the millisecond, or one whose
 kernel's start-up was never measured, it takes as no less than 1 ms. A CI run of only some of a
 kernel's cases keeps its last start-up and binary size. `--one-core` runs each case a kernel
-builds a second time, pinned to one core, for its speedup on all of them (Linux only). Each
+builds a second time, pinned to one core, for its speedup on all of them (Linux only). A kernel
+marked `"step": true` in `kernels.json` runs each case it builds once more, untimed, writing its
+solid as STEP; `harness/step.py` reads the file for what the solid is made of (its form, its
+topology, its faces by surface and edges by curve), and the result keeps that as `step`. The file
+itself is not kept, since a faceted solid's can run to tens of megabytes (`python3
+harness/step.py FILE` prints the same make-up for any STEP file). Each
 result file also records its machine and the size of the kernel's binary, as `binary` in
 `kernels.json` names it.
 

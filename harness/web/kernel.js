@@ -38,7 +38,8 @@ function draw(b) {
   const counted = (o, count, extra = {}) => (count
     ? `<a href='${explore({ ...extra, [`f.${k.name}`]: o })}'>${count}</a>` : '<span class=muted>·</span>');
   out += `<p class=muted>${esc(k.version)} · run ${esc(k.run.slice(0, 10))}${
-    k.measured === 'mesh' ? ' · no exact measures: graded on its triangles, to 1e-3' : ''}</p>
+    k.measured === 'mesh' ? ' · no exact measures: graded on its triangles, to 1e-3' : ''}${
+    k.step ? ' · writes STEP: each case page shows what its solid is made of' : ''}</p>
     <p>It has an implementation of ${n - t.missing} of the ${n} cases.</p>
     <div class=scroll><table><tr><th></th>${OUTCOMES.map((o) => `<th class=num>${o}</th>`).join('')}
       </tr><tr><td>${bar(t)}</td>${OUTCOMES.map((o) => `<td class=num>${counted(o, t[o])}</td>`)

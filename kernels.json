@@ -21,6 +21,7 @@
         "--version"
       ],
       "source": "kernels/cad-kernel/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/cad-kernel/target/release/brep-bench-cad-kernel"]
     },
     {
@@ -47,6 +48,7 @@
         "--version"
       ],
       "source": "kernels/occt/cases/{category}/{name_snake}.py",
+      "step": true,
       "binary": [{"python": "python3", "distribution": "cadquery-ocp"}]
     },
     {"name": "monstertruck", "kernel": "https://github.com/virtualritz/monstertruck", "license": "Apache-2.0", "backend": "Rust", "frontend": "Rust", "command": null},
@@ -118,6 +120,7 @@
         "--version"
       ],
       "source": "kernels/vcad/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/vcad/target/release/brep-bench-vcad"]
     },
     {

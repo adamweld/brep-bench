@@ -17,7 +17,10 @@ from the operating system's account of the runner's process (wait4), which harne
 starts and waits for. So is what starting the runner costs, alone: it is given a case id no case
 has, `harness/start`, so that it starts and builds nothing, a few times over (`startup`). With
 `--one-core` a case the kernel built is run a second time on one core only, for what its other
-cores bought it; that run is timed and nothing else. Times are kept to the microsecond: a
+cores bought it; that run is timed and nothing else. A kernel whose runner writes STEP
+(`"step": true` in kernels.json) is asked for its solid as STEP in a run of its own, untimed, for
+each case it built, and what the file says the solid is made of is kept beside its result
+(harness/step.py); like the runner's own `faces`, it is not graded. Times are kept to the microsecond: a
 kernel's own time, a run's less its runner's start-up, can be under a millisecond. Standard
 library only (where there is no wait4, only the time is kept; pinning to one core needs Linux).
 """
@@ -35,6 +38,7 @@ import tempfile
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import step  # noqa: E402
 import stl  # noqa: E402
 from suite import ROOT, cases, implements, kernels, source  # noqa: E402
 
@@ -188,6 +192,30 @@ def run_one(command, case, timeout, keep):
         return (*grade(case, reply, mesh), reply, mesh, ran)
 
 
+def step_of(command, case, timeout):
+    """The make-up of the solid in STEP, from a run of its own (SPEC.md, "A runner"): the runner
+    given a third argument, the file to write. {"error": why} where the runner wrote none, or none
+    that could be read. The file is not kept: a faceted solid's runs to tens of megabytes, and its
+    make-up is what the board shows."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out_step = os.path.join(tmp, "result.step")
+        ran = execute(command + [case["id"], os.path.join(tmp, "result.stl"), out_step], timeout)
+        if ran.code is None:
+            return {"error": f"over {timeout} s"}
+        if ran.code != 0:
+            return {"error": why_crashed(ran.stderr, ran.code)}
+        if not os.path.exists(out_step):
+            try:
+                said = json.loads(ran.stdout.strip().splitlines()[-1]).get("step_error")
+            except (ValueError, IndexError, AttributeError):
+                said = None
+            return {"error": said or "no STEP written"}
+        try:
+            return step.read(out_step)
+        except (ValueError, OSError) as e:
+            return {"error": f"unreadable STEP: {e}"}
+
+
 # the decimal places a time in seconds is kept to: microseconds
 TIME_PLACES = 6
 
@@ -310,6 +338,8 @@ def run_kernel(k, chosen, timeout, one_core=None):
             "volume": (reply or {}).get("volume"), "area": (reply or {}).get("area"),
             "faces": (reply or {}).get("faces"), "mesh": mesh,
         }
+        if k.get("step") and outcome in ("pass", "built", "wrong"):
+            row["step"] = step_of(k["command"], c, timeout)
         if one_core is not None and outcome in ("pass", "built", "wrong"):
             row["one_core_seconds"] = one_core_seconds(k["command"], c, timeout, one_core)
         rows.append(row)
