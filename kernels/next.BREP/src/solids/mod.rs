@@ -17,6 +17,7 @@ pub mod boolean;
 pub mod draft;
 pub mod fillet;
 pub mod geometry;
+pub mod nurbs;
 pub mod offset;
 pub mod shell;
 pub mod singular;
