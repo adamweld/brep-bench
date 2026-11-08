@@ -26,6 +26,7 @@ import urllib.parse
 from decimal import ROUND_HALF_UP, Decimal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import step  # noqa: E402
 from highlight import highlight, loc  # noqa: E402
 from run import FROM_MESH  # noqa: E402
 from suite import ROOT, cases as read_cases, kernels as read_kernels, source  # noqa: E402
@@ -174,7 +175,11 @@ def board(registry, results, cases, drawings):
       before run.py kept microseconds; null where it has no row), and how many faces its solid
       has by its runner's word (`faces`, null where it built none or did not say) and, where
       that solid is faceted, the median of the other kernels' (`faceted`, else null; see
-      FACETED_TIMES).
+      FACETED_TIMES); and, for a kernel whose runner writes STEP, its STEP verdict of each case
+      as a string of one letter a case (`step`, the letters `stepVerdicts` keys, `-` where it
+      built no solid) and why where its writer refused or the run failed (`stepWhy`, indices in
+      `stepReasons`, -1 for none). A kernel's `step` is kernels.json's: true where its runner
+      writes STEP, why not where its kernel cannot, absent where it has not been set up to.
       A kernel's `host` is the machine its last run was made on, and its `startup` what starting
       its runner cost there, building nothing (`seconds`, `cpu`, `mb`, and `one` on one core);
       its `binary` is the size of its binary (`bytes`, `files`), and `of` what kernels.json counts
@@ -183,7 +188,7 @@ def board(registry, results, cases, drawings):
     ids = sorted(cases)
     tags = sorted({t for c in cases.values() for t in c["tags"]})
     tag_ix = {t: i for i, t in enumerate(tags)}
-    strings = {"reasons": {}, "workarounds": {}, "elegance": {}}
+    strings = {"reasons": {}, "workarounds": {}, "elegance": {}, "stepReasons": {}}
 
     def intern(table, text):
         if not text:
@@ -214,7 +219,7 @@ def board(registry, results, cases, drawings):
             if start:
                 k["startup"] = {key: start.get(field) for key, field in COSTS.items()}
             codes, why, worked, neat, lines, places = [], [], [], [], [], []
-            faces, faceted = [], []
+            faces, faceted, steps, step_why = [], [], [], []
             spent = {key: [] for key in COSTS}
             for cid in ids:
                 row = r["rows"].get(cid)
@@ -229,6 +234,8 @@ def board(registry, results, cases, drawings):
                     places.append(None)
                     faces.append(None)
                     faceted.append(None)
+                    steps.append("-")
+                    step_why.append(-1)
                     continue
                 codes.append(CODES[row["outcome"]])
                 # a missing case has no run, whatever an older row says of its time
@@ -241,9 +248,17 @@ def board(registry, results, cases, drawings):
                 places.append(row.get("time_places", 3))
                 faces.append(face_count(row))
                 faceted.append(r["faceted"].get(cid))
+                verdict = step_verdict(row, a.get("step"))
+                steps.append(STEP_VERDICTS[verdict][0] if verdict else "-")
+                made = row.get("step") or {}
+                step_why.append(intern("stepReasons", made.get("refused") or made.get("error"))
+                                if verdict in ("refused", "failed") else -1)
             out[name] = {"codes": "".join(codes), **spent, "why": why, "workaround": worked,
                          "elegance": neat, "loc": lines, "places": places, "faces": faces,
                          "faceted": faceted}
+            if a.get("step") is True:
+                out[name]["step"] = "".join(steps)
+                out[name]["stepWhy"] = step_why
         elif not a.get("command"):
             k["awaiting"] = True
         kernels.append(k)
@@ -258,6 +273,8 @@ def board(registry, results, cases, drawings):
         "reasons": list(strings["reasons"]),
         "workarounds": list(strings["workarounds"]),
         "elegance": list(strings["elegance"]),
+        "stepReasons": list(strings["stepReasons"]),
+        "stepVerdicts": {v[0]: k for k, v in STEP_VERDICTS.items()},
     }
 
 
@@ -402,7 +419,8 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
         neat = r["elegance"].get(cid)
         facets = r["faceted"].get(cid)
         entries.append({"name": name, "row": row, "outcome": o, "stl": href, "mb": mb,
-                        "step": step_href, "wa": wa,
+                        "step": step_href, "writes": registry.get(name, {}).get("step"),
+                        "wa": wa,
                         "neat": neat, "facets": facets, "src": src, "code": code,
                         "loc": None if code is None else loc(code, src),
                         "label": "–" if o == "missing" else
@@ -513,11 +531,49 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
 KEYS = ("volume", "area")
 
 # how a STEP file represents its solid (harness/step.py's `form`), in words
-FORMS = {"advanced": "B-rep of advanced faces, each on a surface",
+FORMS = {"advanced": "advanced faces, each on a surface",
          "faceted": "faceted B-rep: polygons, no surfaces",
          "tessellated": "triangles (AP242 tessellated), no B-rep",
          "surfaces": "faces on surfaces, but no solid",
          "none": "no solid and no faces"}
+
+
+# a result's STEP verdict (harness/step.py's `verdict`, SPEC.md "STEP"): its letter in
+# board.json, its word on the board, what it means, and the outcome whose colour its badge takes
+# (as board.js's STEP_VERDICTS).
+# `unrun` is a solid built before its kernel's runner was asked for STEP.
+STEP_VERDICTS = {
+    "brep": ("b", "B-rep", "a solid of advanced faces, each on a surface, its shell closed", "pass"),
+    "faceted": ("f", "faceted", "a mesh stored as a B-rep: polygons, or faces that are mostly "
+                "flat triangles", "built"),
+    "triangles": ("t", "triangles", "tessellated triangles, and no B-rep", "built"),
+    "open": ("o", "open", "faces that do not close into a solid", "wrong"),
+    "empty": ("e", "empty", "no solid and no faces", "wrong"),
+    "refused": ("r", "refused", "its kernel's STEP writer declined the solid", "refused"),
+    "failed": ("x", "failed", "the runner failed to write STEP", "crashed"),
+    "unrun": ("?", "not yet run", "built before its runner was asked for STEP", "missing"),
+}
+# outcomes of a run that built a solid, which a kernel that writes STEP is asked to write
+BUILT = ("pass", "built", "wrong")
+
+
+def step_verdict(row, writes):
+    """A result's STEP verdict (a key of STEP_VERDICTS), given its kernel's `step` in
+    kernels.json; None where it built no solid, or its kernel writes no STEP."""
+    if writes is not True or not row or row["outcome"] not in BUILT:
+        return None
+    made = row.get("step")
+    return step.verdict(made) if made else "unrun"
+
+
+def step_kernel(writes):
+    """What a kernel's `step` in kernels.json says of it, in words, for a solid it built: None
+    for a kernel that writes STEP."""
+    if writes is True:
+        return None
+    if writes:
+        return f"cannot write STEP: {writes}"
+    return "not set up: its runner has not been set up to write STEP"
 
 
 def size_text(mb):
@@ -528,13 +584,28 @@ def counted(counts):
     return ", ".join(f"{n} {k}" for k, n in counts.items())
 
 
-def step_facts(made, faces):
-    """The data rows for what a result's STEP file says its solid is made of (harness/step.py),
-    or why it has none; `faces` its runner's own count, set beside the file's."""
+def step_badge(verdict):
+    _, word, means, colour = STEP_VERDICTS[verdict]
+    return f"<span class='badge {colour}' title='{html.escape(means)}'>{word}</span>"
+
+
+def step_facts(row, writes, faces):
+    """The data rows for a result's STEP (harness/step.py): its verdict and what its file says
+    the solid is made of, or why it has none (its kernel's writer refused, the runner failed, its
+    kernel cannot write STEP or has not been set up to); `faces` its runner's own count, set
+    beside the file's. None where it built no solid."""
     e = html.escape
-    if "error" in made:
-        return [("STEP", f"<span class=muted>none: {e(made['error'])}</span>")]
-    form = f"{e(FORMS.get(made['form'], made['form']))}"
+    if not row or row["outcome"] not in BUILT:
+        return []
+    if writes is not True:
+        return [("STEP", f"<span class='badge missing'>{'cannot' if writes else 'not set up'}"
+                         f"</span> <span class=muted>{e(step_kernel(writes))}</span>")]
+    verdict = step_verdict(row, writes)
+    made = row.get("step") or {}
+    if verdict in ("refused", "failed", "unrun"):
+        why = made.get("refused") or made.get("error") or STEP_VERDICTS[verdict][2]
+        return [("STEP", f"{step_badge(verdict)} <span class=muted>{e(why)}</span>")]
+    form = f"{step_badge(verdict)} {e(FORMS.get(made['form'], made['form']))}"
     if made.get("schema"):
         form += f" <span class=muted>{e(made['schema'])}</span>"
     rows = [("STEP", form)]
@@ -546,7 +617,11 @@ def step_facts(made, faces):
         surfaces += f" <span class=muted>(its runner counts {said})</span>"
     rows.append(("STEP faces", surfaces))
     if made["edges"]:
-        rows.append(("STEP edges", f"{made['edges']}: {e(counted(made['curves']))}"))
+        edges = f"{made['edges']}: {e(counted(made['curves']))}"
+        if made.get("unpaired"):
+            edges += (f"; {made['unpaired']} not bounding exactly two sides of faces, so the "
+                      "shell is open")
+        rows.append(("STEP edges", edges))
     rows.append(("STEP topology", f"{made['solids']} solid{'' if made['solids'] == 1 else 's'}, "
                  f"{made['shells']} shell{'' if made['shells'] == 1 else 's'}, "
                  f"{made['faces']} faces, {made['loops']} loops, {made['edges']} edges, "
@@ -653,9 +728,7 @@ def entry(en, exp):
     if en["stl"]:
         facts.append(("STL", f"<a href='{en['stl']}' download>download</a> "
                              f"<span class=muted>{size_text(en['mb'])}</span>"))
-    made = (row or {}).get("step")
-    if made:
-        facts += step_facts(made, faces)
+    facts += step_facts(row, en["writes"], faces)
     if facts:
         out.append("<table class=facts>" + "".join(
             f"<tr><th scope=row>{k}</th><td>{v}</td></tr>" for k, v in facts) + "</table>")

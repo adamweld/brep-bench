@@ -1,13 +1,17 @@
 //! The brep-bench runner for SolidCraft (https://solidcraft.io), on its B-rep kernel boundary,
 //! the `solidcraft-kernel` crate.
 //!
-//!     brep-bench-solidcraft CASE OUT.stl
+//!     brep-bench-solidcraft CASE OUT.stl [OUT.step]
 //!     brep-bench-solidcraft --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
 //! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
 //! line of JSON: the solid's faces by surface kind and whether it passes SolidCraft's own
 //! validity check, or a refusal.
+//!
+//! Given `OUT.step`, it also writes the solid there as STEP (AP242) with the kernel's own writer,
+//! `solidcraft_kernel::step_export`, the one SolidCraft's app exports a body with. Where the
+//! writer declines the solid, no file is written and the reply says why in `step_error`.
 //!
 //! SolidCraft measures a solid from its tessellations (`solidcraft_kernel::measure`: fine and
 //! medium meshes, face by face), so the runner answers `"measured": "mesh"` and the harness takes
@@ -17,7 +21,7 @@
 //! its own words, where the kernel has no operation for what it describes. A boolean the kernel
 //! answers is empty is not a refusal but an answer: the runner reports an empty solid.
 use serde_json::{Value, json};
-use solidcraft_kernel::{Body, FaceSurface, KernelError, face_surface, measure};
+use solidcraft_kernel::{Body, FaceSurface, KernelError, face_surface, measure, step_export};
 use std::collections::BTreeMap;
 use std::process::ExitCode;
 
@@ -119,6 +123,19 @@ fn report(body: &Body, out: &str) -> Result<Value, KernelError> {
     Ok(reply)
 }
 
+/// `bodies` written as STEP to `path` by SolidCraft's writer, or, where it declines them, why
+/// (and no file). The writer turns a panic in truck's STEP writer under it into an error of its
+/// own, and declines an empty list ("nothing to export").
+fn step(bodies: &[&Body], path: &str) -> Option<String> {
+    match step_export(bodies, "SolidCraft") {
+        Ok(text) => {
+            std::fs::write(path, text).expect("the STEP file writes");
+            None
+        }
+        Err(e) => Some(e.to_string()),
+    }
+}
+
 fn refused(why: impl std::fmt::Display) -> Value {
     json!({"status": "refused", "reason": why.to_string()})
 }
@@ -133,21 +150,40 @@ fn main() -> ExitCode {
         );
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-solidcraft CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-solidcraft CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
-    let reply = match build().and_then(|body| Ok(report(&body, out)?)) {
+    let reply = match build().and_then(|body| {
+        let mut reply = report(&body, out)?;
+        if let Some(path) = out_step
+            && let Some(why) = step(&[&body], path)
+        {
+            reply["step_error"] = json!(why);
+        }
+        Ok(reply)
+    }) {
         Ok(reply) => reply,
         // the kernel said the solid is empty: no triangles, and the measures of nothing
         Err(Refusal(why)) if why.contains(solids::EMPTY) => {
             std::fs::write(out, stl(&solidcraft_geom::Mesh::default())).expect("the STL file writes");
-            json!({"status": "ok", "measured": "mesh", "faces": {}, "valid": false,
-                   "problems": [why]})
+            let mut reply = json!({"status": "ok", "measured": "mesh", "faces": {}, "valid": false,
+                                   "problems": [why]});
+            // and no solid to write as STEP: the writer is given none, and says so
+            if let Some(path) = out_step
+                && let Some(why) = step(&[], path)
+            {
+                reply["step_error"] = json!(why);
+            }
+            reply
         }
         Err(e) => refused(e),
     };

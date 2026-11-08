@@ -15,6 +15,10 @@ solidcore-ops = { git = "https://github.com/tangency-labs/solidcore", rev = "8d7
 solidcore-tess = { git = "https://github.com/tangency-labs/solidcore", rev = "8d74f1f19fdf4b61be99c462a2e41c979d2a7f63" }
 solidcore-record = { git = "https://github.com/tangency-labs/solidcore", rev = "8d74f1f19fdf4b61be99c462a2e41c979d2a7f63" }
 solidcore-convert = { git = "https://github.com/tangency-labs/solidcore", rev = "8d74f1f19fdf4b61be99c462a2e41c979d2a7f63" }
+# solidcore's STEP writer, for a run asked for STEP: step-brep maps the kernel's body to the neutral
+# STEP model and step-export writes that model as a Part 21 file.
+step-brep = { git = "https://github.com/tangency-labs/solidcore", rev = "8d74f1f19fdf4b61be99c462a2e41c979d2a7f63" }
+step-export = { git = "https://github.com/tangency-labs/solidcore", rev = "8d74f1f19fdf4b61be99c462a2e41c979d2a7f63" }
 
 [profile.release]
 debug = 0

@@ -1,17 +1,18 @@
 //! The brep-bench runner for next.BREP's kernel
 //! (https://github.com/mmiscool/next.BREP.io_RUST_BREP_KERNEL, `BREP_kernel` on crates.io).
 //!
-//!     brep-bench-next-brep CASE OUT.stl
+//!     brep-bench-next-brep CASE OUT.stl [OUT.step]
 //!     brep-bench-next-brep --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
-//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
+//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` (and, if asked,
+//! the solid to `OUT.step` with the kernel's own STEP writer, `export_step`, AP242) and prints one
 //! line of JSON: the kernel's own measures of the solid (`solid_mass_properties`, integrated from
 //! the B-rep), its faces by surface kind and whether it passes the kernel's validation, or a
 //! refusal. A kernel error is a refusal: the kernel declined, saying why. A case may also refuse in
 //! its own words, where the kernel has no operation for what it describes.
 use brep_kernel::{
-    solid_mass_properties, tessellate_brep_watertight, write_binary_stl, AnalyticSurface,
+    export_step, solid_mass_properties, tessellate_brep_watertight, write_binary_stl, AnalyticSurface,
     BrepSolid, KernelRefusal,
 };
 use serde_json::{json, Value};
@@ -176,8 +177,10 @@ fn ascii_stl(points: &[[f64; 3]], indices: &[u32]) -> Vec<u8> {
     text.into_bytes()
 }
 
-/// The measures, face kinds and validity of `solid`, its triangles written to `out`.
-fn report(solid: &BrepSolid, out: &str) -> Result<Value, Refusal> {
+/// The measures, face kinds and validity of `solid`, its triangles written to `out`; with
+/// `out_step`, the solid written there as STEP, or why the kernel's writer would not
+/// (`step_error`).
+fn report(solid: &BrepSolid, out: &str, out_step: Option<&str>, case: &str) -> Result<Value, Refusal> {
     let props = solid_mass_properties(solid).map_err(|e| format!("not measured: {e}"))?;
     let mut faces: BTreeMap<&str, usize> = BTreeMap::new();
     for face in solid.shells.iter().flat_map(|s| &s.faces) {
@@ -186,10 +189,19 @@ fn report(solid: &BrepSolid, out: &str) -> Result<Value, Refusal> {
     let valid = solid.validate().iter().all(|issue| issue.severity != "error");
     let (bytes, _) = triangles(solid, props.volume, props.surface_area)?;
     std::fs::write(out, bytes).expect("the STL file writes");
-    Ok(json!({
+    let mut reply = json!({
         "status": "ok", "volume": props.volume, "area": props.surface_area, "faces": faces,
         "valid": valid,
-    }))
+    });
+    if let Some(path) = out_step {
+        // the body is in millimetres, the unit the file is labelled with; no time stamp, so the
+        // same case writes the same file
+        match export_step(std::slice::from_ref(solid), case, "millimeter", "") {
+            Ok(step) => std::fs::write(path, step).expect("the STEP file writes"),
+            Err(e) => reply["step_error"] = json!(e),
+        }
+    }
+    Ok(reply)
 }
 
 fn refused(why: impl std::fmt::Display) -> Value {
@@ -203,15 +215,19 @@ fn main() -> ExitCode {
                  env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-next-brep CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-next-brep CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
-    let reply = match build().and_then(|solid| report(&solid, out)) {
+    let reply = match build().and_then(|solid| report(&solid, out, out_step, case)) {
         Ok(reply) => reply,
         Err(e) => refused(e),
     };

@@ -1,6 +1,6 @@
 //! The brep-bench runner for geop (https://github.com/geop-cad/geop).
 //!
-//!     brep-bench-geop CASE OUT.stl
+//!     brep-bench-geop CASE OUT.stl [OUT.step]
 //!     brep-bench-geop --version
 //!
 //! A geop part is a program: an ordered list of steps, each an operation with its arguments,
@@ -13,14 +13,19 @@
 //! one a NURBS: geop has no other kind of surface) and its validity check
 //! (`validation::validate`). The solids are meshed into OUT.stl by geop's rasterizer, as finely as
 //! geop meshes an STL file (its `STL_QUALITY`, refined to each face's curvature), and
-//! one line of JSON is printed. A step that fails is a refusal: the kernel declined, saying why.
-//! A case may also refuse in its own words, where geop has no operation for what it describes.
+//! one line of JSON is printed. Given `OUT.step`, the part's bodies are also written there by
+//! geop's own STEP writer (`geop_ops_step::write_step`, AP214, every surface and curve the NURBS
+//! geop holds), the product named after the case; where the writer fails, nothing is written and
+//! the reply says why in `step_error`. A step that fails is a refusal: the kernel declined,
+//! saying why. A case may also refuse in its own words, where geop has no operation for what it
+//! describes.
 //! The runner never reads the case's description.
 use geop_core_math::primitives::TriangleFace;
 use geop_core_rasterize::rasterize;
 use geop_core_topology::validation::{ValidationParameters, validate};
 use geop_core_topology::{Model, SolidId};
 use geop_ops_model::{NamedModel, STL_QUALITY};
+use geop_ops_step::write_step;
 use std::collections::HashMap;
 use std::process::ExitCode;
 
@@ -119,8 +124,15 @@ fn measures(model: &Model, solid: SolidId) -> Result<(f64, f64, bool), Refusal> 
 }
 
 /// The reply for the part built: the measures of its solids, once their triangles are written.
-/// Measuring, checking and meshing it are independent, and run side by side.
-fn measured(part: &NamedModel, out: &str) -> Result<String, Refusal> {
+/// Measuring, checking and meshing it are independent, and run side by side. With `out_step`,
+/// the part is then written there as STEP, the product called `name`, or the reply says why geop
+/// would not (`step_error`).
+fn measured(
+    part: &NamedModel,
+    out: &str,
+    out_step: Option<&str>,
+    name: &str,
+) -> Result<String, Refusal> {
     let model = part.topology();
     let solids: Vec<_> = model.solids.keys().copied().collect();
     if solids.is_empty() {
@@ -149,8 +161,18 @@ fn measured(part: &NamedModel, out: &str) -> Result<String, Refusal> {
     }
     std::fs::write(out, stl(&triangles)).map_err(|e| format!("{out} not written: {e}"))?;
     let valid = valid && converged;
+    let mut step_error = String::new();
+    if let Some(path) = out_step {
+        match write_step(part, name) {
+            Ok(text) => std::fs::write(path, text).expect("the STEP file writes"),
+            Err(e) => {
+                let why = Refusal::from(e).to_string();
+                step_error = format!(",\"step_error\":{}", quoted(&why));
+            }
+        }
+    }
     Ok(format!(
-        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{\"bspline\":{faces}}},\"valid\":{valid}}}"
+        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{\"bspline\":{faces}}},\"valid\":{valid}{step_error}}}"
     ))
 }
 
@@ -160,9 +182,13 @@ fn main() -> ExitCode {
         println!("geop {} (brep-bench runner {})", env!("KERNEL_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [_, case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-geop CASE OUT.stl");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [_, case, out] => (case, out, None),
+        [_, case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-geop CASE OUT.stl [OUT.step]");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
@@ -170,7 +196,11 @@ fn main() -> ExitCode {
     };
     let mut bench = Bench::new();
     let reply = match build(&mut bench).and_then(|()| bench.model()) {
-        Ok(part) => measured(&part, out).unwrap_or_else(|why| refused(&why.to_string())),
+        Ok(part) => {
+            // The product is named as geop's editor names it after a program's file: the case's.
+            let name = case.rsplit('/').next().unwrap_or(case);
+            measured(&part, out, out_step, name).unwrap_or_else(|why| refused(&why.to_string()))
+        }
         Err(why) => refused(&why.to_string()),
     };
     println!("{reply}");

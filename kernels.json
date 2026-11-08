@@ -73,6 +73,7 @@
         "--version"
       ],
       "source": "kernels/arris/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/arris/target/release/brep-bench-arris"]
     },
     {
@@ -96,6 +97,7 @@
         "--version"
       ],
       "source": "kernels/kentron/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/kentron/target/release/brep-bench-kentron"]
     },
     {
@@ -145,6 +147,7 @@
         "--version"
       ],
       "source": "kernels/solidcraft/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/solidcraft/target/release/brep-bench-solidcraft"]
     },
     {
@@ -168,6 +171,7 @@
         "--version"
       ],
       "source": "kernels/brepkit/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/brepkit/target/release/brep-bench-brepkit"]
     },
     {
@@ -191,6 +195,7 @@
         "--version"
       ],
       "source": "kernels/popkern/cases/{category}/{name_snake}.rhai",
+      "step": true,
       "binary": ["kernels/popkern/target/release/brep-bench-popkern"]
     },
     {
@@ -214,6 +219,7 @@
       ],
       "measured": "mesh",
       "source": "kernels/aetheris/cases/{category}/{name_snake}.firmament",
+      "step": true,
       "binary": ["kernels/aetheris/bin/Release/net10.0/*.dll"]
     },
     {
@@ -237,6 +243,7 @@
         "--version"
       ],
       "source": "kernels/next.BREP/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/next.BREP/target/release/brep-bench-next-brep"]
     },
     {
@@ -260,6 +267,7 @@
         "--version"
       ],
       "source": "kernels/solidcore/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/solidcore/target/release/brep-bench-solidcore"]
     },
     {
@@ -283,6 +291,7 @@
         "--version"
       ],
       "source": "kernels/geop/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/geop/target/release/brep-bench-geop"]
     },
     {
@@ -306,6 +315,7 @@
         "--version"
       ],
       "source": "kernels/cadrs/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/cadrs/target/release/brep-bench-cadrs"]
     }
   ]

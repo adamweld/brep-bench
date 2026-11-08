@@ -1,21 +1,26 @@
 //! The brep-bench runner for brepkit (https://github.com/andymai/brepkit, the `brepkit-*` crates on
 //! crates.io).
 //!
-//!     brep-bench-brepkit CASE OUT.stl
+//!     brep-bench-brepkit CASE OUT.stl [OUT.step]
 //!     brep-bench-brepkit --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
-//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
-//! line of JSON: the kernel's own measures of the solid (`measure::solid_volume` and
-//! `measure::solid_surface_area`), its faces by surface kind and whether it passes
-//! `validate::validate_solid`, or a refusal. A kernel error is a refusal: the kernel declined,
-//! saying why. A case may also refuse in its own words, where the kernel has no operation for what
-//! it describes.
+//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` (and, if asked,
+//! the solid to `OUT.step` with brepkit's own STEP writer, `brepkit_io::step::write_step`, which
+//! writes AP203) and prints one line of JSON: the kernel's own measures of the solid
+//! (`measure::solid_volume` and `measure::solid_surface_area`), its faces by surface kind and
+//! whether it passes `validate::validate_solid`, or a refusal. A kernel error is a refusal: the
+//! kernel declined, saying why. A case may also refuse in its own words, where the kernel has no
+//! operation for what it describes.
 //!
 //! brepkit measures exactly where it can (planar solids, analytic primitives, solids of planes and
 //! quadrics) and otherwise integrates a tessellation of its exact faces; the runner asks it for a
 //! fine one. The solid's triangles are `tessellate::tessellate_solid_with_tolerance`, which shares
 //! each edge's points between its two faces, so the mesh is welded by the kernel itself.
+//!
+//! Where brepkit's STEP writer declines a solid, the reply says why in `step_error` and no STEP
+//! file is written. The writer serializes each solid's outer shell only (its documentation says
+//! so): a solid with voids is written without them.
 use brepkit_operations::measure::{solid_bounding_box, solid_surface_area, solid_volume};
 use brepkit_operations::tessellate::{tessellate_solid_with_tolerance, TriangleMesh};
 use brepkit_operations::validate::validate_solid;
@@ -151,8 +156,14 @@ fn stl(meshes: &[TriangleMesh]) -> Vec<u8> {
     out
 }
 
-/// The measures, face kinds and validity of `solids`, their triangles written to `out`.
-fn report(topo: &Topology, solids: &[SolidId], out: &str) -> Result<Value, Refusal> {
+/// The measures, face kinds and validity of `solids`, their triangles written to `out` and, if
+/// asked, the solids to `out_step` as STEP, or why brepkit would not (`step_error`).
+fn report(
+    topo: &Topology,
+    solids: &[SolidId],
+    out: &str,
+    out_step: Option<&str>,
+) -> Result<Value, Refusal> {
     if solids.is_empty() {
         return Err("the operation left no solid".into());
     }
@@ -176,9 +187,16 @@ fn report(topo: &Topology, solids: &[SolidId], out: &str) -> Result<Value, Refus
         meshes.push(mesh);
     }
     std::fs::write(out, stl(&meshes)).expect("the STL file writes");
-    Ok(json!({
+    let mut reply = json!({
         "status": "ok", "volume": volume, "area": area, "faces": faces, "valid": valid,
-    }))
+    });
+    if let Some(path) = out_step {
+        match brepkit_io::step::write_step(topo, solids) {
+            Ok(step) => std::fs::write(path, step).expect("the STEP file writes"),
+            Err(e) => reply["step_error"] = json!(e.to_string()),
+        }
+    }
+    Ok(reply)
 }
 
 fn refused(why: impl std::fmt::Display) -> Value {
@@ -191,16 +209,20 @@ fn main() -> ExitCode {
         println!("brepkit {} (runner {})", env!("KERNEL_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-brepkit CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-brepkit CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
     let mut topo = Topology::new();
-    let reply = match build(&mut topo).and_then(|solids| report(&topo, &solids, out)) {
+    let reply = match build(&mut topo).and_then(|solids| report(&topo, &solids, out, out_step)) {
         Ok(reply) => reply,
         Err(e) => refused(e),
     };

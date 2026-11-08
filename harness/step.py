@@ -23,7 +23,23 @@ The make-up (`makeup`):
   as the curve in space it lies along;
 - `triangles`: how many of the faces are flat triangles (a plane bounded by one loop of three
   edges): a mesh stored as faces;
+- `unpaired`: how many edges do not bound exactly two sides of faces (a seam bounds both sides of
+  one face): none, in the closed shell of a solid; absent where the faces are not bounded by edges
+  (a faceted B-rep's polygons);
 - `tessellated`: for a tessellated file, its triangles.
+
+`verdict` judges a make-up, for the board (SPEC.md, "STEP"):
+
+- `brep`: a solid of advanced faces, each on a surface, its shell closed (no edge unpaired);
+- `faceted`: a mesh stored as a B-rep: a FACETED_BREP, or advanced faces at least half of which
+  are flat triangles, of FACETED_LEAST or more;
+- `triangles`: AP242's tessellated faces, no B-rep;
+- `open`: faces on surfaces that do not close into a solid: no solid, or edges unpaired;
+- `empty`: no solid and no faces.
+
+The verdict of a STEP the runner did not write is `refused` (its kernel's writer declined, and the
+runner said why) or `failed` (the runner crashed or ran out of time on it, wrote nothing and said
+nothing, or wrote a file that could not be read).
 """
 import json
 import re
@@ -184,6 +200,8 @@ def makeup(schema, entities):
     faces = all_of(FACES)
     surfaces, curves = {}, {}
     loops, edges, vertices = set(), set(), set()
+    # each edge's uses by the faces' loops: two, in a closed shell
+    uses = {}
     triangles = 0
     for f in faces:
         face = entities[f]
@@ -211,6 +229,7 @@ def makeup(schema, entities):
                     continue
                 # ORIENTED_EDGE('', *, *, edge, sense): the edge is named last
                 edges.add(oriented.refs[-1])
+                uses[oriented.refs[-1]] = uses.get(oriented.refs[-1], 0) + 1
                 face_edges += 1
         if face_kind == "plane" and face_loops == 1 and face_edges == 3:
             triangles += 1
@@ -245,9 +264,37 @@ def makeup(schema, entities):
            "surfaces": dict(sorted(surfaces.items(), key=lambda x: -x[1])),
            "curves": dict(sorted(curves.items(), key=lambda x: -x[1])),
            "triangles": triangles}
+    if edges:
+        out["unpaired"] = sum(1 for n in uses.values() if n != 2)
     if tessellated:
         out["tessellated"] = len(tessellated)
     return out
+
+
+# a solid of advanced faces is judged faceted where it has at least this many faces, at least half
+# of them flat triangles: a mesh stored as faces (the board's own mark compares kernels' counts)
+FACETED_LEAST = 50
+
+
+def verdict(made):
+    """The judgement of a result's `step` (its make-up, or {"refused": why} or {"error": why}):
+    one of the words the module's docstring lists."""
+    if "refused" in made:
+        return "refused"
+    if "error" in made:
+        return "failed"
+    form = made["form"]
+    if form == "faceted":
+        return "faceted"
+    if form == "tessellated":
+        return "triangles"
+    if form == "none":
+        return "empty"
+    if form != "advanced" or made.get("unpaired"):
+        return "open"
+    if made["faces"] >= FACETED_LEAST and 2 * made["triangles"] >= made["faces"]:
+        return "faceted"
+    return "brep"
 
 
 def read(path):
@@ -263,4 +310,5 @@ def read(path):
 
 
 if __name__ == "__main__":
-    print(json.dumps(read(sys.argv[1]), indent=1))
+    made = read(sys.argv[1])
+    print(json.dumps({**made, "verdict": verdict(made)}, indent=1))

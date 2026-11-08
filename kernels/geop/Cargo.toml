@@ -30,6 +30,7 @@ geop-ops-surface = { git = "https://github.com/geop-cad/geop", tag = "v0.14.0" }
 geop-ops-edit = { git = "https://github.com/geop-cad/geop", tag = "v0.14.0" }
 geop-ops-pattern = { git = "https://github.com/geop-cad/geop", tag = "v0.14.0" }
 geop-ops-hole = { git = "https://github.com/geop-cad/geop", tag = "v0.14.0" }
+geop-ops-step = { git = "https://github.com/geop-cad/geop", tag = "v0.14.0" }
 
 [profile.release]
 debug = 0

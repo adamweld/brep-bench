@@ -1,4 +1,4 @@
-# brep-bench specification, version 1.13
+# brep-bench specification, version 1.14
 
 brep-bench works like Rosetta Code. Each **case** describes a solid in plain words and gives its
 volume and area as closed forms. Each **kernel** has its own **implementation** of each case,
@@ -206,8 +206,11 @@ given a case id it has no implementation of, exit without building anything (wit
 refusing): the harness times that, as what starting the runner costs.
 
 **STEP.** A runner whose kernel can write its solid as STEP (ISO 10303-21, AP203, AP214 or AP242)
-may say so in `kernels.json` (`"step": true`). For each case such a kernel builds (passes, builds
-or answers wrong), the harness then runs it a second time with a third argument, the file to write:
+should, and says so in `kernels.json` (`"step": true`). A kernel with no STEP writer says that
+instead, and why (`"step": "the kernel has no STEP writer"`), so the board can tell a kernel that
+cannot write STEP from one whose runner has not been set up to (no `step` at all). For each case
+a kernel with `"step": true` builds (passes, builds or answers wrong), the harness runs it a second
+time with a third argument, the file to write:
 
 ```
 <command> CASE OUT.stl OUT.step
@@ -215,13 +218,30 @@ or answers wrong), the harness then runs it a second time with a third argument,
 
 The runner builds the case as before and also writes the solid to `OUT.step` with its kernel's own
 STEP writer, as the kernel's users would; it may not write or rewrite STEP itself. Where the writer
-declines, the runner writes no file, answers as it would have, and may say why in `step_error`.
-The STEP run is not timed, and its reply is not graded again. The harness reads the file for what
-the solid is made of (`harness/step.py`): how its boundary is represented (advanced faces on
-surfaces, a faceted B-rep, or triangles), its solids, shells, faces, loops, edges and vertices,
-its faces by surface and its edges by curve, and how many faces are flat triangles. That is the
-evidence for `faces` that a runner's word alone is not, as its triangles are for its measures;
-like `faces`, it is shown and not graded.
+declines the solid, the runner writes no file, answers as it would have, and says why in
+`step_error`, in the writer's own words where it has them: the kernel **refused** STEP for that
+case. A runner that crashes or runs out of time on the STEP run, writes no file and gives no
+`step_error`, or writes a file that cannot be read **failed** to write STEP. The STEP run is not
+timed, and its reply is not graded again; the runner should do nothing for STEP when it is not
+asked, so that the timed run is not slowed.
+
+The harness reads the file for what the solid is made of (`harness/step.py`): how its boundary is
+represented (advanced faces on surfaces, a faceted B-rep, or triangles), its solids, shells, faces,
+loops, edges and vertices, its faces by surface and its edges by curve, how many faces are flat
+triangles, and how many edges do not bound exactly two sides of faces (none, in a closed shell).
+That is the evidence for `faces` that a runner's word alone is not, as its triangles are for its
+measures. It judges the file one of:
+
+| verdict | the file holds |
+| --- | --- |
+| **B-rep** | a solid of advanced faces, each on a surface, its shell closed |
+| **faceted** | a mesh stored as a B-rep: a faceted B-rep, or 50 or more advanced faces, at least half of them flat triangles |
+| **triangles** | AP242's tessellated faces, and no B-rep |
+| **open** | faces on surfaces that do not close into a solid: no solid, or edges that do not pair |
+| **empty** | no solid and no faces |
+
+beside **refused** and **failed** where there is no file to judge. Like `faces`, the verdict is
+shown and not graded.
 
 **Welding.** The harness joins only vertices whose coordinates are exactly equal. A runner may weld
 its triangles with its own kernel's tools, but no further: a gap the kernel leaves is the kernel's
@@ -295,13 +315,17 @@ One entry per kernel:
 | `version` | the command that prints the kernel's version |
 | `source` | the pattern of an implementation's path |
 | `measured` | `"mesh"` for a kernel with no exact measures |
-| `step` | `true` for a kernel whose runner writes its solid as STEP when given a third argument |
+| `step` | `true` for a kernel whose runner writes its solid as STEP when given a third argument; for a kernel that cannot, why not (a string); left out where the runner has not been set up for it |
 | `binary` | the files of the kernel's binary, whose size the harness measures after the build: paths or glob patterns relative to the repository (a directory counts every file under it), or a Python distribution, `{"python": "python3", "distribution": NAME}`; beside the language runtime its runner runs on and the system's libraries |
 | `note` | shown beside the kernel on the board (e.g. that no new implementations are being written) |
 | `reference` | `true` for the kernel whose results the drawings are made from where it passes (else the first kernel that does) |
 
 ## Versions
 
+- **1.14:** every runner whose kernel can write STEP should; a kernel that cannot says why in
+  `kernels.json`. A writer's declining is a refusal (`step_error`), told apart from a failure, and
+  the harness judges each file (B-rep, faceted, triangles, open or empty), shown and not graded.
+  Grading is as in 1.9.
 - **1.13:** a runner may write its solid as STEP, with its kernel's own writer, when given a third
   argument; a kernel that does says `"step": true` in `kernels.json`. The harness reads the file
   for what the solid is made of, in an untimed run of its own, and shows it. Grading is as in 1.9.

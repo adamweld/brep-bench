@@ -1,13 +1,15 @@
 //! The brep-bench runner for arris (https://github.com/arris-labs/arris).
 //!
-//!     brep-bench-arris CASE OUT.stl
+//!     brep-bench-arris CASE OUT.stl [OUT.step]
 //!     brep-bench-arris --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
-//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
-//! line of JSON: arris's own measures of the solid, its faces by surface kind and whether it passes
-//! arris's checker, or a refusal. An arris error is a refusal: the kernel declined, saying why. A
-//! case may also refuse in its own words, where arris has no operation for what it describes.
+//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` (and, if asked,
+//! the solid to `OUT.step` with arris's own STEP writer, `arris::io::step::write`, which writes
+//! AP214) and prints one line of JSON: arris's own measures of the solid, its faces by surface kind
+//! and whether it passes arris's checker, or a refusal. An arris error is a refusal: the kernel
+//! declined, saying why. A case may also refuse in its own words, where arris has no operation for
+//! what it describes.
 use arris::check::{check, Level};
 use arris::geom::SurfaceKind;
 use arris::math::Control;
@@ -76,8 +78,9 @@ fn kind(k: SurfaceKind) -> &'static str {
     }
 }
 
-/// The measures, face kinds and validity of `body`, its triangles written to `out`.
-fn report(m: &Model, body: Body, out: &str) -> Result<Value, OpError> {
+/// The measures, face kinds and validity of `body`, its triangles written to `out`; with
+/// `out_step`, the body written there as STEP, or why arris would not (`step_error`).
+fn report(m: &Model, body: Body, out: &str, out_step: Option<&str>) -> Result<Value, OpError> {
     let props = mass_properties(m, body, &Control::NONE)?;
     let mut faces: BTreeMap<&str, usize> = BTreeMap::new();
     for f in m.faces(body)? {
@@ -100,9 +103,16 @@ fn report(m: &Model, body: Body, out: &str) -> Result<Value, OpError> {
         Err(e) => return Ok(refused(format!("no STL written: {e}"))),
     };
     std::fs::write(out, bytes).expect("the STL file writes");
-    Ok(json!({
+    let mut reply = json!({
         "status": "ok", "volume": props.volume, "area": props.area, "faces": faces, "valid": valid,
-    }))
+    });
+    if let Some(path) = out_step {
+        match arris::io::step::write(m, &[body]) {
+            Ok(text) => std::fs::write(path, text).expect("the STEP file writes"),
+            Err(e) => reply["step_error"] = json!(e.to_string()),
+        }
+    }
+    Ok(reply)
 }
 
 fn refused(why: impl std::fmt::Display) -> Value {
@@ -115,16 +125,20 @@ fn main() -> ExitCode {
         println!("arris {} (runner {})", env!("ARRIS_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-arris CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-arris CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
     let mut m = Model::default();
-    let reply = match build(&mut m).and_then(|body| Ok(report(&m, body, out)?)) {
+    let reply = match build(&mut m).and_then(|body| Ok(report(&m, body, out, out_step)?)) {
         Ok(reply) => reply,
         Err(e) => refused(e),
     };

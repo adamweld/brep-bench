@@ -28,10 +28,13 @@ kernel's cases keeps its last start-up and binary size. `--one-core` runs each c
 builds a second time, pinned to one core, for its speedup on all of them (Linux only). A kernel
 marked `"step": true` in `kernels.json` runs each case it builds once more, untimed, writing its
 solid as STEP; `harness/step.py` reads the file for what the solid is made of (its form, its
-topology, its faces by surface and edges by curve), and the result keeps that as `step`. The file
+topology, its faces by surface and edges by curve, its unpaired edges), and the result keeps that
+as `step`, or `{"refused": why}` where the kernel's writer declined it, or `{"error": why}` where
+the run failed. The run prints each one's verdict (`STEP brep`, `STEP refused: …`) at the end of
+its line. The file
 is kept beside the triangles, as `results/meshes/<kernel>/<case>.step`, for the case page's
 viewer, if it is no larger than 5 MB: a faceted solid's can run to tens of megabytes (`python3
-harness/step.py FILE` prints the make-up for any STEP file). Each
+harness/step.py FILE` prints the make-up and its verdict for any STEP file). Each
 result file also records its machine and the size of the kernel's binary, as `binary` in
 `kernels.json` names it.
 
