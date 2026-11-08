@@ -308,6 +308,7 @@
         "--version"
       ],
       "source": "kernels/cadrs/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/cadrs/target/release/brep-bench-cadrs"]
     }
   ]

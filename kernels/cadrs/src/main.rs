@@ -1,7 +1,7 @@
 //! The brep-bench runner for cadrs's kernel (https://github.com/rvdende/cadrs, the crate
 //! `cadrs_kernel`).
 //!
-//!     brep-bench-cadrs CASE OUT.stl
+//!     brep-bench-cadrs CASE OUT.stl [OUT.step]
 //!     brep-bench-cadrs --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
@@ -10,7 +10,9 @@
 //! body with the kernel's own tools: its volume and area integrated over the exact B-rep
 //! (`Kernel::mass_properties`), its faces by surface kind, and the kernel's full validity check
 //! (`Body::check_with(CheckLevel::Full)`). It meshes the body with the kernel's tessellator
-//! (`Kernel::tessellate`) into OUT.stl and prints one line of JSON. An operation's error is a
+//! (`Kernel::tessellate`) into OUT.stl and, if asked, writes it as STEP (AP214) into OUT.step with
+//! the kernel's own writer (`Kernel::export_step`; where the writer declines the body, the reply
+//! says why in `step_error`), and prints one line of JSON. An operation's error is a
 //! refusal: the kernel declined, saying why. A case may also refuse in its own words, where the
 //! kernel has no operation for what it describes. The runner never reads the case's description.
 use cadrs_kernel::native::{CheckLevel, Surface};
@@ -161,8 +163,9 @@ fn write_stl(path: &str, mesh: &cadrs_kernel::TriMesh) -> std::io::Result<()> {
 /// 1/50): from a thousandth of the body's size, or a twentieth of its thickness (its volume over
 /// its area) where that is less, at 15°, each step a chord where the volume would be off 0.7 of
 /// that (in proportion to how far off this one is, a half to a sixteenth of it) and half the
-/// angle (to 5°), down to a hundred-thousandth of the size.
-fn measured(k: &DefaultKernel, body: BodyId, out: &str) -> Result<String, Refusal> {
+/// angle (to 5°), down to a hundred-thousandth of the size. With `out_step`, the body is also
+/// written there as STEP by the kernel's writer, or the reply says why it was not (`step_error`).
+fn measured(k: &DefaultKernel, body: BodyId, out: &str, out_step: Option<&str>) -> Result<String, Refusal> {
     let timing = std::env::var_os("BREP_TIMING").is_some();
     let t0 = std::time::Instant::now();
     let lap = |what: &str, t: &mut std::time::Instant| {
@@ -234,8 +237,16 @@ fn measured(k: &DefaultKernel, body: BodyId, out: &str) -> Result<String, Refusa
     }
     write_stl(out, &mesh).map_err(|e| format!("{out} not written: {e}"))?;
     lap(&format!("write {} triangles", mesh.indices.len()), &mut t);
+    let step_error = match out_step.map(|path| (path, k.export_step(&[body]))) {
+        None => String::new(),
+        Some((path, Ok(step))) => {
+            std::fs::write(path, step).expect("the STEP file writes");
+            String::new()
+        }
+        Some((_, Err(e))) => format!(",\"step_error\":{}", quoted(&e.to_string())),
+    };
     Ok(format!(
-        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}}}"
+        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}{step_error}}}"
     ))
 }
 
@@ -249,9 +260,13 @@ fn main() -> ExitCode {
         );
         return ExitCode::SUCCESS;
     }
-    let [_, case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-cadrs CASE OUT.stl");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [_, case, out] => (case, out, None),
+        [_, case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-cadrs CASE OUT.stl [OUT.step]");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
@@ -270,7 +285,7 @@ fn main() -> ExitCode {
         for _ in 0..n {
             let mut k = DefaultKernel::new();
             if let Ok(body) = build(&mut k) {
-                let _ = measured(&k, body, out);
+                let _ = measured(&k, body, out, None);
             }
         }
     }
@@ -283,10 +298,10 @@ fn main() -> ExitCode {
     // (Profiling: the measures and the mesh made over and over, to sample.)
     if let (Ok(body), Some(n)) = (&built, std::env::var("BREP_REPEAT").ok().and_then(|n| n.parse::<usize>().ok())) {
         for _ in 1..n {
-            let _ = measured(&k, *body, out);
+            let _ = measured(&k, *body, out, None);
         }
     }
-    let reply = match built.and_then(|body| measured(&k, body, out)) {
+    let reply = match built.and_then(|body| measured(&k, body, out, out_step)) {
         Ok(reply) => reply,
         Err(why) => refused(&why.to_string()),
     };
