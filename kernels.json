@@ -97,6 +97,7 @@
         "--version"
       ],
       "source": "kernels/kentron/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/kentron/target/release/brep-bench-kentron"]
     },
     {

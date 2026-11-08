@@ -1,15 +1,16 @@
 //! The brep-bench runner for kentron (https://github.com/rsz269/kentron, `kentron` on crates.io).
 //!
-//!     brep-bench-kentron CASE OUT.stl
+//!     brep-bench-kentron CASE OUT.stl [OUT.step]
 //!     brep-bench-kentron --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
 //! `src/cases/boolean/napkin_ring.rs`, in a fresh `Model`, then measures the solid with the
 //! kernel's own tools: its exact volume and area (`properties`, integrated over the B-rep), its
 //! faces by surface kind and its validity check (`validity::check`). It triangulates the solid
-//! into OUT.stl and prints one line of JSON. A kernel error is a refusal: the kernel declined,
-//! saying why. A case may also refuse in its own words, where kentron has no operation for what
-//! it describes. The runner never reads the case's description.
+//! into OUT.stl, writes it as STEP into OUT.step if asked (the kernel's own writer,
+//! `io::step::write`, AP214) and prints one line of JSON. A kernel error is a refusal: the kernel
+//! declined, saying why. A case may also refuse in its own words, where kentron has no operation
+//! for what it describes. The runner never reads the case's description.
 use kentron::geometry::surface::Surface;
 use kentron::math::Point;
 use kentron::meshing::{triangulate, MeshOptions};
@@ -115,8 +116,10 @@ fn write_stl(path: &str, nodes: &[Point], triangles: &[[u32; 3]]) -> std::io::Re
 
 /// The reply for a solid built: its measures, once its triangles are written. The mesh keeps
 /// within a ten-thousandth of the solid's size, or 1/200 of its thickness (its volume over its
-/// area) where that is less: the reference runner's rule (`kernels/occt/run.py`).
-fn measured(m: &mut Model, solid: Shape, out: &str) -> String {
+/// area) where that is less: the reference runner's rule (`kernels/occt/run.py`). With `out_step`,
+/// the solid is also written there as STEP, named after the case; where the writer declines, no
+/// file is written and the reply says why in `step_error`.
+fn measured(m: &mut Model, solid: Shape, out: &str, out_step: Option<&str>, case: &str) -> String {
     let mut faces = BTreeMap::new();
     for f in m.explore(solid, NodeKind::Face).collect::<Vec<_>>() {
         let k = m.surface(f).map_or("other", kind);
@@ -136,12 +139,29 @@ fn measured(m: &mut Model, solid: Shape, out: &str) -> String {
     m.clear_meshes(solid);
     match triangulate(m, solid, options) {
         Ok((nodes, triangles)) => match write_stl(out, &nodes, &triangles) {
-            Ok(()) => format!(
-                "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}}}"
-            ),
+            Ok(()) => {
+                let step_error = out_step.and_then(|path| write_step(m, solid, case, path)).unwrap_or_default();
+                format!(
+                    "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}{step_error}}}"
+                )
+            }
             Err(e) => refused(&format!("{out} not written: {e}")),
         },
         Err(e) => refused(&format!("not meshed: {e}")),
+    }
+}
+
+/// The solid written to `path` as STEP by kentron's writer, or, where it declines, the reply's
+/// `step_error` field saying why in its own words. The file is written whole once the writer has
+/// finished, so a refusal leaves none.
+fn write_step(m: &Model, solid: Shape, case: &str, path: &str) -> Option<String> {
+    let mut step = Vec::new();
+    match kentron::io::step::write(m, solid, case, None, &mut step) {
+        Ok(()) => {
+            std::fs::write(path, step).unwrap_or_else(|e| panic!("{path} not written: {e}"));
+            None
+        }
+        Err(e) => Some(format!(",\"step_error\":{}", quoted(&e.to_string()))),
     }
 }
 
@@ -151,9 +171,13 @@ fn main() -> ExitCode {
         println!("kentron {} (brep-bench runner {})", env!("KERNEL_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [_, case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-kentron CASE OUT.stl");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [_, case, out] => (case, out, None),
+        [_, case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-kentron CASE OUT.stl [OUT.step]");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
@@ -161,7 +185,7 @@ fn main() -> ExitCode {
     };
     let mut model = Model::new();
     let reply = match build(&mut model) {
-        Ok(solid) => measured(&mut model, solid, out),
+        Ok(solid) => measured(&mut model, solid, out, out_step, case),
         Err(why) => refused(&why.to_string()),
     };
     println!("{reply}");
