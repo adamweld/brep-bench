@@ -170,6 +170,7 @@
         "--version"
       ],
       "source": "kernels/brepkit/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/brepkit/target/release/brep-bench-brepkit"]
     },
     {
