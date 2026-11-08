@@ -1,6 +1,6 @@
 // A kernel's page (kernel.html?k=NAME): what it is, its outcomes by category, its refusals by
-// reason, what it got wrong, what it worked around, which implementations are elegant, and how
-// long it took.
+// reason, what it got wrong, what it worked around, which implementations are elegant, which
+// solids are faceted, and how long it took.
 import { load, tally, bar, legend, esc, casePage, kernelPage, OUTCOMES,
          failed, secondsText, megabytesText, quantile } from './board.js';
 import { sortable } from './sort.js';
@@ -107,6 +107,19 @@ function draw(b) {
         esc(lack)}</span></summary><ul>${cases.map((i) => `<li>${link(i)} <span class=muted>${
         k.outcomes[i]}</span></li>`).join('')}</ul></details>`).join('')}`
     : '<p class=muted>None.</p>';
+
+  // faceted solids: a mesh stored as B-rep faces, many times as many as the other kernels'
+  const faceted = all.filter((i) => k.faceted[i] != null);
+  out += `<h2 id=faceted>Faceted</h2>`;
+  out += faceted.length ? `<p class=muted>Solids stored as meshes in B-rep form: at least ten times
+    as many faces as the median of the other kernels' solids of the case, by each runner's own
+    count. The mark changes no grade.</p>
+    <div class=scroll><table><tr><th>case</th><th class=num>faces</th>
+    <th class=num title='the median of the other kernels&#39; solids of the case'>others'</th>
+    <th>outcome</th></tr>${faceted.map((i) => `<tr><td class=case>${link(i)}</td>
+      <td class=num data-v=${k.faces[i]}>${k.faces[i]}</td><td class=num data-v=${k.faceted[i]}>${
+      k.faceted[i]}</td><td class='cell ${k.outcomes[i]}'>${k.outcomes[i]}</td></tr>`).join('')}
+    </table></div>` : '<p class=muted>None.</p>';
 
   // times, CPU time and memory
   const timed = all.filter((i) => k.seconds[i] != null);

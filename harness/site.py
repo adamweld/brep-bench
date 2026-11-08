@@ -19,6 +19,7 @@ import json
 import os
 import re
 import shutil
+import statistics
 import sys
 import tomllib
 import urllib.parse
@@ -77,6 +78,7 @@ def load():
     # kernels.json's order: the board ranks nothing
     order = {name: i for i, name in enumerate(registry)}
     results.sort(key=lambda r: order[r["kernel"]])
+    faceting(results)
     cases = {c["id"]: c for c in read_cases()}
     drawings = {}
     index = os.path.join(SITE, "drawings", "index.json")
@@ -90,6 +92,45 @@ def load():
 # what makes each it calls elegant
 WORKAROUNDS = "workarounds.toml"
 ELEGANCE = "elegance.toml"
+
+
+# A solid is marked faceted where it has at least FACETED_TIMES as many faces as the median of
+# the other kernels' solids of the same case, and at least FACETED_LEAST faces: a mesh stored as
+# B-rep faces, a flat face for every triangle or two, where the others bound the same solid by a
+# few curved faces. Kernels split faces differently (a cylinder cut in two at its seam, a face
+# split where a Boolean crossed it), but by a few times, not tenfold. The counts are the runners'
+# own `faces` (SPEC.md), so the mark is the board's reading of them, not a grade.
+FACETED_TIMES = 10
+FACETED_LEAST = 50
+
+
+def face_count(row):
+    """How many faces a result's solid has, by its runner's word, or None where it built none or
+    did not say."""
+    if not row or row["outcome"] not in ("pass", "built", "wrong") or not row.get("faces"):
+        return None
+    return sum(row["faces"].values())
+
+
+def faceting(results):
+    """Marks each result faceted or not: sets each kernel's `faceted`, by case id, to the median
+    of the other kernels' face counts where its own solid is faceted (see FACETED_TIMES)."""
+    by_case = {}
+    for r in results:
+        for cid, row in r["rows"].items():
+            n = face_count(row)
+            if n is not None:
+                by_case.setdefault(cid, []).append((r["kernel"], n))
+    for r in results:
+        r["faceted"] = {}
+        for cid, row in r["rows"].items():
+            n = face_count(row)
+            others = [m for k, m in by_case.get(cid, []) if k != r["kernel"]]
+            if n is None or not others or n < FACETED_LEAST:
+                continue
+            median = statistics.median(others)
+            if n >= FACETED_TIMES * median:
+                r["faceted"][cid] = median
 
 
 def flags(kernel, name):
@@ -125,7 +166,10 @@ def board(registry, results, cases, drawings):
       `elegance`, -1 for none),
       and the lines of code of its implementation of each case (`loc`, null where it has none),
       and the decimal places its times were kept to (`places`: 3, milliseconds, for a row from
-      before run.py kept microseconds; null where it has no row).
+      before run.py kept microseconds; null where it has no row), and how many faces its solid
+      has by its runner's word (`faces`, null where it built none or did not say) and, where
+      that solid is faceted, the median of the other kernels' (`faceted`, else null; see
+      FACETED_TIMES).
       A kernel's `host` is the machine its last run was made on, and its `startup` what starting
       its runner cost there, building nothing (`seconds`, `cpu`, `mb`, and `one` on one core);
       its `binary` is the size of its binary (`bytes`, `files`), and `of` what kernels.json counts
@@ -165,6 +209,7 @@ def board(registry, results, cases, drawings):
             if start:
                 k["startup"] = {key: start.get(field) for key, field in COSTS.items()}
             codes, why, worked, neat, lines, places = [], [], [], [], [], []
+            faces, faceted = [], []
             spent = {key: [] for key in COSTS}
             for cid in ids:
                 row = r["rows"].get(cid)
@@ -177,6 +222,8 @@ def board(registry, results, cases, drawings):
                     neat.append(-1)
                     lines.append(None)
                     places.append(None)
+                    faces.append(None)
+                    faceted.append(None)
                     continue
                 codes.append(CODES[row["outcome"]])
                 # a missing case has no run, whatever an older row says of its time
@@ -187,8 +234,11 @@ def board(registry, results, cases, drawings):
                 neat.append(intern("elegance", r["elegance"].get(cid)))
                 lines.append(lines_of(a, cid))
                 places.append(row.get("time_places", 3))
+                faces.append(face_count(row))
+                faceted.append(r["faceted"].get(cid))
             out[name] = {"codes": "".join(codes), **spent, "why": why, "workaround": worked,
-                         "elegance": neat, "loc": lines, "places": places}
+                         "elegance": neat, "loc": lines, "places": places, "faces": faces,
+                         "faceted": faceted}
         elif not a.get("command"):
             k["awaiting"] = True
         kernels.append(k)
@@ -339,11 +389,13 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
         o = row["outcome"] if row else "missing"
         wa = r["workarounds"].get(cid)
         neat = r["elegance"].get(cid)
+        facets = r["faceted"].get(cid)
         entries.append({"name": name, "row": row, "outcome": o, "stl": href, "mb": mb, "wa": wa,
-                        "neat": neat, "src": src, "code": code,
+                        "neat": neat, "facets": facets, "src": src, "code": code,
                         "loc": None if code is None else loc(code, src),
                         "label": "–" if o == "missing" else
-                                 o + (" †" if wa else "") + (" ✦" if neat else ""),
+                                 o + (" †" if wa else "") + (" ✦" if neat else "")
+                                 + (" ▦" if facets is not None else ""),
                         "measures": measures(row)})
     # which other results each agrees with
     for en in entries:
@@ -398,8 +450,10 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
                 "</tr>")
         out.append("</table></div>")
         neat = " ✦ an elegant solution." if any(en["neat"] for en in entries) else ""
-        out.append(f"<p class=muted>† works around a missing feature.{neat} Pick an entry to see "
-                   "its solid, its measures and its code.</p>")
+        facets = (" ▦ a faceted solid: a mesh stored as B-rep faces." if
+                  any(en["facets"] is not None for en in entries) else "")
+        out.append(f"<p class=muted>† works around a missing feature.{neat}{facets} Pick an entry "
+                   "to see its solid, its measures and its code.</p>")
 
         # the entry picked (the page's script shows it): its solid in 3D, its time, its notes,
         # its data and its code
@@ -489,6 +543,10 @@ def entry(en, exp):
         out.append(f"<p><strong>Workaround †</strong> {e(en['wa'])}</p>")
     if en["neat"]:
         out.append(f"<p><strong>Elegant ✦</strong> {e(en['neat'])}</p>")
+    if en["facets"] is not None:
+        out.append(f"<p><strong>Faceted ▦</strong> {face_count(row)} faces, where the other "
+                   f"kernels' solids have {en['facets']:g} (the median): a mesh stored as B-rep "
+                   "faces.</p>")
     if row and row.get("measured") == "mesh":
         out.append("<p class=muted>It has no exact measures: its volume and area are its "
                    f"triangles', graded to {FROM_MESH:g}.</p>")
