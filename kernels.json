@@ -291,6 +291,7 @@
         "--version"
       ],
       "source": "kernels/geop/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/geop/target/release/brep-bench-geop"]
     },
     {
