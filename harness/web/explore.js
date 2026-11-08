@@ -40,6 +40,7 @@ const VIEWS = [
   ['differ', 'where the shown kernels differ'],
   ['workaround', 'with a workaround'],
   ['elegance', 'with an elegant solution'],
+  ['faceted', 'with a faceted solid'],
 ];
 
 function start(b) {
@@ -157,6 +158,7 @@ function start(b) {
         }
         case 'workaround': return shown.some((k) => k.workaround[i]);
         case 'elegance': return shown.some((k) => k.elegance[i]);
+        case 'faceted': return shown.some((k) => k.faceted[i] != null);
         default: return true;
       }
     }).map((c) => c.i);
@@ -247,16 +249,19 @@ function start(b) {
       if (o === 'missing') return `<td class='cell missing' title='${esc(k.name)}: no implementation yet'>–</td>`;
       const wa = k.workaround[c.i];
       const neat = k.elegance[c.i];
+      const facets = k.faceted[c.i];
       const seconds = k.seconds[c.i];
       const mb = k.mb[c.i];
       const tip = [`${k.name}: ${o}`, wa && `workaround: ${wa}`, neat && `elegant: ${neat}`,
+                   facets != null && `faceted: ${k.faces[c.i]} faces, the other kernels' median ${facets}`,
                    k.why[c.i],
                    seconds != null && secondsText(seconds),
                    mb != null && megabytesText(mb)].filter(Boolean).join(' · ');
       const shows = state.cells === 'time' ? secondsText(seconds)
         : state.cells === 'memory' ? megabytesText(mb) : o;
       return `<td class='cell ${o}' title='${esc(tip)}'><a href='${casePage(c.id, k.name)}'>${shows}${
-        wa ? ' <span class=wa>†</span>' : ''}${neat ? ' <span class=wa>✦</span>' : ''}</a></td>`;
+        wa ? ' <span class=wa>†</span>' : ''}${neat ? ' <span class=wa>✦</span>' : ''}${
+        facets != null ? ' <span class=wa>▦</span>' : ''}</a></td>`;
     }).join('');
     return `<tr><td class=case><div class=cc>${thumb}<div><a class=t href='${page}'
       title='${esc(c.title)}'>${esc(c.title)}</a><small>${esc(c.id)}${

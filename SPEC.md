@@ -1,4 +1,4 @@
-# brep-bench specification, version 1.12
+# brep-bench specification, version 1.13
 
 brep-bench works like Rosetta Code. Each **case** describes a solid in plain words and gives its
 volume and area as closed forms. Each **kernel** has its own **implementation** of each case,
@@ -199,9 +199,29 @@ The reply's fields:
 - **`valid`** is the kernel's own validity check.
 
 `faces` and `valid` are reported but not graded, because kernels split and check faces differently.
+The board marks a solid whose faces far outnumber the other kernels' solids of the case as
+*faceted*: a mesh stored as B-rep faces (see [the board](docs/board.md)). The mark is not a grade.
 A runner must also answer `--version` with one line naming the kernel and its version, and,
 given a case id it has no implementation of, exit without building anything (with an error, or
 refusing): the harness times that, as what starting the runner costs.
+
+**STEP.** A runner whose kernel can write its solid as STEP (ISO 10303-21, AP203, AP214 or AP242)
+may say so in `kernels.json` (`"step": true`). For each case such a kernel builds (passes, builds
+or answers wrong), the harness then runs it a second time with a third argument, the file to write:
+
+```
+<command> CASE OUT.stl OUT.step
+```
+
+The runner builds the case as before and also writes the solid to `OUT.step` with its kernel's own
+STEP writer, as the kernel's users would; it may not write or rewrite STEP itself. Where the writer
+declines, the runner writes no file, answers as it would have, and may say why in `step_error`.
+The STEP run is not timed, and its reply is not graded again. The harness reads the file for what
+the solid is made of (`harness/step.py`): how its boundary is represented (advanced faces on
+surfaces, a faceted B-rep, or triangles), its solids, shells, faces, loops, edges and vertices,
+its faces by surface and its edges by curve, and how many faces are flat triangles. That is the
+evidence for `faces` that a runner's word alone is not, as its triangles are for its measures;
+like `faces`, it is shown and not graded.
 
 **Welding.** The harness joins only vertices whose coordinates are exactly equal. A runner may weld
 its triangles with its own kernel's tools, but no further: a gap the kernel leaves is the kernel's
@@ -275,12 +295,16 @@ One entry per kernel:
 | `version` | the command that prints the kernel's version |
 | `source` | the pattern of an implementation's path |
 | `measured` | `"mesh"` for a kernel with no exact measures |
+| `step` | `true` for a kernel whose runner writes its solid as STEP when given a third argument |
 | `binary` | the files of the kernel's binary, whose size the harness measures after the build: paths or glob patterns relative to the repository (a directory counts every file under it), or a Python distribution, `{"python": "python3", "distribution": NAME}`; beside the language runtime its runner runs on and the system's libraries |
 | `note` | shown beside the kernel on the board (e.g. that no new implementations are being written) |
 | `reference` | `true` for the kernel whose results the drawings are made from where it passes (else the first kernel that does) |
 
 ## Versions
 
+- **1.13:** a runner may write its solid as STEP, with its kernel's own writer, when given a third
+  argument; a kernel that does says `"step": true` in `kernels.json`. The harness reads the file
+  for what the solid is made of, in an untimed run of its own, and shows it. Grading is as in 1.9.
 - **1.12:** a case defines its solid directly, from its geometry and parameters, not as a path
   through other solids that a direct construction of the result would skip; the direct edits,
   which move a solid's faces, are the one exception. Grading is as in 1.9.

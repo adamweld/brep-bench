@@ -1,10 +1,11 @@
 //! The brep-bench runner for vcad (https://github.com/ecto/vcad).
 //!
-//!     brep-bench-vcad CASE OUT.stl
+//!     brep-bench-vcad CASE OUT.stl [OUT.step]
 //!     brep-bench-vcad --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
-//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
+//! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` (and, if asked,
+//! the solid to `OUT.step` with vcad's own STEP writer, `Solid::to_step_buffer`) and prints one
 //! line of JSON, or a refusal.
 //!
 //! vcad measures only meshes: `Solid::volume` and `Solid::surface_area` are its tessellation's.
@@ -90,8 +91,9 @@ fn kind(k: SurfaceKind) -> &'static str {
     }
 }
 
-/// The faces of `solid` by surface kind, its validity, and its triangles written to `out`.
-fn report(solid: &Solid, out: &str) -> Result<Value, Refusal> {
+/// The faces of `solid` by surface kind, its validity, and its triangles written to `out`; with
+/// `out_step`, the solid written there as STEP, or why vcad would not (`step_error`).
+fn report(solid: &Solid, out: &str, out_step: Option<&str>) -> Result<Value, Refusal> {
     // vcad's ledger of the solid's construction: an operation that could not be done and left the
     // wrong solid in its place (a skipped cut, two meshes concatenated) is the kernel declining
     if let Some(event) = solid.wrong_geometry_events().next() {
@@ -121,7 +123,14 @@ fn report(solid: &Solid, out: &str) -> Result<Value, Refusal> {
     let bytes = vcad_kernel_export::build_stl_json(&spec.to_string(), &mesh.vertices, &mesh.indices)
         .map_err(|e| Refusal(format!("no STL written: {e:?}")))?;
     std::fs::write(out, bytes).expect("the STL file writes");
-    Ok(json!({"status": "ok", "measured": "mesh", "faces": faces, "valid": valid}))
+    let mut reply = json!({"status": "ok", "measured": "mesh", "faces": faces, "valid": valid});
+    if let Some(path) = out_step {
+        match solid.to_step_buffer() {
+            Ok(step) => std::fs::write(path, step).expect("the STEP file writes"),
+            Err(e) => reply["step_error"] = json!(e.to_string()),
+        }
+    }
+    Ok(reply)
 }
 
 fn main() -> ExitCode {
@@ -130,15 +139,19 @@ fn main() -> ExitCode {
         println!("vcad-kernel {} (runner {})", env!("VCAD_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-vcad CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-vcad CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
-    let reply = match build().and_then(|solid| report(&solid, out)) {
+    let reply = match build().and_then(|solid| report(&solid, out, out_step)) {
         Ok(reply) => reply,
         Err(why) => json!({"status": "refused", "reason": why.to_string()}),
     };
