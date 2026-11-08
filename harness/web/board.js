@@ -119,10 +119,18 @@ export async function load() {
            tags: b.tags };
 }
 
-/** A time in seconds, as a table shows it: 3 ms, 420 ms, 4.21 s, 12.3 s. */
+// The least a run's own time is taken as, on a logarithmic scale and in a ratio: a tenth of a
+// millisecond, about what starting one runner varies by from start to start, so a time less its
+// runner's start-up says nothing finer.  The harness keeps times to the microsecond (run.py).
+export const TIME_FLOOR = 0.0001;
+
+/** A time in seconds, as a table shows it: 0.42 ms, 3.7 ms, 420 ms, 4.21 s, 12.3 s; one under
+ * TIME_FLOOR (a run no longer than its runner's start-up, to within what that varies by),
+ * <0.1 ms. */
 export function secondsText(x) {
   if (x == null) return '–';
-  if (x < 0.001) return '<1 ms';
+  if (x < TIME_FLOOR) return '<0.1 ms';
+  if (x < 0.01) return `${Number((x * 1000).toPrecision(2))} ms`;
   if (x < 1) return `${Math.round(x * 1000)} ms`;
   return x < 10 ? `${x.toFixed(2)} s` : `${x.toFixed(1)} s`;
 }

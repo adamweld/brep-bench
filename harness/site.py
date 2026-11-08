@@ -214,14 +214,31 @@ def lines_of(kernel, cid):
 COSTS = {"seconds": "seconds", "cpu": "cpu_seconds", "mb": "peak_mb", "one": "one_core_seconds"}
 
 
-def cost(x, unit):
-    """A run's measure for a table cell, or a dash where it was not measured."""
-    return "<span class=muted>–</span>" if x is None else f"{x:g}{unit}"
+def seconds_text(x):
+    """A time in seconds as the board's tables show it (board.js's secondsText): 0.42 ms, 3.7 ms,
+    420 ms, 4.21 s, 12.3 s; under a tenth of a millisecond, <0.1 ms."""
+    if x < 1e-4:
+        return "<0.1 ms"
+    if x < 0.01:
+        return f"{x * 1000:.2g} ms"
+    if x < 1:
+        return f"{round(x * 1000)} ms"
+    return f"{x:.2f} s" if x < 10 else f"{x:.1f} s"
 
 
-def spent(en, field, unit):
+def megabytes_text(x):
+    return f"{x:g} MB"
+
+
+def cost(x, text):
+    """A run's measure for a table cell, as `text` writes it, or a dash where it was not
+    measured."""
+    return "<span class=muted>–</span>" if x is None else text(x)
+
+
+def spent(en, field, text):
     """An entry's measure of its run for the case page, or nothing where it has not run."""
-    return "" if en["outcome"] == "missing" else cost(en["row"].get(field), unit)
+    return "" if en["outcome"] == "missing" else cost(en["row"].get(field), text)
 
 
 def relative(got, want):
@@ -349,12 +366,12 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
              else "<th scope=row>volume</th>", "td", None, lambda en: value(en, 0), None),
             ("<th scope=row title='relative error'>area err.</th>" if exp
              else "<th scope=row>area</th>", "td", None, lambda en: value(en, 1), None),
-            ("<th scope=row>time</th>", "td", None, lambda en: spent(en, "seconds", " s"),
+            ("<th scope=row>time</th>", "td", None, lambda en: spent(en, "seconds", seconds_text),
              "seconds"),
             ("<th scope=row title='user and system time, over every thread'>CPU time</th>", "td",
-             None, lambda en: spent(en, "cpu_seconds", " s"), "cpu_seconds"),
+             None, lambda en: spent(en, "cpu_seconds", seconds_text), "cpu_seconds"),
             ("<th scope=row title='the most memory the runner held resident at once'>memory</th>",
-             "td", None, lambda en: spent(en, "peak_mb", " MB"), "peak_mb"),
+             "td", None, lambda en: spent(en, "peak_mb", megabytes_text), "peak_mb"),
             ("<th scope=row title='lines of code, comments and blank lines left out'>LOC</th>",
              "td", None, lambda en: "" if en["loc"] is None else str(en["loc"]), None),
         ]
@@ -450,8 +467,9 @@ def entry(en, exp):
         out.append(f"<div class='muted nomesh'>{e(name)} left no triangles to show.</div>")
 
     out.append("<h3>Time</h3>")
-    out.append(f"<p>{spent(en, 'seconds', ' s')}; CPU time {spent(en, 'cpu_seconds', ' s')}; "
-               f"peak memory {spent(en, 'peak_mb', ' MB')}</p>" if o != "missing"
+    out.append(f"<p>{spent(en, 'seconds', seconds_text)}; CPU time "
+               f"{spent(en, 'cpu_seconds', seconds_text)}; "
+               f"peak memory {spent(en, 'peak_mb', megabytes_text)}</p>" if o != "missing"
                else "<p class=muted>It has not run.</p>")
 
     out.append("<h3>Notes</h3>")

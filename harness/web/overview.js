@@ -1,11 +1,7 @@
 // The overview: the kernels, the categories by kernels, and a strip of every case.
 import { load, tally, words, bar, legend, esc, casePage, kernelPage, groupOf, markColours,
-         failed, placeTip, solved, secondsText, megabytesText } from './board.js';
+         failed, placeTip, solved, secondsText, megabytesText, TIME_FLOOR } from './board.js';
 import { sortable } from './sort.js';
-
-// The least time a run's own time is taken as, for the mean of their logarithms: a time of 0 is
-// under the clock's resolution (the performance page's floor).
-const TIME_FLOOR = 0.001;
 
 /** Kernel `k`'s geometric mean time over the cases it passes or builds, its runner's start-up
  * left out (each time no less than TIME_FLOOR), and how many cases it is over; null if none. */
