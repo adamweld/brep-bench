@@ -73,6 +73,7 @@
         "--version"
       ],
       "source": "kernels/arris/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/arris/target/release/brep-bench-arris"]
     },
     {
