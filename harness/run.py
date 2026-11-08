@@ -17,8 +17,9 @@ from the operating system's account of the runner's process (wait4), which harne
 starts and waits for. So is what starting the runner costs, alone: it is given a case id no case
 has, `harness/start`, so that it starts and builds nothing, a few times over (`startup`). With
 `--one-core` a case the kernel built is run a second time on one core only, for what its other
-cores bought it; that run is timed and nothing else. Standard library
-only (where there is no wait4, only the time is kept; pinning to one core needs Linux).
+cores bought it; that run is timed and nothing else. Times are kept to the microsecond: a
+kernel's own time, a run's less its runner's start-up, can be under a millisecond. Standard
+library only (where there is no wait4, only the time is kept; pinning to one core needs Linux).
 """
 import argparse
 import functools
@@ -187,12 +188,16 @@ def run_one(command, case, timeout, keep):
         return (*grade(case, reply, mesh), reply, mesh, ran)
 
 
+# the decimal places a time in seconds is kept to: microseconds
+TIME_PLACES = 6
+
+
 def one_core_seconds(command, case, timeout, core):
     """The wall-clock time of the case run again on `core` alone, or None if it ran out of time or
     failed. Nothing of the run but its time is kept."""
     with tempfile.TemporaryDirectory() as tmp:
         ran = execute(command + [case["id"], os.path.join(tmp, "result.stl")], timeout, core)
-    return round(ran.seconds, 3) if ran.code == 0 else None
+    return round(ran.seconds, TIME_PLACES) if ran.code == 0 else None
 
 
 def rounded(x, places):
@@ -221,12 +226,12 @@ def startup(k, timeout, one_core=None):
         runs = [execute(argv, min(timeout, 60)) for _ in range(STARTS)]
         if any(r.code is None for r in runs):
             return None
-        out = {"seconds": round(median(r.seconds for r in runs), 4),
-               "cpu_seconds": rounded(median(r.cpu for r in runs), 4),
+        out = {"seconds": round(median(r.seconds for r in runs), TIME_PLACES),
+               "cpu_seconds": rounded(median(r.cpu for r in runs), TIME_PLACES),
                "peak_mb": rounded(median(r.peak_mb for r in runs), 1)}
         if one_core is not None:
             pinned = [execute(argv, min(timeout, 60), one_core) for _ in range(STARTS)]
-            out["one_core_seconds"] = round(median(r.seconds for r in pinned), 4)
+            out["one_core_seconds"] = round(median(r.seconds for r in pinned), TIME_PLACES)
     return out
 
 
@@ -297,8 +302,10 @@ def run_kernel(k, chosen, timeout, one_core=None):
             outcome, why, reply, mesh, ran = run_one(k["command"], c, timeout, keep)
         row = {
             "case": c["id"], "outcome": outcome, "why": why,
-            "seconds": rounded(ran and ran.seconds, 3),
-            "cpu_seconds": rounded(ran and ran.cpu, 3), "peak_mb": rounded(ran and ran.peak_mb, 1),
+            "seconds": rounded(ran and ran.seconds, TIME_PLACES),
+            "cpu_seconds": rounded(ran and ran.cpu, TIME_PLACES),
+            "time_places": TIME_PLACES,  # rows from before microseconds have none: 3, milliseconds
+            "peak_mb": rounded(ran and ran.peak_mb, 1),
             "measured": (reply or {}).get("measured", "exact"),
             "volume": (reply or {}).get("volume"), "area": (reply or {}).get("area"),
             "faces": (reply or {}).get("faces"), "mesh": mesh,

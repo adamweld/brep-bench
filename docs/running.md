@@ -20,9 +20,14 @@ beside its outcome; none of them is graded. Runners are started by `harness/meas
 small process that holds almost no memory, because on Linux a child's peak resident set starts
 at its parent's. Before its cases, each runner is given the case id `harness/start`, which names
 no case, five times; the median is the kernel's start-up, which the board subtracts from its
-times. A CI run of only some of a kernel's cases keeps its last start-up and binary size. `--one-core` runs each case a kernel builds a second time, pinned to one core, for its
-speedup on all of them (Linux only). Each result file also records its machine and the size of
-the kernel's binary, as `binary` in `kernels.json` names it.
+times. Times are recorded to the microsecond, since a fast kernel's run less its start-up can be
+under a millisecond. In its means and ratios the board takes any time under 0.1 ms, about the
+spread of a runner's start-up, as 0.1 ms; a time recorded only to the millisecond, or one whose
+kernel's start-up was never measured, it takes as no less than 1 ms. A CI run of only some of a
+kernel's cases keeps its last start-up and binary size. `--one-core` runs each case a kernel
+builds a second time, pinned to one core, for its speedup on all of them (Linux only). Each
+result file also records its machine and the size of the kernel's binary, as `binary` in
+`kernels.json` names it.
 
 CI does not run on pull requests, so run a change locally before proposing it.
 

@@ -22,6 +22,7 @@ import shutil
 import sys
 import tomllib
 import urllib.parse
+from decimal import ROUND_HALF_UP, Decimal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from highlight import highlight, loc  # noqa: E402
@@ -122,7 +123,9 @@ def board(registry, results, cases, drawings):
       peak memory in megabytes (`mb`) and its wall-clock seconds on one core alone (`one`); and
       of its `why`, its `workaround` and its `elegance` (indices in `reasons`, `workarounds` and
       `elegance`, -1 for none),
-      and the lines of code of its implementation of each case (`loc`, null where it has none).
+      and the lines of code of its implementation of each case (`loc`, null where it has none),
+      and the decimal places its times were kept to (`places`: 3, milliseconds, for a row from
+      before run.py kept microseconds; null where it has no row).
       A kernel's `host` is the machine its last run was made on, and its `startup` what starting
       its runner cost there, building nothing (`seconds`, `cpu`, `mb`, and `one` on one core);
       its `binary` is the size of its binary (`bytes`, `files`), and `of` what kernels.json counts
@@ -161,7 +164,7 @@ def board(registry, results, cases, drawings):
             start = r.get("startup")
             if start:
                 k["startup"] = {key: start.get(field) for key, field in COSTS.items()}
-            codes, why, worked, neat, lines = [], [], [], [], []
+            codes, why, worked, neat, lines, places = [], [], [], [], [], []
             spent = {key: [] for key in COSTS}
             for cid in ids:
                 row = r["rows"].get(cid)
@@ -173,6 +176,7 @@ def board(registry, results, cases, drawings):
                     worked.append(-1)
                     neat.append(-1)
                     lines.append(None)
+                    places.append(None)
                     continue
                 codes.append(CODES[row["outcome"]])
                 # a missing case has no run, whatever an older row says of its time
@@ -182,8 +186,9 @@ def board(registry, results, cases, drawings):
                 worked.append(intern("workarounds", r["workarounds"].get(cid)))
                 neat.append(intern("elegance", r["elegance"].get(cid)))
                 lines.append(lines_of(a, cid))
+                places.append(row.get("time_places", 3))
             out[name] = {"codes": "".join(codes), **spent, "why": why, "workaround": worked,
-                         "elegance": neat, "loc": lines}
+                         "elegance": neat, "loc": lines, "places": places}
         elif not a.get("command"):
             k["awaiting"] = True
         kernels.append(k)
@@ -214,14 +219,36 @@ def lines_of(kernel, cid):
 COSTS = {"seconds": "seconds", "cpu": "cpu_seconds", "mb": "peak_mb", "one": "one_core_seconds"}
 
 
-def cost(x, unit):
-    """A run's measure for a table cell, or a dash where it was not measured."""
-    return "<span class=muted>–</span>" if x is None else f"{x:g}{unit}"
+def half_up(x, places):
+    """`x` to `places` decimal places, a tie rounded up, as JavaScript's toFixed, toPrecision and
+    Math.round round (Python's round and format round a tie to the even digit)."""
+    return Decimal(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
 
 
-def spent(en, field, unit):
-    """An entry's measure of its run for the case page, or nothing where it has not run."""
-    return "" if en["outcome"] == "missing" else cost(en["row"].get(field), unit)
+def seconds_text(x):
+    """A time in seconds as the board's tables show it (board.js's secondsText): 0.42 ms, 3.7 ms,
+    420 ms, 4.21 s, 12.3 s; under a tenth of a millisecond, <0.1 ms."""
+    if x < 1e-4:
+        return "<0.1 ms"
+    if x < 0.01:
+        ms = x * 1000  # to two figures, as toPrecision(2) and Number() write it
+        return f"{half_up(ms, 2 if ms < 1 else 1).normalize():f} ms"
+    if x < 1:
+        return f"{half_up(x * 1000, 0)} ms"
+    return f"{half_up(x, 2)} s" if x < 10 else f"{half_up(x, 1)} s"
+
+
+def megabytes_text(x):
+    return f"{x:g} MB"
+
+
+def spent(en, field, text):
+    """An entry's measure of its run for the case page, as `text` writes it: nothing where it has
+    not run, a dash where it was not measured."""
+    if en["outcome"] == "missing":
+        return ""
+    x = en["row"].get(field)
+    return "<span class=muted>–</span>" if x is None else text(x)
 
 
 def relative(got, want):
@@ -349,12 +376,12 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
              else "<th scope=row>volume</th>", "td", None, lambda en: value(en, 0), None),
             ("<th scope=row title='relative error'>area err.</th>" if exp
              else "<th scope=row>area</th>", "td", None, lambda en: value(en, 1), None),
-            ("<th scope=row>time</th>", "td", None, lambda en: spent(en, "seconds", " s"),
+            ("<th scope=row>time</th>", "td", None, lambda en: spent(en, "seconds", seconds_text),
              "seconds"),
             ("<th scope=row title='user and system time, over every thread'>CPU time</th>", "td",
-             None, lambda en: spent(en, "cpu_seconds", " s"), "cpu_seconds"),
+             None, lambda en: spent(en, "cpu_seconds", seconds_text), "cpu_seconds"),
             ("<th scope=row title='the most memory the runner held resident at once'>memory</th>",
-             "td", None, lambda en: spent(en, "peak_mb", " MB"), "peak_mb"),
+             "td", None, lambda en: spent(en, "peak_mb", megabytes_text), "peak_mb"),
             ("<th scope=row title='lines of code, comments and blank lines left out'>LOC</th>",
              "td", None, lambda en: "" if en["loc"] is None else str(en["loc"]), None),
         ]
@@ -450,8 +477,9 @@ def entry(en, exp):
         out.append(f"<div class='muted nomesh'>{e(name)} left no triangles to show.</div>")
 
     out.append("<h3>Time</h3>")
-    out.append(f"<p>{spent(en, 'seconds', ' s')}; CPU time {spent(en, 'cpu_seconds', ' s')}; "
-               f"peak memory {spent(en, 'peak_mb', ' MB')}</p>" if o != "missing"
+    out.append(f"<p>{spent(en, 'seconds', seconds_text)}; CPU time "
+               f"{spent(en, 'cpu_seconds', seconds_text)}; "
+               f"peak memory {spent(en, 'peak_mb', megabytes_text)}</p>" if o != "missing"
                else "<p class=muted>It has not run.</p>")
 
     out.append("<h3>Notes</h3>")

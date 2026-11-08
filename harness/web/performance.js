@@ -5,7 +5,7 @@
 // kernel uses many cores.  One row of filters above scopes them all, and is kept in the address.
 // Kernels keep kernels.json's order: the board ranks nothing.
 import { load, esc, casePage, kernelPage, failed, secondsText, megabytesText, solved, quantile,
-         option, placeTip, PARALLEL_FROM } from './board.js';
+         option, placeTip, PARALLEL_FROM, TIME_FLOOR } from './board.js';
 import { sortable } from './sort.js';
 
 const main = document.getElementById('performance');
@@ -14,11 +14,13 @@ load().then(start, (e) => failed(main, e));
 // What can be measured of a run: each reads one of a kernel's lists (board.js), a value a case.
 // A time is the kernel's own, what starting its runner costs left out (`key`), unless the reader
 // asks for it counted (`raw`); `start` names the field of a kernel's start-up to show beside it.
-// `floor` is the least value the logarithmic axis and the ratios take (a time of 0 is under the
-// clock's resolution); `additive` says whether a total means anything, `compare` whether a ratio
-// of two kernels' does; `least` and `most` head the summary's ends, `top` the runs that cost most;
-// `higher` says more is better (else less is), for the summary's shading.
-const timeTick = (x) => (x < 1 ? `${Math.round(x * 1000)} ms` : `${Math.round(x)} s`);
+// `floor` is the least value the logarithmic axis and the ratios take (a time under TIME_FLOOR is
+// within what a runner's start-up varies by), and a `timed` measure's ratios each kernel's floor
+// for the case instead (board.js's `timeFloor`); `additive` says whether a total means anything,
+// `compare` whether a ratio of two kernels' does; `least` and `most` head the summary's ends,
+// `top` the runs that cost most; `higher` says more is better (else less is), for the summary's
+// shading.
+const timeTick = (x) => (x < 1 ? `${Number((x * 1000).toPrecision(1))} ms` : `${Math.round(x)} s`);
 const mbTick = (x) => (x < 1000 ? `${x} MB` : `${x / 1000} GB`);
 const ratioText = (x) => (x == null ? '–' : `${x.toFixed(x < 10 ? 2 : 1)}`);
 const speedupText = (x) => (x == null ? '–' : `${ratioText(x)}×`);
@@ -27,8 +29,8 @@ const short = `The runner's start-up is left out of both, and so are runs whose 
 const METRICS = [
   {
     key: 'built', raw: 'seconds', start: 'seconds', label: 'time', text: secondsText,
-    tick: timeTick, floor: 0.001, additive: true, compare: true, least: 'fastest',
-    most: 'slowest', top: 'The slowest runs',
+    tick: timeTick, floor: TIME_FLOOR, timed: true, additive: true,
+    compare: true, least: 'fastest', most: 'slowest', top: 'The slowest runs',
     about: (counted) => (counted ? `Each dot is one case's wall-clock time, from starting the
       kernel's runner to its exit, starting it counted.` : `Each dot is one case's wall-clock
       time less the runner's start-up: the kernel's own time, building the
@@ -37,8 +39,8 @@ const METRICS = [
   },
   {
     key: 'builtCpu', raw: 'cpu', start: 'cpu', label: 'CPU time', text: secondsText,
-    tick: timeTick, floor: 0.001, additive: true, compare: true, least: 'least', most: 'most',
-    top: 'The runs that spent the most CPU time',
+    tick: timeTick, floor: TIME_FLOOR, timed: true, additive: true,
+    compare: true, least: 'least', most: 'most', top: 'The runs that spent the most CPU time',
     about: (counted) => `Each dot is the CPU time one case spent, user and system, over every
       thread${counted ? '' : `, less the runner's start-up`}: more than its
       time where it kept more than one core busy.`,
@@ -285,10 +287,12 @@ function grid(lo, hi, x, top, height, tick) {
 }
 
 // Every case a dot, a row a kernel, on one logarithmic axis that does not move with the filters.
+// A value of 0 (a run no longer than its runner's start-up) sits at the axis's left end.
 function strip(b, rows, m, holder, tip) {
   const all = [];
-  for (const k of b.ran) for (const x of k[m.key]) if (x != null) all.push(Math.max(x, m.floor));
-  // from just before the least value to just past the greatest
+  for (const k of b.ran) for (const x of k[m.key]) if (x) all.push(Math.max(x, m.floor));
+  if (!all.length) all.push(m.floor);
+  // from just before the least value above 0 to just past the greatest
   const lo = Math.log10(Math.min(...all)) - 0.08;
   const hi = Math.max(lo + 0.5, Math.log10(Math.max(...all)) + 0.08);
   const width = Math.max(holder.clientWidth, 360);
@@ -297,7 +301,8 @@ function strip(b, rows, m, holder, tip) {
   const rowHeight = 34;
   const top = 4;
   const height = top + rows.length * rowHeight + 26;
-  const x = (v) => left + (Math.log10(Math.max(v, m.floor)) - lo) / (hi - lo) * (width - left - right);
+  const x = (v) => left + (Math.max(Math.log10(Math.max(v, m.floor)), lo) - lo) / (hi - lo)
+    * (width - left - right);
   // a dot's place across its row: the same for a case in every row, so a case lines up
   const jitter = (i) => ((Math.imul(i + 1, 2654435761) >>> 0) / 2 ** 32) * 2 - 1;
   const dots = [];
@@ -413,7 +418,9 @@ function versus(rows, indices, m) {
       const va = a[m.key][i];
       const vc = c[m.key][i];
       if (!solved(a.outcomes[i]) || !solved(c.outcomes[i]) || va == null || vc == null) continue;
-      sum += Math.log(Math.max(va, m.floor) / Math.max(vc, m.floor));
+      // a ratio is only as fine as the coarser of the two times
+      const f = m.timed ? Math.max(a.timeFloor[i], c.timeFloor[i]) : m.floor;
+      sum += Math.log(Math.max(va, f) / Math.max(vc, f));
       n++;
     }
     if (!n) return '<td class="muted empty">·</td>';
