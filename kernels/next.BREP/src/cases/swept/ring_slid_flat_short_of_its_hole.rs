@@ -1,44 +1,63 @@
-//! The solid a ring fills as it slides 6 along x, square to its axis, less than its hole's width.
+//! The solid a ring fills as it slides 6 along x, square to its axis, less than its hole's width:
+//! the torus about the z axis centred on the origin, the circle through its tube's centres of
+//! radius 6, its tube of radius 2.
 //!
-//! Through the kernel's sweep of a solid (`sweep_solid_within`): the ring is a solid of revolution
-//! about the z axis, its meridian the circle of radius 2 at 6 from the axis; slid 6 along x, asked
-//! for within 12 of the vertical line through (3, 0) from z = −2.5 to 2.5, which holds the whole
-//! sweep. The kernel's sweep takes a solid of revolution only along a screw or turn whose end
-//! positions stay out of the region asked for, so it may refuse.
+//! next.BREP has no sweep of a solid along a line. The ring's sweep follows by elementary geometry,
+//! level by level. The plane z = h (|h| < 2) cuts the ring in an annulus between the circles of
+//! radius 6 − w and 6 + w about the ring's axis, w = √(4 − h²). Slid without turning, the outer
+//! circle's disc sweeps a stadium, its two end discs joined by their common tangents; the disc
+//! of the hole is left uncovered only where every position of it overlaps, and since a point's
+//! distance from a centre moving along a line is convex in the centre's place, that is the lens
+//! the hole's discs at the start and at the stop share. So the sweep is what `torus_slid_up` makes
+//! of a ring slid farther than its hole (the ring with its hole filled at the start and at the stop,
+//! and between them its outline seen along the slide), less the lens of the two holes: the solid
+//! of revolution the tube's inner half bounds with the ring's axis, at the start and at the stop,
+//! in common. The hole is 2·(6 − w) ≥ 8 wide at every level, more than the slide, so the lens
+//! never empties and its walls are the ring's inner halves at those two places, meeting along two
+//! curves. `torus_slid_up` slides a wheel whose axis is along y up the z axis; the rotation (x,
+//! y, z) ↦ (z, x, y) carries its axis onto z and its slide onto x.
+use crate::solids::boolean::{common, cut, union};
 use crate::solids::p;
+use crate::solids::sweep::{moved, torus_slid_up};
 use crate::Refusal;
-#[allow(unused_imports)]
-use brep_kernel::{
-    boolean_operation_nary, make_box_brep, make_cylinder_brep, revolve_profile_brep,
-    sweep_solid_within, BooleanOperation, BrepSolid, OutlinePiece, ScrewStep, SolidMotion,
-    SweepClip, SweptTool, Vec3,
-};
-#[allow(unused_imports)]
-use std::f64::consts::{FRAC_PI_2, PI, TAU};
+use brep_kernel::{make_arc, make_line, revolve_profile_brep, AffineTransform, BrepSolid};
+use std::f64::consts::{FRAC_PI_2, TAU};
 
 pub fn build() -> Result<BrepSolid, Refusal> {
-    let mut bodies = Vec::new();
-    let tool0 = SweptTool::Revolved {
-        axis_origin: p(0.0, 0.0, 0.0),
-        axis_direction: p(0.0, 0.0, 1.0),
-        radial: p(1.0, 0.0, 0.0),
-        meridian: vec![OutlinePiece::Arc { centre: [6.0, 0.0], radius: 2.0, start: 0.0, end: TAU }],
-    };
-    let motion0 = SolidMotion {
-        steps: vec![
-            ScrewStep { axis_origin: p(0.0, 0.0, 0.0), axis_direction: p(1.0, 0.0, 0.0), turn: 0.0, advance: 6.0 },
-        ],
-        from: 0.0,
-        to: 1.0,
-    };
-    let clip0 = SweepClip {
-        axis_origin: p(3.0, 0.0, 0.0),
-        axis_direction: p(0.0, 0.0, 1.0),
-        reference: p(1.0, 0.0, 0.0),
-        radius: [0.0, 12.0],
-        axial: [-2.5, 2.5],
-        angle: None,
-    };
-    bodies.extend(sweep_solid_within(&tool0, &motion0, &clip0)?);
-    Ok(boolean_operation_nary(&bodies, BooleanOperation::Union)?)
+    let (major, minor, slide) = (6.0, 2.0, 6.0);
+    let onto = AffineTransform::new([
+        0.0, 0.0, 1.0, 0.0, //
+        1.0, 0.0, 0.0, 0.0, //
+        0.0, 1.0, 0.0, 0.0, //
+        0.0, 0.0, 0.0, 1.0,
+    ])?;
+    let mut parts = Vec::new();
+    for part in torus_slid_up(p(0.0, 0.0, 0.0), major, minor, slide)? {
+        parts.push(moved(&part, onto)?);
+    }
+    let mut whole = parts[0].clone();
+    for part in &parts[1..] {
+        whole = union(&whole, part)?;
+    }
+
+    // The hole at the start, in the ring's own frame (axis along z): the revolve about z of the
+    // region between the axis and the tube's inner half, |z| ≤ 2 (the arc runs from the tube's
+    // bottom through its innermost point to its top).
+    let (x, z) = (p(1.0, 0.0, 0.0), p(0.0, 0.0, 1.0));
+    let at = |r: f64, h: f64| p(r, 0.0, h);
+    let meridian = vec![
+        make_line(at(0.0, minor), at(0.0, -minor))?,
+        make_line(at(0.0, -minor), at(major, -minor))?,
+        make_arc(at(major, 0.0), x, p(0.0, 0.0, -1.0), minor, FRAC_PI_2, 3.0 * FRAC_PI_2)?,
+        make_line(at(major, minor), at(0.0, minor))?,
+    ];
+    let hole = revolve_profile_brep(&meridian, p(0.0, 0.0, 0.0), z, TAU)?;
+    let slid = AffineTransform::new([
+        1.0, 0.0, 0.0, slide, //
+        0.0, 1.0, 0.0, 0.0, //
+        0.0, 0.0, 1.0, 0.0, //
+        0.0, 0.0, 0.0, 1.0,
+    ])?;
+    let lens = common(&hole, &moved(&hole, slid)?)?;
+    Ok(cut(&whole, &lens)?)
 }
