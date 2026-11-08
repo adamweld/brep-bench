@@ -63,7 +63,10 @@ export const PARALLEL_FROM = 0.1;
  * the start's: the kernel's own.
  * `cores` is how many cores a run kept busy on average while building (its CPU time over its
  * time, the start's left out of both) and `speedup` its time on one core over its time on all of
- * them (likewise), both null for a run shorter than PARALLEL_FROM so reckoned. */
+ * them (likewise), both null for a run shorter than PARALLEL_FROM so reckoned.
+ * `timeFloor` is the least each case's own time and CPU time are taken as, in a mean of their
+ * logarithms or a ratio: TIME_FLOOR where the start-up was measured and the run's times were kept
+ * to the microsecond, else COARSE_TIME_FLOOR. */
 export async function load() {
   const response = await fetch('board.json');
   if (!response.ok) throw new Error(`board.json: ${response.status}`);
@@ -91,6 +94,11 @@ export async function load() {
     const start = k.startup ? { ...k.startup, measured: true }
       : { seconds: least(seconds), cpu: least(cpu), mb: least(mb), one: null,
           measured: false };
+    // a run's times recorded only to the millisecond, as the harness kept them before microseconds
+    const coarse = (i) => [seconds[i], cpu[i]].every((x) => x == null
+      || Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-6);
+    const timeFloor = seconds.map((x, i) => (x == null ? null
+      : start.measured && !coarse(i) ? TIME_FLOOR : COARSE_TIME_FLOOR));
     const less = (list, by) => list.map((x) => (x == null ? null : Math.max(0, x - (by || 0))));
     const built = less(seconds, start.seconds);
     const builtCpu = less(cpu, start.cpu);
@@ -106,6 +114,7 @@ export async function load() {
       built,
       builtCpu,
       builtOne,
+      timeFloor,
       cores: builtCpu.map((c, i) => (c != null && long(i) ? c / built[i] : null)),
       speedup: builtOne.map((t, i) => (t != null && long(i) ? t / built[i] : null)),
       why: r.why.map((i) => (i < 0 ? '' : b.reasons[i])),
@@ -123,6 +132,10 @@ export async function load() {
 // millisecond, about what starting one runner varies by from start to start, so a time less its
 // runner's start-up says nothing finer.  The harness keeps times to the microsecond (run.py).
 export const TIME_FLOOR = 0.0001;
+// The least a run's own time is taken as where it can't be told that finely: its times were
+// recorded to the millisecond, or its kernel's fastest run stands in for the start-up.  This
+// keeps the means and ratios of results from before microseconds where they were.
+export const COARSE_TIME_FLOOR = 0.001;
 
 /** A time in seconds, as a table shows it: 0.42 ms, 3.7 ms, 420 ms, 4.21 s, 12.3 s; one under
  * TIME_FLOOR (a run no longer than its runner's start-up, to within what that varies by),

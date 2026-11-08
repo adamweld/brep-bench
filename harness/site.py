@@ -22,6 +22,7 @@ import shutil
 import sys
 import tomllib
 import urllib.parse
+from decimal import ROUND_HALF_UP, Decimal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from highlight import highlight, loc  # noqa: E402
@@ -214,16 +215,23 @@ def lines_of(kernel, cid):
 COSTS = {"seconds": "seconds", "cpu": "cpu_seconds", "mb": "peak_mb", "one": "one_core_seconds"}
 
 
+def half_up(x, places):
+    """`x` to `places` decimal places, a tie rounded up, as JavaScript's toFixed, toPrecision and
+    Math.round round (Python's round and format round a tie to the even digit)."""
+    return Decimal(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
+
+
 def seconds_text(x):
     """A time in seconds as the board's tables show it (board.js's secondsText): 0.42 ms, 3.7 ms,
     420 ms, 4.21 s, 12.3 s; under a tenth of a millisecond, <0.1 ms."""
     if x < 1e-4:
         return "<0.1 ms"
     if x < 0.01:
-        return f"{x * 1000:.2g} ms"
+        ms = x * 1000  # to two figures, as toPrecision(2) and Number() write it
+        return f"{half_up(ms, 1 - Decimal(ms).adjusted()).normalize():f} ms"
     if x < 1:
-        return f"{round(x * 1000)} ms"
-    return f"{x:.2f} s" if x < 10 else f"{x:.1f} s"
+        return f"{half_up(x * 1000, 0)} ms"
+    return f"{half_up(x, 2)} s" if x < 10 else f"{half_up(x, 1)} s"
 
 
 def megabytes_text(x):

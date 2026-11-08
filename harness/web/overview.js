@@ -1,15 +1,16 @@
 // The overview: the kernels, the categories by kernels, and a strip of every case.
 import { load, tally, words, bar, legend, esc, casePage, kernelPage, groupOf, markColours,
-         failed, placeTip, solved, secondsText, megabytesText, TIME_FLOOR } from './board.js';
+         failed, placeTip, solved, secondsText, megabytesText } from './board.js';
 import { sortable } from './sort.js';
 
 /** Kernel `k`'s geometric mean time over the cases it passes or builds, its runner's start-up
- * left out (each time no less than TIME_FLOOR), and how many cases it is over; null if none. */
+ * left out (each time no less than its `timeFloor`, board.js), and how many cases it is over;
+ * null if none. */
 function meanTime(k) {
-  const xs = k.built.filter((x, i) => x != null && solved(k.outcomes[i]));
-  if (!xs.length) return null;
-  const logs = xs.reduce((s, x) => s + Math.log(Math.max(x, TIME_FLOOR)), 0);
-  return { seconds: Math.exp(logs / xs.length), n: xs.length };
+  const at = k.built.flatMap((x, i) => (x != null && solved(k.outcomes[i]) ? [i] : []));
+  if (!at.length) return null;
+  const logs = at.reduce((s, i) => s + Math.log(Math.max(k.built[i], k.timeFloor[i])), 0);
+  return { seconds: Math.exp(logs / at.length), n: at.length };
 }
 
 /** Kernel `k`'s geometric mean lines of code over the cases it passes or builds, and how many
