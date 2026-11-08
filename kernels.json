@@ -241,6 +241,7 @@
         "--version"
       ],
       "source": "kernels/next.BREP/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/next.BREP/target/release/brep-bench-next-brep"]
     },
     {
