@@ -123,7 +123,9 @@ def board(registry, results, cases, drawings):
       peak memory in megabytes (`mb`) and its wall-clock seconds on one core alone (`one`); and
       of its `why`, its `workaround` and its `elegance` (indices in `reasons`, `workarounds` and
       `elegance`, -1 for none),
-      and the lines of code of its implementation of each case (`loc`, null where it has none).
+      and the lines of code of its implementation of each case (`loc`, null where it has none),
+      and the decimal places its times were kept to (`places`: 3, milliseconds, for a row from
+      before run.py kept microseconds; null where it has no row).
       A kernel's `host` is the machine its last run was made on, and its `startup` what starting
       its runner cost there, building nothing (`seconds`, `cpu`, `mb`, and `one` on one core);
       its `binary` is the size of its binary (`bytes`, `files`), and `of` what kernels.json counts
@@ -162,7 +164,7 @@ def board(registry, results, cases, drawings):
             start = r.get("startup")
             if start:
                 k["startup"] = {key: start.get(field) for key, field in COSTS.items()}
-            codes, why, worked, neat, lines = [], [], [], [], []
+            codes, why, worked, neat, lines, places = [], [], [], [], [], []
             spent = {key: [] for key in COSTS}
             for cid in ids:
                 row = r["rows"].get(cid)
@@ -174,6 +176,7 @@ def board(registry, results, cases, drawings):
                     worked.append(-1)
                     neat.append(-1)
                     lines.append(None)
+                    places.append(None)
                     continue
                 codes.append(CODES[row["outcome"]])
                 # a missing case has no run, whatever an older row says of its time
@@ -183,8 +186,9 @@ def board(registry, results, cases, drawings):
                 worked.append(intern("workarounds", r["workarounds"].get(cid)))
                 neat.append(intern("elegance", r["elegance"].get(cid)))
                 lines.append(lines_of(a, cid))
+                places.append(row.get("time_places", 3))
             out[name] = {"codes": "".join(codes), **spent, "why": why, "workaround": worked,
-                         "elegance": neat, "loc": lines}
+                         "elegance": neat, "loc": lines, "places": places}
         elif not a.get("command"):
             k["awaiting"] = True
         kernels.append(k)
@@ -228,7 +232,7 @@ def seconds_text(x):
         return "<0.1 ms"
     if x < 0.01:
         ms = x * 1000  # to two figures, as toPrecision(2) and Number() write it
-        return f"{half_up(ms, 1 - Decimal(ms).adjusted()).normalize():f} ms"
+        return f"{half_up(ms, 2 if ms < 1 else 1).normalize():f} ms"
     if x < 1:
         return f"{half_up(x * 1000, 0)} ms"
     return f"{half_up(x, 2)} s" if x < 10 else f"{half_up(x, 1)} s"
@@ -238,15 +242,13 @@ def megabytes_text(x):
     return f"{x:g} MB"
 
 
-def cost(x, text):
-    """A run's measure for a table cell, as `text` writes it, or a dash where it was not
-    measured."""
-    return "<span class=muted>–</span>" if x is None else text(x)
-
-
 def spent(en, field, text):
-    """An entry's measure of its run for the case page, or nothing where it has not run."""
-    return "" if en["outcome"] == "missing" else cost(en["row"].get(field), text)
+    """An entry's measure of its run for the case page, as `text` writes it: nothing where it has
+    not run, a dash where it was not measured."""
+    if en["outcome"] == "missing":
+        return ""
+    x = en["row"].get(field)
+    return "<span class=muted>–</span>" if x is None else text(x)
 
 
 def relative(got, want):

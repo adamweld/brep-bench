@@ -66,7 +66,7 @@ export const PARALLEL_FROM = 0.1;
  * them (likewise), both null for a run shorter than PARALLEL_FROM so reckoned.
  * `timeFloor` is the least each case's own time and CPU time are taken as, in a mean of their
  * logarithms or a ratio: TIME_FLOOR where the start-up was measured and the run's times were kept
- * to the microsecond, else COARSE_TIME_FLOOR. */
+ * finer than it (board.json's `places`), else COARSE_TIME_FLOOR. */
 export async function load() {
   const response = await fetch('board.json');
   if (!response.ok) throw new Error(`board.json: ${response.status}`);
@@ -94,11 +94,8 @@ export async function load() {
     const start = k.startup ? { ...k.startup, measured: true }
       : { seconds: least(seconds), cpu: least(cpu), mb: least(mb), one: null,
           measured: false };
-    // a run's times recorded only to the millisecond, as the harness kept them before microseconds
-    const coarse = (i) => [seconds[i], cpu[i]].every((x) => x == null
-      || Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-6);
-    const timeFloor = seconds.map((x, i) => (x == null ? null
-      : start.measured && !coarse(i) ? TIME_FLOOR : COARSE_TIME_FLOOR));
+    const timeFloor = r.places.map((p) => (start.measured && 10 ** -p <= TIME_FLOOR
+      ? TIME_FLOOR : COARSE_TIME_FLOOR));
     const less = (list, by) => list.map((x) => (x == null ? null : Math.max(0, x - (by || 0))));
     const built = less(seconds, start.seconds);
     const builtCpu = less(cpu, start.cpu);

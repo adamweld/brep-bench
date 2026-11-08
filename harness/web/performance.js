@@ -15,11 +15,11 @@ load().then(start, (e) => failed(main, e));
 // A time is the kernel's own, what starting its runner costs left out (`key`), unless the reader
 // asks for it counted (`raw`); `start` names the field of a kernel's start-up to show beside it.
 // `floor` is the least value the logarithmic axis and the ratios take (a time under TIME_FLOOR is
-// within what a runner's start-up varies by), and `floorAt`, where it is given, a kernel's floor
-// for one case in a ratio instead (board.js's `timeFloor`); `additive` says whether a total means
-// anything, `compare` whether a ratio of two kernels' does; `least` and `most` head the summary's
-// ends, `top` the runs that cost most; `higher` says more is better (else less is), for the
-// summary's shading.
+// within what a runner's start-up varies by), and a `timed` measure's ratios each kernel's floor
+// for the case instead (board.js's `timeFloor`); `additive` says whether a total means anything,
+// `compare` whether a ratio of two kernels' does; `least` and `most` head the summary's ends,
+// `top` the runs that cost most; `higher` says more is better (else less is), for the summary's
+// shading.
 const timeTick = (x) => (x < 1 ? `${Number((x * 1000).toPrecision(1))} ms` : `${Math.round(x)} s`);
 const mbTick = (x) => (x < 1000 ? `${x} MB` : `${x / 1000} GB`);
 const ratioText = (x) => (x == null ? '–' : `${x.toFixed(x < 10 ? 2 : 1)}`);
@@ -29,7 +29,7 @@ const short = `The runner's start-up is left out of both, and so are runs whose 
 const METRICS = [
   {
     key: 'built', raw: 'seconds', start: 'seconds', label: 'time', text: secondsText,
-    tick: timeTick, floor: TIME_FLOOR, floorAt: (k, i) => k.timeFloor[i], additive: true,
+    tick: timeTick, floor: TIME_FLOOR, timed: true, additive: true,
     compare: true, least: 'fastest', most: 'slowest', top: 'The slowest runs',
     about: (counted) => (counted ? `Each dot is one case's wall-clock time, from starting the
       kernel's runner to its exit, starting it counted.` : `Each dot is one case's wall-clock
@@ -39,7 +39,7 @@ const METRICS = [
   },
   {
     key: 'builtCpu', raw: 'cpu', start: 'cpu', label: 'CPU time', text: secondsText,
-    tick: timeTick, floor: TIME_FLOOR, floorAt: (k, i) => k.timeFloor[i], additive: true,
+    tick: timeTick, floor: TIME_FLOOR, timed: true, additive: true,
     compare: true, least: 'least', most: 'most', top: 'The runs that spent the most CPU time',
     about: (counted) => `Each dot is the CPU time one case spent, user and system, over every
       thread${counted ? '' : `, less the runner's start-up`}: more than its
@@ -419,7 +419,7 @@ function versus(rows, indices, m) {
       const vc = c[m.key][i];
       if (!solved(a.outcomes[i]) || !solved(c.outcomes[i]) || va == null || vc == null) continue;
       // a ratio is only as fine as the coarser of the two times
-      const f = m.floorAt ? Math.max(m.floorAt(a, i), m.floorAt(c, i)) : m.floor;
+      const f = m.timed ? Math.max(a.timeFloor[i], c.timeFloor[i]) : m.floor;
       sum += Math.log(Math.max(va, f) / Math.max(vc, f));
       n++;
     }

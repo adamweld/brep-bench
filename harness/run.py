@@ -304,6 +304,7 @@ def run_kernel(k, chosen, timeout, one_core=None):
             "case": c["id"], "outcome": outcome, "why": why,
             "seconds": rounded(ran and ran.seconds, TIME_PLACES),
             "cpu_seconds": rounded(ran and ran.cpu, TIME_PLACES),
+            "time_places": TIME_PLACES,  # rows from before microseconds have none: 3, milliseconds
             "peak_mb": rounded(ran and ran.peak_mb, 1),
             "measured": (reply or {}).get("measured", "exact"),
             "volume": (reply or {}).get("volume"), "area": (reply or {}).get("area"),
