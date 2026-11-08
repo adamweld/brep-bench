@@ -78,6 +78,104 @@ fn kind(surface: &brep_kernel::NurbsSurface) -> &'static str {
     }
 }
 
+/// The finest chord: a fraction of the body's thickness (volume over area: half a tube's radius),
+/// so a thin pipe is meshed as closely as a block.
+const FINEST: f64 = 5e-3;
+
+/// The chords tried, coarser first, as multiples of the finest. A rung that fails costs a
+/// tessellation, so there are two.
+const LADDER: [f64; 2] = [16.0, 1.0];
+
+/// How near the volume the triangles bound must be to the solid's for a chord coarser than the
+/// finest to be kept: half what the harness asks (2e-2).
+const MESH_VOLUME: f64 = 1e-2;
+
+/// The STL of `solid`, and the chord it was meshed at: the coarsest of [`LADDER`] whose triangles,
+/// as the STL holds them, are closed (joined where their points are equal, every edge used once
+/// each way) and bound the solid's `volume` to [`MESH_VOLUME`], else the finest. A dense mesh of a
+/// thin body is most of what such a case costs (the twisted thin blade: 590 000 triangles, 25 s, at
+/// the finest). Binary STL holds single precision; where that joins points the mesher kept apart,
+/// or moves the volume, the STL is ASCII with every coordinate in full.
+fn triangles(solid: &BrepSolid, volume: f64, area: f64) -> Result<(Vec<u8>, f64), Refusal> {
+    let finest = FINEST * volume.abs() / area.max(1e-12);
+    for (rung, factor) in LADDER.iter().enumerate() {
+        let chord = finest * factor;
+        let last = rung + 1 == LADDER.len();
+        let mesh = match tessellate_brep_watertight(solid, chord) {
+            Ok(mesh) => mesh,
+            Err(e) if last => return Err(format!("not meshed: {e}").into()),
+            Err(_) => continue,
+        };
+        let points64: Vec<[f64; 3]> = mesh.positions.chunks_exact(3).map(|p| [p[0], p[1], p[2]]).collect();
+        let points32: Vec<[f64; 3]> = points64.iter().map(|p| p.map(|x| x as f32 as f64)).collect();
+        let exact = sound(&points64, &mesh.indices);
+        let single = sound(&points32, &mesh.indices);
+        let near = |bound: Option<f64>, rel: f64| bound.is_some_and(|v| (v - volume).abs() <= rel * volume.abs());
+        // binary unless single precision opens what the mesher closed or moves its volume
+        let binary = single.is_some_and(|v| exact.is_none_or(|w| (v - w).abs() <= 1e-4 * w.abs()))
+            || exact.is_none();
+        if !last && !near(if binary { single } else { exact }, MESH_VOLUME) {
+            continue;
+        }
+        let bytes = if binary {
+            write_binary_stl(&mesh, "next.BREP").map_err(|e| format!("no STL: {e}"))?
+        } else {
+            ascii_stl(&points64, &mesh.indices)
+        };
+        return Ok((bytes, chord));
+    }
+    unreachable!("the last rung returns")
+}
+
+/// The volume the triangles bound when they are closed as the harness reads them: points joined
+/// where equal, a triangle with two equal corners left out, every directed edge used once and its
+/// reverse once. None when they are not.
+fn sound(points: &[[f64; 3]], indices: &[u32]) -> Option<f64> {
+    use std::collections::HashMap;
+    let mut ids: HashMap<[u64; 3], usize> = HashMap::with_capacity(points.len());
+    let id: Vec<usize> = points
+        .iter()
+        .map(|p| {
+            let next = ids.len();
+            *ids.entry(p.map(f64::to_bits)).or_insert(next)
+        })
+        .collect();
+    let mut uses: HashMap<(usize, usize), u32> = HashMap::with_capacity(indices.len());
+    let mut volume = 0.0;
+    for t in indices.chunks_exact(3) {
+        let [a, b, c] = [t[0], t[1], t[2]].map(|i| i as usize);
+        let [ia, ib, ic] = [id[a], id[b], id[c]];
+        if ia == ib || ib == ic || ic == ia {
+            continue;
+        }
+        for e in [(ia, ib), (ib, ic), (ic, ia)] {
+            *uses.entry(e).or_default() += 1;
+        }
+        let [p, q, r] = [points[a], points[b], points[c]];
+        volume += (p[0] * (q[1] * r[2] - q[2] * r[1]) - p[1] * (q[0] * r[2] - q[2] * r[0])
+            + p[2] * (q[0] * r[1] - q[1] * r[0]))
+            / 6.0;
+    }
+    let closed = !uses.is_empty() && uses.iter().all(|(&(i, j), &n)| n == 1 && uses.get(&(j, i)) == Some(&1));
+    closed.then_some(volume)
+}
+
+/// ASCII STL, each coordinate the shortest decimal that reads back as the same double.
+fn ascii_stl(points: &[[f64; 3]], indices: &[u32]) -> Vec<u8> {
+    use std::fmt::Write;
+    let mut text = String::from("solid next.BREP\n");
+    for t in indices.chunks_exact(3) {
+        let _ = writeln!(text, "facet normal 0 0 0\nouter loop");
+        for &i in t {
+            let [x, y, z] = points[i as usize];
+            let _ = writeln!(text, "vertex {x:?} {y:?} {z:?}");
+        }
+        let _ = writeln!(text, "endloop\nendfacet");
+    }
+    text.push_str("endsolid next.BREP\n");
+    text.into_bytes()
+}
+
 /// The measures, face kinds and validity of `solid`, its triangles written to `out`.
 fn report(solid: &BrepSolid, out: &str) -> Result<Value, Refusal> {
     let props = solid_mass_properties(solid).map_err(|e| format!("not measured: {e}"))?;
@@ -86,11 +184,7 @@ fn report(solid: &BrepSolid, out: &str) -> Result<Value, Refusal> {
         *faces.entry(kind(&face.surface)).or_default() += 1;
     }
     let valid = solid.validate().iter().all(|issue| issue.severity != "error");
-    // a chord of a fraction of the body's thickness (volume over area: half a tube's radius), so a
-    // thin pipe is meshed as closely as a block, well inside the harness' 2e-2 on the volume
-    let chord = 5e-3 * props.volume.abs() / props.surface_area.max(1e-12);
-    let mesh = tessellate_brep_watertight(solid, chord).map_err(|e| format!("not meshed: {e}"))?;
-    let bytes = write_binary_stl(&mesh, "next.BREP").map_err(|e| format!("no STL: {e}"))?;
+    let (bytes, _) = triangles(solid, props.volume, props.surface_area)?;
     std::fs::write(out, bytes).expect("the STL file writes");
     Ok(json!({
         "status": "ok", "volume": props.volume, "area": props.surface_area, "faces": faces,
