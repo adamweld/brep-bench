@@ -1,8 +1,9 @@
 // A kernel's page (kernel.html?k=NAME): what it is, its outcomes by category, its refusals by
 // reason, what it got wrong, what it worked around, which implementations are elegant, which
-// solids are faceted, and how long it took.
+// solids are faceted, what its STEP files are, and how long it took.
 import { load, tally, bar, legend, esc, casePage, kernelPage, OUTCOMES,
-         failed, secondsText, megabytesText, quantile } from './board.js';
+         failed, secondsText, megabytesText, quantile, STEP_VERDICTS, stepStanding,
+         stepTally } from './board.js';
 import { sortable } from './sort.js';
 
 const main = document.getElementById('kernel');
@@ -39,7 +40,8 @@ function draw(b) {
     ? `<a href='${explore({ ...extra, [`f.${k.name}`]: o })}'>${count}</a>` : '<span class=muted>·</span>');
   out += `<p class=muted>${esc(k.version)} · run ${esc(k.run.slice(0, 10))}${
     k.measured === 'mesh' ? ' · no exact measures: graded on its triangles, to 1e-3' : ''}${
-    k.step ? ' · writes STEP: each case page shows what its solid is made of' : ''}</p>
+    { writes: ' · writes STEP', cannot: ' · cannot write STEP', unset: ' · STEP not set up' }[
+      stepStanding(k).standing]}</p>
     <p>It has an implementation of ${n - t.missing} of the ${n} cases.</p>
     <div class=scroll><table><tr><th></th>${OUTCOMES.map((o) => `<th class=num>${o}</th>`).join('')}
       </tr><tr><td>${bar(t)}</td>${OUTCOMES.map((o) => `<td class=num>${counted(o, t[o])}</td>`)
@@ -122,6 +124,8 @@ function draw(b) {
       k.faceted[i]}</td><td class='cell ${k.outcomes[i]}'>${k.outcomes[i]}</td></tr>`).join('')}
     </table></div>` : '<p class=muted>None.</p>';
 
+  out += stepSection(k, all, link, b.repo);
+
   // times, CPU time and memory
   const timed = all.filter((i) => k.seconds[i] != null);
   if (timed.length) {
@@ -152,4 +156,44 @@ function draw(b) {
   sortable(main);
   // drawn after the page loaded: a section the address names (#elegance) is scrolled to now
   if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+}
+
+/** What kernel `k`'s STEP files are: its verdicts tallied, and the cases where it wrote none or
+ * none that is a closed B-rep, with why; or that its kernel cannot write STEP, or that its
+ * runner has not been set up to. */
+function stepSection(k, all, link, repo) {
+  const { standing, why } = stepStanding(k);
+  let out = `<h2 id=step>STEP</h2>`;
+  if (standing === 'cannot') {
+    return `${out}<p><span class='badge missing'>cannot</span> It cannot write its solids as STEP:
+      ${esc(why)}.</p>`;
+  }
+  if (standing === 'unset') {
+    return `${out}<p><span class='badge missing'>not set up</span> Its runner has not been set up
+      to write its solids as STEP yet, so there is nothing to judge; that says nothing of whether
+      the kernel can. See <a href='${esc(repo)}/blob/main/SPEC.md'>SPEC.md</a>
+      (STEP) to add it.</p>`;
+  }
+  const t = stepTally(k);
+  const n = t.reduce((s, [, c]) => s + c, 0);
+  const badge = (v) => `<span class='badge ${STEP_VERDICTS[v].colour}' title='${
+    esc(STEP_VERDICTS[v].means)}'>${STEP_VERDICTS[v].word}</span>`;
+  out += `<p class=muted>Each solid it builds it also writes as STEP, with its kernel's own
+    writer, in a run of its own; the harness reads the file and judges what it holds. The verdict
+    is shown, not graded.</p>`;
+  if (!n) return `${out}<p class=muted>No solid built yet to write.</p>`;
+  out += `<div class=scroll><table><tr><th>verdict</th><th class=num>solids</th><th>meaning</th></tr>${
+    t.map(([v, c]) => `<tr><td>${badge(v)}</td><td class=num data-v=${c}>${c}</td>
+      <td class=why>${esc(STEP_VERDICTS[v].means)}</td></tr>`).join('')}</table></div>`;
+  // the solids whose STEP is not a closed B-rep, refused and failed first
+  const order = ['refused', 'failed', 'open', 'empty', 'triangles', 'faceted', 'unrun'];
+  const odd = all.filter((i) => order.includes(k.stepVerdict[i]))
+    .sort((x, y) => order.indexOf(k.stepVerdict[x]) - order.indexOf(k.stepVerdict[y]));
+  if (odd.length) {
+    out += `<div class=scroll><table><tr><th>case</th><th>STEP</th><th>why</th><th>outcome</th></tr>
+      ${odd.map((i) => `<tr><td class=case>${link(i)}</td><td>${badge(k.stepVerdict[i])}</td>
+        <td class=why>${esc(k.stepWhy[i])}</td><td class='cell ${k.outcomes[i]}'>${
+        k.outcomes[i]}</td></tr>`).join('')}</table></div>`;
+  }
+  return out;
 }

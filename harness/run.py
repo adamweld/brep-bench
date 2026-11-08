@@ -20,7 +20,8 @@ has, `harness/start`, so that it starts and builds nothing, a few times over (`s
 cores bought it; that run is timed and nothing else. A kernel whose runner writes STEP
 (`"step": true` in kernels.json) is asked for its solid as STEP in a run of its own, untimed, for
 each case it built, and what the file says the solid is made of is kept beside its result
-(harness/step.py); like the runner's own `faces`, it is not graded. Times are kept to the microsecond: a
+(harness/step.py), or that its kernel's writer refused, or that the run failed; like the runner's
+own `faces`, it is not graded. Times are kept to the microsecond: a
 kernel's own time, a run's less its runner's start-up, can be under a millisecond. Standard
 library only (where there is no wait4, only the time is kept; pinning to one core needs Linux).
 """
@@ -199,10 +200,11 @@ STEP_KEPT = 5_000_000
 
 
 def step_of(command, case, timeout, keep):
-    """The make-up of the solid in STEP, from a run of its own (SPEC.md, "A runner"): the runner
-    given a third argument, the file to write. The file is kept as `keep`, for the viewer, if it is
-    no larger than STEP_KEPT. {"error": why} where the runner wrote none, or none that could be
-    read."""
+    """The make-up of the solid in STEP, from a run of its own (SPEC.md, "STEP"): the runner given
+    a third argument, the file to write. The file is kept as `keep`, for the viewer, if it is no
+    larger than STEP_KEPT. Where there is no file to read: {"refused": why} where the runner said
+    why its kernel's writer declined (`step_error`), else {"error": why}, a failure: the runner
+    crashed or ran out of time, wrote nothing and said nothing, or wrote what could not be read."""
     with tempfile.TemporaryDirectory() as tmp:
         out_step = os.path.join(tmp, "result.step")
         ran = execute(command + [case["id"], os.path.join(tmp, "result.stl"), out_step], timeout)
@@ -210,12 +212,18 @@ def step_of(command, case, timeout, keep):
             return {"error": f"over {timeout} s"}
         if ran.code != 0:
             return {"error": why_crashed(ran.stderr, ran.code)}
+        try:
+            reply = json.loads(ran.stdout.strip().splitlines()[-1])
+        except (ValueError, IndexError):
+            reply = None
         if not os.path.exists(out_step):
-            try:
-                said = json.loads(ran.stdout.strip().splitlines()[-1]).get("step_error")
-            except (ValueError, IndexError, AttributeError):
-                said = None
-            return {"error": said or "no STEP written"}
+            said = reply.get("step_error") if isinstance(reply, dict) else None
+            if said:
+                return {"refused": str(said)}
+            if isinstance(reply, dict) and reply.get("status") == "refused":
+                return {"error": "the case was refused when asked for STEP: "
+                        f"{reply.get('reason') or 'no reason given'}"}
+            return {"error": "no STEP written, and no step_error saying why"}
         try:
             makeup = step.read(out_step)
         except (ValueError, OSError) as e:
@@ -325,6 +333,15 @@ def overhead(k, timeout, one_core):
     return start, size
 
 
+def step_said(row):
+    """A result's STEP, as a run prints it: its verdict, and why where there is no file."""
+    made = row.get("step")
+    if not made:
+        return ""
+    why = made.get("refused") or made.get("error")
+    return f"  STEP {step.verdict(made)}" + (f": {why[:70]}" if why else "")
+
+
 def run_kernel(k, chosen, timeout, one_core=None):
     """Run `chosen` cases with kernel `k`: its rows, one per case, in case order. With `one_core`, a
     core's number, each case it builds (passes, builds or answers wrong) is run again on that core
@@ -350,14 +367,15 @@ def run_kernel(k, chosen, timeout, one_core=None):
             "volume": (reply or {}).get("volume"), "area": (reply or {}).get("area"),
             "faces": (reply or {}).get("faces"), "mesh": mesh,
         }
-        if k.get("step") and outcome in ("pass", "built", "wrong"):
+        if k.get("step") is True and outcome in ("pass", "built", "wrong"):
             row["step"] = step_of(k["command"], c, timeout, keep_step)
         if one_core is not None and outcome in ("pass", "built", "wrong"):
             row["one_core_seconds"] = one_core_seconds(k["command"], c, timeout, one_core)
         rows.append(row)
         cost = (f"{ran.seconds:8.3f} s {ran.cpu if ran.cpu is not None else 0:8.3f} cpu "
                 f"{ran.peak_mb or 0:7.1f} MB" if ran else " " * 33)
-        print(f"{k['name']:<14} {outcome:<8} {c['id']:<44} {cost} {why[:70]}", flush=True)
+        print(f"{k['name']:<14} {outcome:<8} {c['id']:<44} {cost} {why[:70]}{step_said(row)}",
+              flush=True)
     return rows
 
 

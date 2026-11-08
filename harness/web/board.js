@@ -56,7 +56,9 @@ export const PARALLEL_FROM = 0.1;
  * `workaround`, `elegance` (what makes its implementation elegant, '' where it is not flagged so),
  * `loc` (its implementation's lines of code), `faces` (how many faces its solid has, by its
  * runner's word) and `faceted` (where its solid is faceted, a mesh stored as B-rep faces, the
- * median of the other kernels' face counts; else null), one entry a case (a measure null where there was no run), and `start`) and
+ * median of the other kernels' face counts; else null), `stepVerdict` and `stepWhy` (its STEP
+ * verdict, a name in STEP_VERDICTS, null where it built no solid or writes no STEP, and why its
+ * writer refused or the run failed), one entry a case (a measure null where there was no run), and `start`) and
  * `ran` (those with results).
  *
  * `start` is what starting the kernel's runner costs, building nothing: as the harness measured
@@ -74,6 +76,7 @@ export async function load() {
   if (!response.ok) throw new Error(`board.json: ${response.status}`);
   const b = await response.json();
   const names = Object.fromEntries(Object.entries(b.outcomes).map(([o, c]) => [c, o]));
+  const verdicts = b.stepVerdicts || {};
   const cases = b.cases.map(([id, title, tags, settled, drawn], i) => ({
     i, id, title, tags: tags.map((t) => b.tags[t]), settled: !!settled, drawn: !!drawn,
     category: categoryOf(id),
@@ -123,6 +126,12 @@ export async function load() {
       loc: r.loc || r.codes.split('').map(() => null),
       faces: r.faces || r.codes.split('').map(() => null),
       faceted: r.faceted || r.codes.split('').map(() => null),
+      // its STEP verdict of each case (a name in STEP_VERDICTS), null where it built no solid or
+      // its kernel writes no STEP; and why, where its writer refused or the run failed
+      stepVerdict: r.step ? Array.from(r.step, (c) => verdicts[c] || null)
+        : r.codes.split('').map(() => null),
+      stepWhy: r.stepWhy ? r.stepWhy.map((i) => (i < 0 ? '' : b.stepReasons[i]))
+        : r.codes.split('').map(() => ''),
     };
   });
   return { repo: b.repo, cases, categories, kernels, ran: kernels.filter((k) => k.outcomes),
@@ -173,6 +182,40 @@ export function bar(t) {
   const spans = parts.map(([g, n]) =>
     `<span class=${g.key} style='flex-grow:${n}' title='${n} ${esc(g.label)}'></span>`).join('');
   return `<div class=bar role=img aria-label='${esc(words(t))}'>${spans}</div>`;
+}
+
+// A result's STEP verdict (harness/step.py, SPEC.md "STEP"): its word, what it means, and the
+// outcome whose colour it takes (as site.py's STEP_VERDICTS). In the order a tally lists them.
+export const STEP_VERDICTS = {
+  brep: { word: 'B-rep', colour: 'pass',
+          means: 'a solid of advanced faces, each on a surface, its shell closed' },
+  faceted: { word: 'faceted', colour: 'built',
+             means: 'a mesh stored as a B-rep: polygons, or faces that are mostly flat triangles' },
+  triangles: { word: 'triangles', colour: 'built', means: 'tessellated triangles, and no B-rep' },
+  open: { word: 'open', colour: 'wrong', means: 'faces that do not close into a solid' },
+  empty: { word: 'empty', colour: 'wrong', means: 'no solid and no faces' },
+  refused: { word: 'refused', colour: 'refused',
+             means: 'its kernel\'s STEP writer declined the solid' },
+  failed: { word: 'failed', colour: 'crashed', means: 'the runner failed to write STEP' },
+  unrun: { word: 'not yet run', colour: 'missing',
+           means: 'built before its runner was asked for STEP' },
+};
+
+/** Where kernel `k` stands on STEP, from kernels.json's `step`: `writes` (its runner writes it),
+ * `cannot` (its kernel has no STEP writer: `why` says) or `unset` (its runner has not been set up
+ * to write it). */
+export function stepStanding(k) {
+  if (k.step === true) return { standing: 'writes' };
+  if (k.step) return { standing: 'cannot', why: k.step };
+  return { standing: 'unset' };
+}
+
+/** A tally of kernel `k`'s STEP verdicts over the solids it built, by verdict, in
+ * STEP_VERDICTS' order (only those it has). */
+export function stepTally(k) {
+  const t = {};
+  for (const v of k.stepVerdict || []) if (v) t[v] = (t[v] || 0) + 1;
+  return Object.keys(STEP_VERDICTS).filter((v) => t[v]).map((v) => [v, t[v]]);
 }
 
 /** The key to the bars' colours. */

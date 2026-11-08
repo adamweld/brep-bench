@@ -2,7 +2,7 @@
 // category, tag, whether it is settled, a view, and each kernel's outcome.  What it shows is in
 // the address, so a view can be linked to.  Only the rows in sight are in the page.
 import { load, tally, words, bar, legend, esc, casePage, kernelPage, thumbOf,
-         failed, secondsText, megabytesText, solved, option } from './board.js';
+         failed, secondsText, megabytesText, solved, option, STEP_VERDICTS } from './board.js';
 import { sortButton, compare, next, rank } from './sort.js';
 
 const main = document.getElementById('explore');
@@ -41,6 +41,7 @@ const VIEWS = [
   ['workaround', 'with a workaround'],
   ['elegance', 'with an elegant solution'],
   ['faceted', 'with a faceted solid'],
+  ['step', 'with a STEP that is not a closed B-rep'],
 ];
 
 function start(b) {
@@ -159,6 +160,7 @@ function start(b) {
         case 'workaround': return shown.some((k) => k.workaround[i]);
         case 'elegance': return shown.some((k) => k.elegance[i]);
         case 'faceted': return shown.some((k) => k.faceted[i] != null);
+        case 'step': return shown.some((k) => k.stepVerdict[i] && k.stepVerdict[i] !== 'brep');
         default: return true;
       }
     }).map((c) => c.i);
@@ -255,6 +257,8 @@ function start(b) {
       const tip = [`${k.name}: ${o}`, wa && `workaround: ${wa}`, neat && `elegant: ${neat}`,
                    facets != null && `faceted: ${k.faces[c.i]} faces, the other kernels' median ${facets}`,
                    k.why[c.i],
+                   k.stepVerdict[c.i] && `STEP ${STEP_VERDICTS[k.stepVerdict[c.i]].word}${
+                     k.stepWhy[c.i] ? `: ${k.stepWhy[c.i]}` : ''}`,
                    seconds != null && secondsText(seconds),
                    mb != null && megabytesText(mb)].filter(Boolean).join(' · ');
       const shows = state.cells === 'time' ? secondsText(seconds)

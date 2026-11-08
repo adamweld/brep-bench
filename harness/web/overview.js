@@ -1,6 +1,7 @@
 // The overview: the kernels, the categories by kernels, and a strip of every case.
 import { load, tally, words, bar, legend, esc, casePage, kernelPage, groupOf, markColours,
-         failed, placeTip, solved, secondsText, megabytesText } from './board.js';
+         failed, placeTip, solved, secondsText, megabytesText, STEP_VERDICTS, stepStanding,
+         stepTally } from './board.js';
 import { sortable } from './sort.js';
 
 /** Kernel `k`'s geometric mean time over the cases it passes or builds, its runner's start-up
@@ -35,7 +36,10 @@ function draw(b) {
       first. <em>Workarounds</em> counts results reached by working around a feature the kernel
       lacks. <em>Faceted</em> counts those whose solid is a mesh stored as B-rep faces: at least
       ten times as many faces as the other kernels' solids of the case have (their median), by
-      each runner's own count. <em>Mean time</em> is the geometric mean (the mean on a logarithmic scale) of the
+      each runner's own count. <em>STEP</em> is how many of the solids it built its own STEP
+      writer wrote as a closed B-rep of faces on surfaces (the rest faceted, open, refused or
+      failed), or that it <em>cannot</em> write STEP, or that its runner is <em>not set up</em> to
+      yet. <em>Mean time</em> is the geometric mean (the mean on a logarithmic scale) of the
       kernel's own time over the cases it passes or builds, what starting its runner costs left
       out; <em>mean LOC</em> is the geometric mean of the lines of code (comments and blank lines
       left out) of its implementations of those same cases; <em>binary</em>
@@ -68,7 +72,7 @@ function kernels(b) {
     const about = `<td class=kernel data-v='${esc(k.name)}'>${name}</td><td>${esc(k.backend || '')}</td>
       <td class=wrap>${esc(k.frontend || '')}</td><td class=wrap>${esc(k.license || '')}</td>`;
     if (!k.outcomes) {
-      return `<tr>${about}<td class=muted colspan=8>awaiting an implementation</td></tr>`;
+      return `<tr>${about}<td class=muted colspan=9>awaiting an implementation</td></tr>`;
     }
     const t = tally(k);
     const worked = k.workaround.filter((w, i) => w && solved(k.outcomes[i])).length;
@@ -76,7 +80,7 @@ function kernels(b) {
     return `<tr>${about}<td class=num data-v=${total - t.missing}>${total - t.missing} <span class=muted>of ${total}</span></td>
       <td data-v=${t.pass + t.built}>${bar(t)}</td><td class=counts>${esc(words(t))}</td>
       <td class='num muted' data-v=${worked}>${worked || ''}</td>
-      <td class='num muted' data-v=${faceted}>${faceted ? `<a href='${kernelPage(k.name)}#faceted'>${faceted}</a>` : ''}</td>${timeCell(k)}${locCell(k)}${sizeCell(k)}</tr>`;
+      <td class='num muted' data-v=${faceted}>${faceted ? `<a href='${kernelPage(k.name)}#faceted'>${faceted}</a>` : ''}</td>${stepCell(k)}${timeCell(k)}${locCell(k)}${sizeCell(k)}</tr>`;
   });
   return `<div class=scroll><table><tr><th>kernel</th>
     <th title='the language the kernel is written in'>back end</th>
@@ -85,6 +89,7 @@ function kernels(b) {
     <th>outcomes</th><th></th>
     <th class=num title='passed or built by working around a feature the kernel lacks'>workarounds</th>
     <th class=num title='passed or built as a faceted solid: a mesh stored as B-rep faces, at least ten times as many as the median of the other kernels&#39; solids of the case'>faceted</th>
+    <th title='what its STEP files are: of the solids it built, how many its STEP judged a closed B-rep; or that it cannot write STEP, or has not been set up to'>STEP</th>
     <th class=num title='the geometric mean of its own time (start-up left out) over the cases it passes or builds'>mean time</th>
     <th class=num title='the geometric mean of the lines of code (comments and blank lines left out) of its implementations of the cases it passes or builds'>mean LOC</th>
     <th class=num title='the size on disk of its binary, as built for its last run'>binary</th></tr>
@@ -92,6 +97,26 @@ function kernels(b) {
 }
 
 const dash = '<td class=num><span class=muted>–</span></td>';
+
+/** Kernel `k`'s STEP, in a cell: how many of the solids it built its STEP files hold as closed
+ * B-reps, the rest in its title; or that it cannot write STEP, or has not been set up to. */
+function stepCell(k) {
+  const { standing, why } = stepStanding(k);
+  const link = (text) => `<a href='${kernelPage(k.name)}#step'>${text}</a>`;
+  if (standing === 'cannot') {
+    return `<td class=muted data-v=-1 title='${esc(`cannot write STEP: ${why}`)}'>${link('cannot')}</td>`;
+  }
+  if (standing === 'unset') {
+    return `<td class=muted data-v=-2 title='its runner has not been set up to write STEP'>${
+      link('not set up')}</td>`;
+  }
+  const t = stepTally(k);
+  const n = t.reduce((s, [, c]) => s + c, 0);
+  if (!n) return dash;
+  const brep = (t.find(([v]) => v === 'brep') || [, 0])[1];
+  const title = t.map(([v, c]) => `${c} ${STEP_VERDICTS[v].word}`).join(', ');
+  return `<td data-v=${brep / n} title='${esc(title)}'>${link(`${brep} <span class=muted>of ${n} B-rep</span>`)}</td>`;
+}
 
 function timeCell(k) {
   const m = meanTime(k);

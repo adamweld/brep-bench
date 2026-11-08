@@ -32,7 +32,9 @@ then a sound result is graded **built**. A result that works around a missing fe
 revolved from a half disk, for a kernel with no sphere) is marked † as a **workaround**; one that
 stands out as especially clean, or for an idea in its kernel's API, is marked ✦ as **elegant**. A solid stored as a mesh in B-rep form, with many times the faces the
 other kernels' solids have, is marked ▦ as **faceted**.
-**Refused** ranks above **wrong**. The full rules are in [SPEC.md](SPEC.md).
+**Refused** ranks above **wrong**. Each solid is also written as STEP with its kernel's own
+writer, and the file judged (a closed B-rep, faceted, open, or refused by the writer), which is
+shown but not graded. The full rules are in [SPEC.md](SPEC.md).
 
 ## Running it
 
@@ -56,7 +58,8 @@ kernels](docs/kernels.md) for links and details.
 
 ## Contributing
 
-- **A kernel:** add `kernels/<kernel>/` with a runner (see [SPEC.md](SPEC.md#a-runner)) and as many
+- **A kernel:** add `kernels/<kernel>/` with a runner (see [SPEC.md](SPEC.md#a-runner)), writing
+  STEP too if your kernel can, and as many
   implementations as you like, following [the rules](SPEC.md#an-implementation), add it to
   `kernels.json`, and open a pull request. `kernels/occt`, `kernels/cad-kernel` and `kernels/geop`
   each have a file for every case to copy from. Where your kernel can't build a case, add the file
