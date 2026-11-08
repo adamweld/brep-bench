@@ -531,7 +531,7 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
 KEYS = ("volume", "area")
 
 # how a STEP file represents its solid (harness/step.py's `form`), in words
-FORMS = {"advanced": "B-rep of advanced faces, each on a surface",
+FORMS = {"advanced": "advanced faces, each on a surface",
          "faceted": "faceted B-rep: polygons, no surfaces",
          "tessellated": "triangles (AP242 tessellated), no B-rep",
          "surfaces": "faces on surfaces, but no solid",
