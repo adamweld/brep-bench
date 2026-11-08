@@ -147,6 +147,7 @@
         "--version"
       ],
       "source": "kernels/solidcraft/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/solidcraft/target/release/brep-bench-solidcraft"]
     },
     {
