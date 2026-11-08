@@ -1,6 +1,6 @@
 //! The brep-bench runner for solidcore (https://github.com/tangency-labs/solidcore).
 //!
-//!     brep-bench-solidcore CASE OUT.stl
+//!     brep-bench-solidcore CASE OUT.stl [OUT.step]
 //!     brep-bench-solidcore --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
@@ -8,10 +8,17 @@
 //! applications built on solidcore call, then measures the body with the kernel's own tools: its
 //! volume and area integrated over the exact B-rep (`Body::volume`, `Body::area`), its faces by
 //! surface kind as its record names them, and the kernel's validity check (`Body::check`). It
-//! meshes the body with solidcore-tess, solidcore's one mesher, into OUT.stl and prints one line
-//! of JSON. An operation's error is a refusal: the kernel declined, saying why. A case may also
-//! refuse in its own words, where solidcore has no operation for what it describes. The runner
-//! never reads the case's description.
+//! meshes the body with solidcore-tess, solidcore's one mesher, into OUT.stl, writes it as STEP
+//! into OUT.step if asked (solidcore's own writer, step-export, through step-brep: see
+//! [`write_step`]) and prints one line of JSON. An operation's error is a refusal: the kernel
+//! declined, saying why. A case may also refuse in its own words, where solidcore has no
+//! operation for what it describes. The runner never reads the case's description.
+use solidcore::geom::attribute::AttributeStore;
+use solidcore::kernel::{Kernel, UpstreamFixes};
+use solidcore::topology::api_files::read_brep_from_file;
+use solidcore::topology::brep::p10::TopologyEnv;
+use solidcore::topology::loopuse::notify_ref;
+use solidcore::topology::topology::NotifyRecords;
 use solidcore_ops::{Body, CheckLevel};
 use solidcore_record::brep::Surface;
 use solidcore_tess::{plan, MeshTolerance};
@@ -136,10 +143,41 @@ fn finest(measure: impl Fn(f64) -> solidcore_ops::Result<f64>) -> solidcore_ops:
     last
 }
 
-/// The reply for a body built: its measures, once its triangles are written. The mesh keeps
+/// The body written as STEP into `path` with solidcore's own writer, or why not: the writer's
+/// words where it declines. The copy of the body is the runner's work, not the writer's, so a
+/// failure in it is a crash (the harness's `failed`), not a refusal. ops keeps its kernel body to itself, so the body comes out as its
+/// native `.smb` bytes (`Body::to_smb`) and is read back by the kernel as `Body::from_smb` reads
+/// them: an exact copy, nothing rebuilt. step-brep maps that B-rep to the neutral STEP model
+/// (`brep_to_model`, exact analytic and NURBS geometry), and step-export writes the model as an
+/// AP203 Part 21 file (`step_export::write`).
+fn write_step(body: &Body, path: &str) -> Result<(), String> {
+    let smb = body.to_smb(false).unwrap_or_else(|e| panic!("no .smb copy of the body: {e}"));
+    let mut k = Kernel::default();
+    k.fixes = UpstreamFixes::all();
+    let mut attributes = AttributeStore::default();
+    let mut records = NotifyRecords::new();
+    let mut env = TopologyEnv {
+        all_attributes: &[],
+        attributes: &mut attributes,
+        key_of: &notify_ref,
+        records: &mut records,
+        // where ops starts a file's curve and surface keys, clear of the entity keys
+        next_key: 1 << 50,
+    };
+    let mut brep = read_brep_from_file(&mut k, Some(smb), false, false, &mut env)
+        .unwrap_or_else(|e| panic!("the .smb copy of the body not read: {e}"));
+    brep.refresh_cached_topology();
+    let model = step_brep::brep_to_model(&brep).map_err(|e| e.to_string())?;
+    let text = step_export::write(&model).map_err(|e| e.to_string())?;
+    std::fs::write(path, text).unwrap_or_else(|e| panic!("{path} not written: {e}"));
+    Ok(())
+}
+
+/// The reply for a body built: its measures, once its triangles are written (and its STEP, if
+/// asked for: where the writer declines, the reply says why in `step_error`). The mesh keeps
 /// within a ten-thousandth of the body's size, or 1/200 of its thickness (its volume over its
 /// area) where that is less: the reference runner's rule (`kernels/occt/run.py`).
-fn measured(body: &Body, out: &str) -> Result<String, Refusal> {
+fn measured(body: &Body, out: &str, out_step: Option<&str>) -> Result<String, Refusal> {
     let volume = finest(|a| body.volume(a)).map_err(|e| format!("volume not measured: {e}"))?;
     let area = finest(|a| body.area(a)).map_err(|e| format!("area not measured: {e}"))?;
     let valid = body.check(CheckLevel::Geometry).is_ok_and(|r| r.is_valid());
@@ -164,8 +202,12 @@ fn measured(body: &Body, out: &str) -> Result<String, Refusal> {
         return Err(format!("not meshed: face {}: {}", f.face, f.reason).into());
     }
     write_stl(out, &mesh).map_err(|e| format!("{out} not written: {e}"))?;
+    let step_error = out_step
+        .and_then(|path| write_step(body, path).err())
+        .map(|e| format!(",\"step_error\":{}", quoted(&e)))
+        .unwrap_or_default();
     Ok(format!(
-        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}}}"
+        "{{\"status\":\"ok\",\"volume\":{volume:e},\"area\":{area:e},\"faces\":{{{faces}}},\"valid\":{valid}{step_error}}}"
     ))
 }
 
@@ -175,9 +217,13 @@ fn main() -> ExitCode {
         println!("solidcore {} (brep-bench runner {})", env!("KERNEL_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [_, case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-solidcore CASE OUT.stl");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [_, case, out] => (case, out, None),
+        [_, case, out, step] => (case, out, Some(step.as_str())),
+        _ => {
+            eprintln!("usage: brep-bench-solidcore CASE OUT.stl [OUT.step]");
+            return ExitCode::from(2);
+        }
     };
     let Some(&(_, build)) = cases::CASES.iter().find(|(id, _)| id == case) else {
         eprintln!("no implementation of `{case}`");
@@ -189,7 +235,7 @@ fn main() -> ExitCode {
         eprintln!("the fixes are not set: {e:?}");
         return ExitCode::from(2);
     }
-    let reply = match build().and_then(|body| measured(&body, out)) {
+    let reply = match build().and_then(|body| measured(&body, out, out_step)) {
         Ok(reply) => reply,
         Err(why) => refused(&why.to_string()),
     };

@@ -267,6 +267,7 @@
         "--version"
       ],
       "source": "kernels/solidcore/src/cases/{category}/{name_snake}.rs",
+      "step": true,
       "binary": ["kernels/solidcore/target/release/brep-bench-solidcore"]
     },
     {
