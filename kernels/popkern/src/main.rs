@@ -1,6 +1,6 @@
 //! The brep-bench runner for popkern (https://github.com/popkern-dev/popkern).
 //!
-//!     brep-bench-popkern CASE OUT.stl
+//!     brep-bench-popkern CASE OUT.stl [OUT.step]
 //!     brep-bench-popkern --version
 //!
 //! A popkern part is a Rhai script, so each case is one: `cases/boolean/napkin_ring.rhai` builds
@@ -9,6 +9,9 @@
 //! popkern serves every part), and reports popkern's own measures of it:
 //! `popkern_measure::body_volume` and `body_surface_area`, of the exact faces. Its triangles are
 //! popkern's gate tessellation (the mesh `assert_watertight` checks), welded by popkern's own weld.
+//! Asked for `OUT.step`, the runner also writes the part there with popkern's own STEP writer,
+//! `Part::step_bytes` (what `Part::export_step` writes: `popkern_io::export_step`, AP214), or says
+//! in `step_error` why the writer declined it.
 //!
 //! popkern sorts its own errors: a feature the kernel declines (`FeatureFailed`, `BooleanFailed`,
 //! …) is a refusal, in popkern's words. So is a script's own `throw "…"`: a case that refuses,
@@ -19,6 +22,7 @@ use popkern_assembly::Document;
 use popkern_analysis::FaceId;
 use popkern_analysis_brep::weld::{WeldedMesh, weld};
 use popkern_core::geometry::surface::SurfaceGeometry;
+use popkern_part::PartError;
 use popkern_rhai::outcome::{self, Outcome};
 use popkern_rhai::{HostOptions, ScriptHost};
 use serde_json::{Value, json};
@@ -69,8 +73,9 @@ fn kind(surface: &SurfaceGeometry) -> &'static str {
     }
 }
 
-/// Run the case's script and report the part it built, its triangles written to `out`.
-fn build(script: &Path, out: &str) -> Result<Value, Failure> {
+/// Run the case's script and report the part it built, its triangles written to `out`; with
+/// `out_step`, the part written there as STEP, or why popkern's writer would not (`step_error`).
+fn build(script: &Path, out: &str, out_step: Option<&Path>) -> Result<Value, Failure> {
     let source = std::fs::read_to_string(script)
         .map_err(|e| Failure::Fault(format!("{}: {e}", script.display())))?;
     let name = script.file_name().map_or("case.rhai".into(), |n| n.to_string_lossy());
@@ -110,7 +115,20 @@ fn build(script: &Path, out: &str) -> Result<Value, Failure> {
     let tagged: Vec<_> = (0..mesh.triangles.len()).map(|t| (t, FaceId(0))).collect();
     let welded = weld(&mesh, &tagged).map_err(|e| Failure::Refused(format!("no weld: {e}")))?;
     write_stl(&welded, Path::new(out)).map_err(|e| Failure::Fault(format!("no STL written: {e}")))?;
-    Ok(json!({"status": "ok", "volume": volume, "area": area, "faces": faces, "valid": valid}))
+    let mut reply =
+        json!({"status": "ok", "volume": volume, "area": area, "faces": faces, "valid": valid});
+    if let Some(path) = out_step {
+        // the product is named for the file's stem, as `Part::export_step` names it; the writer's
+        // refusal is its own error, without the file name `PartError::Io` wraps it in
+        let product = path.file_stem().map_or("part".into(), |s| s.to_string_lossy());
+        match part.step_bytes(&product) {
+            Ok(step) => std::fs::write(path, step)
+                .map_err(|e| Failure::Fault(format!("no STEP written: {e}")))?,
+            Err(PartError::Io { source, .. }) => reply["step_error"] = json!(source.to_string()),
+            Err(e) => reply["step_error"] = json!(e.to_string()),
+        }
+    }
+    Ok(reply)
 }
 
 /// `mesh` as a binary STL file.
@@ -136,15 +154,19 @@ fn main() -> ExitCode {
         println!("popkern {} (runner {})", env!("POPKERN_VERSION"), env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
-    let [case, out] = &args[..] else {
-        eprintln!("usage: brep-bench-popkern CASE OUT.stl | --version");
-        return ExitCode::from(2);
+    let (case, out, out_step) = match &args[..] {
+        [case, out] => (case, out, None),
+        [case, out, step] => (case, out, Some(Path::new(step))),
+        _ => {
+            eprintln!("usage: brep-bench-popkern CASE OUT.stl [OUT.step] | --version");
+            return ExitCode::from(2);
+        }
     };
     let Some(script) = script_of(case) else {
         eprintln!("no implementation of `{case}`");
         return ExitCode::from(2);
     };
-    match build(&script, out) {
+    match build(&script, out, out_step) {
         Ok(reply) => println!("{reply}"),
         Err(Failure::Refused(why)) => println!("{}", json!({"status": "refused", "reason": why})),
         Err(Failure::Fault(what)) => {

@@ -195,6 +195,7 @@
         "--version"
       ],
       "source": "kernels/popkern/cases/{category}/{name_snake}.rhai",
+      "step": true,
       "binary": ["kernels/popkern/target/release/brep-bench-popkern"]
     },
     {
