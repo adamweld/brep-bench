@@ -37,6 +37,8 @@ OUTCOMES = ["pass", "built", "refused", "wrong", "crashed", "timeout", "missing"
 CODES = {"pass": "p", "built": "b", "refused": "r", "wrong": "w", "crashed": "c", "timeout": "t",
          "missing": "."}
 THREE = "https://cdn.jsdelivr.net/npm/three@0.160.0"
+# Open CASCADE for the browser, which meshes a STEP file's faces for the viewer
+OCCT_JS = "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist"
 KATEX = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist"
 
 def head(title, description, depth):
@@ -384,6 +386,12 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
             shutil.copyfile(stl, dest)
             href = f"{up}meshes/{e(name)}/{e(cid)}.stl"
             mb = os.path.getsize(stl) / 1e6
+        # its STEP file, for the viewer's faces, where the run kept it (run.py's STEP_KEPT)
+        step_file, step_href = stl[:-len(".stl")] + ".step", None
+        if href and (row.get("step") or {}).get("faces") and os.path.exists(step_file):
+            dest = os.path.join(SITE, "meshes", name, cid + ".step")
+            shutil.copyfile(step_file, dest)
+            step_href = f"{up}meshes/{e(name)}/{e(cid)}.step"
         src = source(registry.get(name, {}), cid)
         code = None
         if src and os.path.exists(src):
@@ -393,7 +401,8 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
         wa = r["workarounds"].get(cid)
         neat = r["elegance"].get(cid)
         facets = r["faceted"].get(cid)
-        entries.append({"name": name, "row": row, "outcome": o, "stl": href, "mb": mb, "wa": wa,
+        entries.append({"name": name, "row": row, "outcome": o, "stl": href, "mb": mb,
+                        "step": step_href, "wa": wa,
                         "neat": neat, "facets": facets, "src": src, "code": code,
                         "loc": None if code is None else loc(code, src),
                         "label": "–" if o == "missing" else
@@ -464,10 +473,24 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
             f"<button type=button data-k='{e(en['name'])}'>{e(en['name'])} "
             f"<span class=muted>{e(en['label'])}</span></button>" for en in entries) + "</div>")
         if has_mesh:
-            out.append("<div id=view hidden><canvas id=viewer></canvas>"
-                       "<p class=muted>Drag to turn, scroll or pinch to zoom, right-drag to move. "
-                       "Black lines are where the surface turns sharply; red ones, seen through "
-                       "the solid, are open edges, where the mesh is not closed.</p></div>")
+            # what the viewer draws: the STL's triangles, or, where the entry's STEP file was
+            # kept, its B-rep faces, each colored by its surface, its edges drawn between them
+            modes = ("<div class=pick id=modes role=group aria-label='What the viewer shows'"
+                     + ("" if any(en["step"] for en in entries) else " hidden") + ">"
+                     "<button type=button data-mode=mesh aria-current=true>triangles "
+                     "<span class=muted>STL</span></button>"
+                     "<button type=button data-mode=faces>faces by surface "
+                     "<span class=muted>STEP</span></button></div>")
+            out.append("<div id=view hidden>" + modes + "<canvas id=viewer></canvas>"
+                       "<p class=legend id=kinds hidden></p>"
+                       "<p class=muted id=mesh-note>Drag to turn, scroll or pinch to zoom, "
+                       "right-drag to move. Black lines are where the surface turns sharply; red "
+                       "ones, seen through the solid, are open edges, where the mesh is not "
+                       "closed.</p><p class=muted id=faces-note hidden>Drag to turn, scroll or "
+                       "pinch to zoom, right-drag to move. The solid as its STEP file has it, "
+                       "meshed in the browser by Open CASCADE (occt-import-js): each face colored "
+                       "by the kind of its surface, and the edges that bound each face drawn "
+                       "between them.</p></div>")
         out += [entry(en, exp) for en in entries]
         out.append(PICK)
         # the table of entries sorted by a click on a row's head (the board's sort.js)
@@ -477,7 +500,7 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
     out.append(f"<p class=muted><a href='{REPO}/blob/main/cases/{e(cid)}.md'>{e(cid)}.md</a>, "
                "the case as written.</p>")
     if has_mesh:
-        out.append(VIEWER.replace("{cdn}", THREE))
+        out.append(VIEWER.replace("{cdn}", THREE).replace("{occt}", OCCT_JS))
     if exp and any(exp[k]["tex"] for k in exp):
         out.append(TEX.replace("{cdn}", KATEX))
     out.append("</body></html>")
@@ -571,7 +594,8 @@ def entry(en, exp):
     Its triangles are drawn by the page's one viewer, above it."""
     e = html.escape
     name, row, o = en["name"], en["row"], en["outcome"]
-    out = [f"<section class=entry data-k='{e(name)}' data-src='{en['stl'] or ''}' hidden "
+    out = [f"<section class=entry data-k='{e(name)}' data-src='{en['stl'] or ''}' "
+           f"data-step='{en['step'] or ''}' hidden "
            f"aria-label='{e(name)}'>"]
     if not en["stl"]:
         out.append(f"<div class='muted nomesh'>{e(name)} left no triangles to show.</div>")
@@ -653,7 +677,7 @@ def entry(en, exp):
 
 # shows the entry picked, by a click on the table of entries or the buttons, or the address's
 # #k=NAME, else the table's default; marks it picked (aria-current) and tells the viewer its
-# triangles (an `entry` event, its detail their path, '' for none)
+# triangles and its STEP file (an `entry` event, its detail {src, step}, each a path or '')
 PICK = """<script>
 (() => {
   const entries = [...document.querySelectorAll('section.entry')];
@@ -665,7 +689,8 @@ PICK = """<script>
     for (const x of entries) x.hidden = x !== entry;
     for (const m of marks) m.setAttribute('aria-current', String(m.dataset.k === k));
     if (view) view.hidden = !entry.dataset.src;
-    document.dispatchEvent(new CustomEvent('entry', { detail: entry.dataset.src }));
+    document.dispatchEvent(new CustomEvent('entry', {
+      detail: { src: entry.dataset.src, step: entry.dataset.step } }));
     return true;
   }
   const asked = () => new URLSearchParams(location.hash.slice(1)).get('k');
@@ -795,14 +820,190 @@ function build(src) {
   return built.get(src);
 }
 
+// The kinds of surface a face can lie on, as harness/step.py names them, each with its color
+// and its entities in a STEP file. A face on any other surface is `other`.
+const KINDS = [
+  ['plane', 0xb8bec8, ['PLANE']],
+  ['cylinder', 0x4c8ed9, ['CYLINDRICAL_SURFACE']],
+  ['cone', 0x2fb5a8, ['CONICAL_SURFACE']],
+  ['sphere', 0xe58a3a, ['SPHERICAL_SURFACE']],
+  ['torus', 0x9b6bd6, ['TOROIDAL_SURFACE', 'DEGENERATE_TOROIDAL_SURFACE']],
+  ['bspline', 0x5fb349, ['B_SPLINE_SURFACE_WITH_KNOTS', 'B_SPLINE_SURFACE', 'BEZIER_SURFACE',
+                         'UNIFORM_SURFACE', 'QUASI_UNIFORM_SURFACE']],
+  ['revolution', 0xd9c23b, ['SURFACE_OF_REVOLUTION']],
+  ['extrusion', 0xd95f87, ['SURFACE_OF_LINEAR_EXTRUSION']],
+  ['offset', 0x8a6f4d, ['OFFSET_SURFACE']],
+  ['other', 0x6b6b70, []],
+];
+const COLOR = Object.fromEntries(KINDS.map(([k, c]) => [k, new THREE.Color(c)]));
+const KIND_OF = Object.fromEntries(KINDS.flatMap(([k, , names]) => names.map((n) => [n, k])));
+
+// The kind of each face in a STEP file, in the order Open CASCADE reads them: each solid's
+// shells in turn (its outer shell, then its voids), each shell's faces as it lists them.
+function faceKinds(text) {
+  const entities = new Map();
+  const record = /#(\d+)\s*=\s*((?:'(?:[^']|'')*'|[^;'])*);/g;
+  let m;
+  while ((m = record.exec(text))) {
+    const body = m[2].replace(/'(?:[^']|'')*'/g, "''");
+    const names = body.trim().startsWith('(')
+      ? [...body.matchAll(/([A-Z_][A-Z0-9_]*)\s*\(/g)].map((x) => x[1])
+      : [(body.match(/^\s*([A-Z_][A-Z0-9_]*)/) || [])[1] || '?'];
+    entities.set(+m[1], { names, refs: [...body.matchAll(/#(\d+)/g)].map((x) => +x[1]) });
+  }
+  const kindOf = (face) => {
+    const surface = entities.get(face.refs[face.refs.length - 1]);
+    for (const n of surface ? surface.names : []) if (KIND_OF[n]) return KIND_OF[n];
+    return 'other';
+  };
+  const out = [];
+  for (const e of entities.values()) {
+    if (!e.names.includes('MANIFOLD_SOLID_BREP') && !e.names.includes('BREP_WITH_VOIDS')) continue;
+    for (const r of e.refs) {
+      let shell = entities.get(r);
+      if (shell && shell.names[0] === 'ORIENTED_CLOSED_SHELL') shell = entities.get(shell.refs[0]);
+      if (!shell || !shell.names[0].endsWith('_SHELL')) continue;
+      for (const f of shell.refs) if (entities.has(f)) out.push(kindOf(entities.get(f)));
+    }
+  }
+  return out;
+}
+
+// Open CASCADE compiled for the browser (occt-import-js), loaded the first time faces are shown
+const OCCT = '{occt}/';
+let occt = null;
+function openCascade() {
+  if (!occt) {
+    occt = new Promise((ok, no) => {
+      const script = document.createElement('script');
+      script.src = OCCT + 'occt-import-js.js';
+      script.onload = ok;
+      script.onerror = () => no(new Error('occt-import-js did not load'));
+      document.head.append(script);
+    }).then(() => window.occtimportjs({ locateFile: (name) => OCCT + name }));
+  }
+  return occt;
+}
+
+// A STEP file's solid, meshed by Open CASCADE: each B-rep face colored by its surface's kind,
+// and the edges bounding each face (those of its triangles that only one of them uses) drawn.
+// Where the file's faces and Open CASCADE's are not as many, the kinds are not known, and every
+// face is drawn in one color.
+function buildFaces(src) {
+  const key = 'step:' + src;
+  if (!built.has(key)) {
+    built.set(key, Promise.all([fetch(src).then((r) => {
+      if (!r.ok) throw new Error(`${src}: ${r.status}`);
+      return r.arrayBuffer();
+    }), openCascade()]).then(([buffer, oc]) => {
+      const bytes = new Uint8Array(buffer);
+      const kinds = faceKinds(new TextDecoder('latin1').decode(bytes));
+      const read = oc.ReadStepFile(bytes, { linearUnit: 'millimeter',
+        linearDeflectionType: 'bounding_box_ratio', linearDeflection: 0.0005,
+        angularDeflection: 0.2 });
+      if (!read.success || !read.meshes.length) throw new Error('Open CASCADE could not read it');
+      const count = read.meshes.reduce((n, mesh) => n + mesh.brep_faces.length, 0);
+      const known = count === kinds.length;
+      const positions = [], normals = [], colors = [], seams = [];
+      const tally = {};
+      let g = 0;
+      for (const mesh of read.meshes) {
+        const p = mesh.attributes.position.array;
+        const n = mesh.attributes.normal ? mesh.attributes.normal.array : null;
+        const index = mesh.index.array;
+        for (const face of mesh.brep_faces) {
+          const kind = known ? kinds[g] : 'other';
+          g++;
+          tally[kind] = (tally[kind] || 0) + 1;
+          const color = COLOR[kind];
+          const uses = new Map();
+          for (let t = face.first; t <= face.last; t++) {
+            const v = [index[3 * t], index[3 * t + 1], index[3 * t + 2]];
+            for (const i of v) {
+              positions.push(p[3 * i], p[3 * i + 1], p[3 * i + 2]);
+              if (n) normals.push(n[3 * i], n[3 * i + 1], n[3 * i + 2]);
+              colors.push(color.r, color.g, color.b);
+            }
+            for (let j = 0; j < 3; j++) {
+              const a = v[j], b = v[(j + 1) % 3];
+              const edge = a < b ? a + ',' + b : b + ',' + a;
+              uses.set(edge, (uses.get(edge) || 0) + 1);
+            }
+          }
+          for (const [edge, used] of uses) {
+            if (used !== 1) continue;
+            const [a, b] = edge.split(',').map(Number);
+            seams.push(p[3 * a], p[3 * a + 1], p[3 * a + 2], p[3 * b], p[3 * b + 1], p[3 * b + 2]);
+          }
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      if (normals.length === positions.length) {
+        geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+      } else {
+        geometry.computeVertexNormals();
+      }
+      geometry.computeBoundingSphere();
+      const solid = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+        vertexColors: true, roughness: 0.75, metalness: 0.0, side: THREE.DoubleSide,
+        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }));
+      const lines = new THREE.BufferGeometry();
+      lines.setAttribute('position', new THREE.Float32BufferAttribute(seams, 3));
+      const group = new THREE.Group();
+      group.add(solid, new THREE.LineSegments(lines,
+        new THREE.LineBasicMaterial({ color: dark.matches ? 0x0d0d10 : 0x22252a })));
+      group.userData.sphere = geometry.boundingSphere;
+      group.userData.tally = tally;
+      group.userData.known = known;
+      return group;
+    }));
+  }
+  return built.get(key);
+}
+
+// what the viewer shows: the triangles (`mesh`) or, where the entry has a STEP file, its faces
+let mode = 'mesh';
+let entry = { src: '', step: '' };
+const modes = document.getElementById('modes');
+const legend = document.getElementById('kinds');
+const meshNote = document.getElementById('mesh-note');
+const facesNote = document.getElementById('faces-note');
+const facesNoteText = facesNote.textContent;
+
+function marks(showing) {
+  for (const b of modes.querySelectorAll('button')) {
+    b.setAttribute('aria-current', String(b.dataset.mode === showing));
+    if (b.dataset.mode === 'faces') b.disabled = !entry.step;
+  }
+  meshNote.hidden = showing !== 'mesh';
+  facesNote.hidden = showing !== 'faces';
+  legend.hidden = true;
+}
+
+function describe(group) {
+  const t = group.userData.tally;
+  legend.innerHTML = group.userData.known
+    ? KINDS.filter(([k]) => t[k]).map(([k, c]) => `<span class=key><span style='background:#${
+      c.toString(16).padStart(6, '0')}'></span>${k} ${t[k]}</span>`).join('')
+    : `${Object.values(t).reduce((a, b) => a + b, 0)} faces; their surfaces could not be matched to them`;
+  legend.hidden = false;
+}
+
 let wanted = null;
-function show(src, fit) {
-  wanted = src;
-  build(src).then((group) => {
-    if (src !== wanted) return;  // another entry was picked while this one loaded
+function show(fit) {
+  const faces = mode === 'faces' && entry.step;
+  const key = faces ? 'step:' + entry.step : entry.src;
+  wanted = key;
+  marks(faces ? 'faces' : 'mesh');
+  if (faces) facesNote.textContent = 'Reading the STEP file…';
+  (faces ? buildFaces(entry.step) : build(entry.src)).then((group) => {
+    if (key !== wanted) return;  // another entry or mode was picked while this one loaded
     if (shown) scene.remove(shown);
     shown = group;
     scene.add(shown);
+    if (faces) { facesNote.textContent = facesNoteText; describe(group); }
     if (fit) {
       const { center, radius } = group.userData.sphere;
       const away = new THREE.Vector3(1, -1, 0.9).normalize()
@@ -812,6 +1013,9 @@ function show(src, fit) {
       camera.updateProjectionMatrix();
       controls.target.copy(center);
     }
+  }, (error) => {
+    if (key !== wanted || !faces) return;
+    facesNote.textContent = `The STEP file could not be shown: ${error.message}.`;
   });
 }
 
@@ -821,21 +1025,29 @@ function frame() {
   renderer.render(scene, camera);
 }
 
-// the entry picked (the page's other script's `entry` event, its detail the path of its
-// triangles): the camera is fitted to the first solid shown, and stays put as others are picked,
-// so they can be compared; nothing is drawn while the viewer is hidden
+// the entry picked (the page's other script's `entry` event, its detail the paths of its
+// triangles and its STEP file): the camera is fitted to the first solid shown, and stays put as
+// others are picked, so they can be compared; nothing is drawn while the viewer is hidden
 let fitted = false;
-function picked(src) {
-  renderer.setAnimationLoop(src ? frame : null);
-  if (!src) return;
-  show(src, !fitted);
+function picked(detail) {
+  entry = detail || { src: '', step: '' };
+  renderer.setAnimationLoop(entry.src ? frame : null);
+  if (!entry.src) return;
+  show(!fitted);
   fitted = true;
 }
+modes.addEventListener('click', (event) => {
+  const b = event.target.closest('button');
+  if (!b || b.disabled || b.dataset.mode === mode) return;
+  mode = b.dataset.mode;
+  if (entry.src) show(false);
+});
 document.addEventListener('entry', (event) => picked(event.detail));
 new ResizeObserver(resize).observe(canvas);
 resize();
 // this module runs after the other script has picked the first entry
-picked(document.querySelector('section.entry:not([hidden])')?.dataset.src);
+const first = document.querySelector('section.entry:not([hidden])');
+picked(first && { src: first.dataset.src, step: first.dataset.step });
 </script>"""
 
 

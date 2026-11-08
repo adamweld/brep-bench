@@ -78,6 +78,7 @@ img.thumb { width: 64px; height: 64px; object-fit: contain; border-radius: 4px;
 .pick button, .chip { font: inherit; padding: 4px 12px; border-radius: 999px; cursor: pointer;
                border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
 .chip[aria-pressed=true] { border-color: var(--accent); color: var(--accent); }
+.pick button:disabled { opacity: 0.45; cursor: default; }
 /* a case page's entries: the table of them all, a column each, picks the one shown below it */
 table.entries th, table.entries td { padding: 4px 10px; text-align: center; }
 table.entries th[scope=row] { text-align: left; font-weight: normal; color: var(--muted); }

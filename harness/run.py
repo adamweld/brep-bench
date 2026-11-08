@@ -192,11 +192,17 @@ def run_one(command, case, timeout, keep):
         return (*grade(case, reply, mesh), reply, mesh, ran)
 
 
-def step_of(command, case, timeout):
+# the largest STEP file kept for the viewer, in bytes: a faceted solid's runs to tens of
+# megabytes, which the results' cache and the site would carry for every run; its make-up is kept
+# whatever its size
+STEP_KEPT = 5_000_000
+
+
+def step_of(command, case, timeout, keep):
     """The make-up of the solid in STEP, from a run of its own (SPEC.md, "A runner"): the runner
-    given a third argument, the file to write. {"error": why} where the runner wrote none, or none
-    that could be read. The file is not kept: a faceted solid's runs to tens of megabytes, and its
-    make-up is what the board shows."""
+    given a third argument, the file to write. The file is kept as `keep`, for the viewer, if it is
+    no larger than STEP_KEPT. {"error": why} where the runner wrote none, or none that could be
+    read."""
     with tempfile.TemporaryDirectory() as tmp:
         out_step = os.path.join(tmp, "result.step")
         ran = execute(command + [case["id"], os.path.join(tmp, "result.stl"), out_step], timeout)
@@ -211,9 +217,13 @@ def step_of(command, case, timeout):
                 said = None
             return {"error": said or "no STEP written"}
         try:
-            return step.read(out_step)
+            makeup = step.read(out_step)
         except (ValueError, OSError) as e:
             return {"error": f"unreadable STEP: {e}"}
+        if os.path.getsize(out_step) <= STEP_KEPT:
+            os.makedirs(os.path.dirname(keep), exist_ok=True)
+            shutil.copyfile(out_step, keep)
+        return makeup
 
 
 # the decimal places a time in seconds is kept to: microseconds
@@ -322,8 +332,10 @@ def run_kernel(k, chosen, timeout, one_core=None):
     rows = []
     for c in chosen:
         keep = os.path.join(ROOT, "results", "meshes", k["name"], c["id"] + ".stl")
-        if os.path.exists(keep):
-            os.remove(keep)
+        keep_step = keep[:-len(".stl")] + ".step"
+        for kept in (keep, keep_step):
+            if os.path.exists(kept):
+                os.remove(kept)
         if not implemented(k, c):
             outcome, why, reply, mesh, ran = "missing", "no implementation", None, None, None
         else:
@@ -339,7 +351,7 @@ def run_kernel(k, chosen, timeout, one_core=None):
             "faces": (reply or {}).get("faces"), "mesh": mesh,
         }
         if k.get("step") and outcome in ("pass", "built", "wrong"):
-            row["step"] = step_of(k["command"], c, timeout)
+            row["step"] = step_of(k["command"], c, timeout, keep_step)
         if one_core is not None and outcome in ("pass", "built", "wrong"):
             row["one_core_seconds"] = one_core_seconds(k["command"], c, timeout, one_core)
         rows.append(row)
@@ -434,9 +446,10 @@ def run_plan(plan, timeout, one_core=None):
             continue
         for cid in gone:
             del rows[cid]
-            mesh = os.path.join(ROOT, "results", "meshes", name, cid + ".stl")
-            if os.path.exists(mesh):
-                os.remove(mesh)
+            for ext in (".stl", ".step"):
+                mesh = os.path.join(ROOT, "results", "meshes", name, cid + ext)
+                if os.path.exists(mesh):
+                    os.remove(mesh)
         # whether its runner is asked for anything: if not, it was not built (changed.py)
         asked = any(implemented(k, c) for c in wanted)
         # measured again when the kernel's whole suite runs (its runner changed) or they never

@@ -32,7 +32,10 @@ descending, then back to the order drawn, with blank cells last. It has:
   (three views and an isometric); a table of every kernel's entry at a glance, a column each (its
   outcome, its errors or measures, its time, CPU time and peak memory, and its lines of code,
   comments left out), its columns sorted by a click on a row's head; and the entry picked, by a click on that table or
-  on the buttons under it: its result in a 3D viewer, with any open edges of its mesh marked in red;
+  on the buttons under it: its result in a 3D viewer, with any open edges of its mesh marked in red,
+  and, where its kernel writes STEP and the file is no larger than 5 MB, its faces as the STEP
+  file has them (meshed in the browser by Open CASCADE, occt-import-js), each colored by the
+  kind of its surface, with the edges between them drawn;
   its time; its notes (why it failed, what it works around, what makes it elegant); its data (its measures against the
   expected ones, which other kernels it agrees with, its faces, its mesh and its STL to download,
   and, for a kernel that writes STEP, what its STEP file says the solid is made of: whether it is
