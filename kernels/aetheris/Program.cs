@@ -1,6 +1,6 @@
 // The brep-bench runner for Aetheris (https://github.com/yuechen-li-dev/Aetheris).
 //
-//     brep-bench-aetheris CASE OUT.stl
+//     brep-bench-aetheris CASE OUT.stl [OUT.step]
 //     brep-bench-aetheris --version
 //
 // An Aetheris part is a Firmament source, so each case is one: `cases/boolean/napkin_ring.firmament`
@@ -8,6 +8,12 @@
 // Aetheris's own compiler (`FirmamentBuildAndExport`, the route `aetheris measure` takes), reads the
 // exact AP242 body it exports back in, and meshes that body with Aetheris's own STL route
 // (SurfaceMeshIR, the route `aetheris mesh` takes), finely.
+//
+// Given OUT.step, the runner also writes that exported AP242 text to it, as
+// `aetheris build part.firmament --out part.step` writes it. Aetheris's own STEP writer
+// (Step242Exporter) runs inside the compiler, so the text is there whether or not it is asked for,
+// and a body it cannot write is no body at all: the compiler refuses the case. So there is no
+// separate STEP refusal to report.
 //
 // Aetheris has exact volumes for only a few families of body, and no exact area: its general mass
 // properties are integrated over a display tessellation, and it says so. So the runner answers
@@ -19,6 +25,7 @@
 // does not parse, or names an unknown field) is a fault of the implementation, not a refusal: the
 // runner prints it and exits non-zero, so the harness records a crash.
 using System.Reflection;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -86,7 +93,7 @@ static class Runner
         return string.Join(" ", paragraph)["Refused:".Length..].Trim();
     }
 
-    static object Build(string path, string output)
+    static object Build(string path, string output, string? step)
     {
         var source = File.ReadAllText(path);
         if (Code(source).Length == 0) throw new Refused(Refusal(source));
@@ -120,6 +127,8 @@ static class Runner
                 + $"{topology.OrientationConflictEdgeCount} edges whose faces disagree in orientation"
                 + (topology.IsOutwardOriented ? "" : ", not oriented outward") + (topology.IsConnected ? "" : ", not connected"));
         BinaryStlExporter.Export(output, mesh);
+        // the AP242 text Aetheris exported, written as `aetheris build` writes it: UTF-8, no BOM
+        if (step is not null) File.WriteAllText(step, built.Value.StepText, new UTF8Encoding(false));
         return new { status = "ok", measured = "mesh", faces, valid };
     }
 
@@ -133,9 +142,9 @@ static class Runner
             Console.WriteLine($"Aetheris {kernel?.Split('+')[0] ?? "unknown"} at {commit?[..12] ?? "unknown"} (runner 0.1.0)");
             return 0;
         }
-        if (args is not [var id, var output])
+        if (args.Length > 3 || args is not [var id, var output, ..])
         {
-            Console.Error.WriteLine("usage: brep-bench-aetheris CASE OUT.stl | --version");
+            Console.Error.WriteLine("usage: brep-bench-aetheris CASE OUT.stl [OUT.step] | --version");
             return 2;
         }
         if (SourceOf(id) is not { } path)
@@ -145,7 +154,7 @@ static class Runner
         }
         try
         {
-            Console.WriteLine(JsonSerializer.Serialize(Build(path, output), Json));
+            Console.WriteLine(JsonSerializer.Serialize(Build(path, output, args is [_, _, var step] ? step : null), Json));
         }
         catch (Refused refused)
         {

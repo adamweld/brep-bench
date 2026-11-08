@@ -216,6 +216,7 @@
       ],
       "measured": "mesh",
       "source": "kernels/aetheris/cases/{category}/{name_snake}.firmament",
+      "step": true,
       "binary": ["kernels/aetheris/bin/Release/net10.0/*.dll"]
     },
     {
