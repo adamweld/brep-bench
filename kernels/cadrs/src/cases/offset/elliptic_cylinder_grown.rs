@@ -36,6 +36,7 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
         body: BodyKind::Solid,
         path,
         control: SweepControl::LockDirection(unit(v3(0.0, 0.0, 1.0))),
+        corners: Default::default(),
         faces: vec![],
     };
     let swept = first(k.sweep_with(&band.sketch(), &spec)?)?;

@@ -23,7 +23,20 @@ pub fn first(r: cadrs_kernel::OpResult) -> Result<BodyId, Refusal> {
 /// The solid `profile`'s regions sweep along `path` (cadrs's Sweep, Solid, no profile control:
 /// the profile keeps its angle to the path, corners mitred).
 pub fn sweep(k: &mut DefaultKernel, profile: &Profile, path: Vec<PathCurve>) -> Result<BodyId, Refusal> {
-    let spec = SweepSpec { body: BodyKind::Solid, path, control: SweepControl::None, faces: vec![] };
+    let spec = SweepSpec { body: BodyKind::Solid, path, control: SweepControl::None, corners: Default::default(), faces: vec![] };
+    first(k.sweep_with(profile, &spec)?)
+}
+
+/// [`sweep`], round the path's sharp corners by turning the profile about each corner (not
+/// mitred).
+pub fn sweep_round_corners(k: &mut DefaultKernel, profile: &Profile, path: Vec<PathCurve>) -> Result<BodyId, Refusal> {
+    let spec = SweepSpec {
+        body: BodyKind::Solid,
+        path,
+        control: SweepControl::None,
+        corners: cadrs_kernel::SweepCorners::Round,
+        faces: vec![],
+    };
     first(k.sweep_with(profile, &spec)?)
 }
 
@@ -126,6 +139,6 @@ pub fn sweep_law(
     twist: f64,
     scale: f64,
 ) -> Result<BodyId, Refusal> {
-    let spec = SweepSpec { body: BodyKind::Solid, path, control: SweepControl::None, faces: vec![] };
+    let spec = SweepSpec { body: BodyKind::Solid, path, control: SweepControl::None, corners: Default::default(), faces: vec![] };
     first(k.sweep_with_law(profile, &spec, &cadrs_kernel::SweepLaw { twist, scale })?)
 }
