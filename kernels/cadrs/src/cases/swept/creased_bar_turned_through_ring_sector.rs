@@ -5,11 +5,12 @@
 //! The bar's section is the rectangle 10 ≤ a ≤ 13, |b| ≤ 2 in the plane through the origin
 //! spanned by u = (1, 0, 0) and v = (0, cos 20°, −sin 20°); each half of it is cadrs's solid Loft
 //! from that rectangle to the one 4 along ±n (n = u × v) whose sides are drawn in by 4 tan 2°, and
-//! the bar is the two united. What it passes through is cadrs's sweep of a solid (one turn), cut
-//! from the block.
-use crate::bench::{cut, p3, plane, rectangle, sketch, union, v3};
+//! the bar is the two united. What it passes through is cut from the block by cadrs's cut of a
+//! swept solid (one turn: the block less the bar where it starts and less each of its leading
+//! faces' sweeps).
+use crate::bench::{p3, plane, rectangle, sketch, union, v3};
 use crate::shared::loft::loft;
-use crate::shared::swept::{ring_sector, swung, z_axis};
+use crate::shared::swept::{cut_swept, ring_sector, swing, z_axis};
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel};
 
@@ -24,6 +25,5 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let up = loft(k, vec![section(0.0, 0.0), section(4.0, d)])?;
     let down = loft(k, vec![section(-4.0, d), section(0.0, 0.0)])?;
     let bar = union(k, up, down)?;
-    let swept = swung(k, bar, z_axis(), -140.0, 140.0)?;
-    cut(k, block, swept)
+    cut_swept(k, block, bar, &swing(z_axis(), -140.0, 140.0))
 }
