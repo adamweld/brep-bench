@@ -4,9 +4,7 @@
 //!
 //! A block is a rectangle extruded and a cylinder a circle extruded, as a sketch-based modeller
 //! such as Onshape makes them; a ball, a cone and a torus are the kernel's primitives
-//! (`Kernel::primitive`). A torus whose tube is as wide as its ring or wider, which the primitive
-//! refuses, is its section revolved, which its case flags as a workaround (`workarounds.toml`:
-//! "no torus primitive").
+//! (`Kernel::primitive`), a torus whose tube is as wide as its ring or wider among them.
 //!
 //! Lengths are the cases' units (cadrs reads them as mm); angles here are in degrees, as the
 //! cases give them, and turned into the kernel's radians.
@@ -249,8 +247,8 @@ pub fn cone(
 }
 
 /// The torus about the axis through `center` along `dir`, the circle through its tube's middle
-/// of radius `major` and its tube of radius `minor` (cadrs's torus primitive; a tube as wide as
-/// its ring or wider, which the primitive refuses, is its section revolved).
+/// of radius `major` and its tube of radius `minor` (cadrs's torus primitive: a ring, horn or
+/// spindle torus).
 pub fn torus(
     k: &mut DefaultKernel,
     center: P3,
@@ -258,11 +256,7 @@ pub fn torus(
     major: f64,
     minor: f64,
 ) -> Result<BodyId, Refusal> {
-    if minor < major {
-        return first(k.primitive(&Primitive::Torus { center, axis: unit(dir), major, minor })?);
-    }
-    let s = sketch(through_axis(center, dir), vec![round((major, 0.0), minor)]);
-    revolve(k, &s, axis(center, dir), None)
+    first(k.primitive(&Primitive::Torus { center, axis: unit(dir), major, minor })?)
 }
 
 // Booleans.
