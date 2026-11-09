@@ -87,6 +87,10 @@ poles where the face's parameters pinch, and an elliptic cylinder is grown and s
 offset to a curve that is no conic: shrunk within its least radius of curvature it has a closed
 form, and shrunk past it the offset turns back on itself in swallowtails that must be trimmed.
 
+A dumbbell shrunk beyond half its neck width splits into two separate bodies, each keeping the
+curved bulge at the lost neck's mouth. Both bodies must survive; unlike the dumbbell shell, it is
+the material itself that separates. Its volume and area have closed forms.
+
 ## Thickened sheets (`thicken/`)
 
 A sheet (a face or faces with no solid behind them) thickened into the solid between it and its
@@ -188,6 +192,10 @@ raised and the hole runs on with it, an L's step is pushed out, a hole's wall is
 it, and a top is raised carrying its round along rather than stretching it. Every one has a closed
 form.
 
+Two holes widened until they overlap add a change of topology: their cylindrical walls must trim
+against each other and the two openings become one. The result is given by the union of two disks
+extruded through the plate, so its measures also have closed forms.
+
 ## Filled surfaces (`fill/`)
 
 A surface made to fill a loop of edges, the bilinearly blended Coons patch, capping a block: four
@@ -214,6 +222,12 @@ another; a hoof cut from a cylinder through a diameter of its base, whose curved
 nothing where base, top and side meet; a tube bored off center, its wall a millionth of its
 radius thick on one side; and a lens of two unequal balls, the line through their centers aslant
 to every axis.
+
+Two coaxial tori in common meet in two separate circles, bounding a ring whose meridian is a
+disk lens. Four balls at a regular tetrahedron's vertices have a Reuleaux tetrahedron in common,
+its spherical patches meeting three at each vertex. Two disjoint tori linked through each other
+test separate bodies with linked placement, rather than nested cavities; volume, area and mesh
+closure alone do not verify that link. All three cases have closed-form measures.
 
 ## Integration tests (`integration/`)
 
