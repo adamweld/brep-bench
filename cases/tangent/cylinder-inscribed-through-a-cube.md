@@ -26,3 +26,7 @@ are not edges of the result: each of the four faces it touches stays one whole s
 
 If the cylinder you make has a seam, turn it so that the seam does not lie on one of the lines of
 contact: put it at 45° to them, along the line y = z of the wall.
+
+**As a set:**
+
+$$[-5,5]^3 \cup \{\,y^2 + z^2 \le 5^2,\ |x| \le 10\,\}$$

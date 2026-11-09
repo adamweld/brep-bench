@@ -28,3 +28,8 @@ straight horizontal segment between two neighboring helices. The two broad faces
 are swept by the long sides, each 0.2 from the axis; at their outer edges they are steep, the
 helices there rising only 60 in a circumference of about 126. The two narrow faces, 0.4 wide, are
 swept by the short sides, 20 from the axis. The ends are flat.
+
+**As a set:**
+
+$$\{\,|u| \le 20,\ |v| \le 0.2,\ 0 \le z \le 60\,\}, \quad (u, v) = (x\cos\alpha + y\sin\alpha,\
+-x\sin\alpha + y\cos\alpha),\ \alpha = 6^\circ\cdot z$$

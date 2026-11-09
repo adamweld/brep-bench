@@ -22,3 +22,7 @@ Chamfer that inside edge with the same distance 7 on both of its faces, adding m
 chamfer is the plane through the lines (10, y, 3) and (3, y, 10), the far edges of both faces, so
 it consumes both faces entirely. The section becomes the pentagon through (0, 0), (10, 0),
 (10, 3), (3, 10) and (0, 10), in xz.
+
+**As a set:**
+
+$$\{\,0 \le x \le 10,\ 0 \le z \le 10,\ x + z \le 13,\ 0 \le y \le 10\,\}$$

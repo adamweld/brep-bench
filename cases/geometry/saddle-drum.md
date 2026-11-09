@@ -22,3 +22,7 @@ whose four control points are (−10, −10, 22.5), (10, −10, −2.5), (−10,
 That patch is exactly the saddle over the whole square (a bilinear patch is a hyperbolic
 paraboloid). The drum's top is the part of it inside the circle of radius 8, trimmed by the drum's
 side: it rises to 14 above the diagonal x = y and falls to 6 above x = −y.
+
+**As a set:**
+
+$$\{\,\rho \le 8,\ 0 \le z \le 10 + \tfrac{xy}{8}\,\}$$

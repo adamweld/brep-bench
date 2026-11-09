@@ -23,3 +23,7 @@ z = 9) and two vertical (at 21 and 39 from the z axis), with a square hole 14 ×
 so the wall is 2 thick all around. The section is the same all the way around: the duct is that
 hollow square, standing in the xz plane at x = 30, turned a quarter turn about the z axis, from +x
 toward +y. Its two ends are flat, in the xz and yz planes.
+
+**As a set:**
+
+$$\{\,7 \le \max(|\rho - 30|,\ |z|) \le 9,\ x \ge 0,\ y \ge 0\,\}$$

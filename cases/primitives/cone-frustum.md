@@ -14,3 +14,7 @@ tex = '\pi\left(r_1 + r_2\right)\sqrt{h^2 + \left(r_1 - r_2\right)^2} + \pi\left
 +++
 
 A truncated cone on the z axis, from z = 0 to z = 6, of radius 5 at its base (z = 0) and radius 2 at its top (z = 6).
+
+**As a set:**
+
+$$\{\,\rho \le 5 - \tfrac{z}{2},\ 0 \le z \le 6\,\}$$

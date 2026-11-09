@@ -20,3 +20,8 @@ is added and every edge stays where its two faces meet.
 
 The grown plate is the outline through (−1, −1), (21, −1), (21, 6), (6, 6), (6, 16) and (−1, 16),
 extruded from z = −1 to z = 9.
+
+**As a set:**
+
+$$\bigl(\operatorname{poly}\bigl((0,0),(20,0),(20,5),(5,5),(5,15),(0,15)\bigr)\times[0,8]\bigr)
+\oplus [-1,1]^3$$

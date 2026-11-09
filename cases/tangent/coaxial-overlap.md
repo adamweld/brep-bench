@@ -20,3 +20,7 @@ Between z = 6 and z = 10 their walls coincide. The union is one cylinder from z 
 the first's top and the second's bottom lie inside it and go, and its wall is one smooth surface.
 If the cylinders you make have a seam, turn the second a quarter turn about the z axis, so that
 the coincident walls are not split in the same place.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \cup \{\,\rho \le 5,\ 6 \le z \le 16\,\}$$

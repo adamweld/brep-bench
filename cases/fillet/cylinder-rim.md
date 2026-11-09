@@ -14,3 +14,8 @@ tex = '150\pi - 9\pi - 10\pi + 2\pi\left(4 + \tfrac{2}{\pi}\right)\tfrac{\pi}{2}
 +++
 
 A cylinder of radius 5 on the z axis, from z = 0 to z = 10. Round the circular edge around its top face to radius 1.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \setminus \{\,\rho \ge 4,\ z \ge 9,\ (\rho - 4)^2 + (z - 9)^2
+\ge 1\,\}$$

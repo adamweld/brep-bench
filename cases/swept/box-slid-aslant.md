@@ -19,3 +19,7 @@ to (18, 11, 7). Make the solid of everything the box passes through.
 
 It is a convex polyhedron with twelve faces, in six parallel pairs: the box's three pairs of faces,
 and three pairs of parallelograms, each with one edge of the box and the slide's vector as its sides.
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,6]\times[0,4]\bigr) \oplus \{\,s\,(8,5,3) : 0 \le s \le 1\,\}$$

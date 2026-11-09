@@ -65,7 +65,8 @@ kernels](docs/kernels.md) for links and details.
   each have a file for every case to copy from. Where your kernel can't build a case, add the file
   anyway and have it refuse, saying why.
 - **A case:** add `cases/<category>/<name>.md` with its closed forms, if it has them, and a
-  description two careful readers would build the same way. Hard cases are the most valuable,
+  description two careful readers would build the same way. Where it helps, end it with the solid
+  [as a set](SPEC.md#the-solid-as-a-set). Hard cases are the most valuable,
   especially ones your own kernel gets wrong.
 
 ## License

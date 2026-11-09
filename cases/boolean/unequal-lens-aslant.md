@@ -19,3 +19,7 @@ the lens common to both.
 
 `boolean/sphere-lens` with its balls unequal and the line between their centers off every axis, so
 the circle where their spheres meet lies in a plane aslant to x, y and z.
+
+**As a set:**
+
+$$B_{5.511}(0,0,0) \cap B_{3.317}(4.231,\ 3.467,\ 2.653)$$

@@ -21,3 +21,7 @@ a square hole at its center leaving a wall 2 thick. At y = 0 the outside is 24 �
 −12 to 12) and the hole 20 × 20; at y = 40 the outside is 12 × 12 and the hole 8 × 8. In
 between, the sizes run linearly with y, so each corner, outside and in, runs in a straight line
 from one end to the other and the eight long faces are flat trapezoids. The two ends are flat.
+
+**As a set:**
+
+$$\{\,h - 2 \le \max(|x|,\ |z|) \le h,\ 0 \le y \le 40\,\}, \quad h = 12 - \tfrac{3y}{20}$$

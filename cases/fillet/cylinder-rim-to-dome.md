@@ -20,3 +20,7 @@ The ball rolling around the rim has its center on the axis, at (0, 0, 5), so the
 to nothing and the round is a hemisphere of radius 5 centered there, tangent to the cylinder's
 side along the circle at z = 5. The solid is a cylinder from z = 0 to z = 5 under that dome, its
 top the point (0, 0, 10).
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 5\,\} \cup \bigl(B_5(0,0,5) \cap \{\,z \ge 5\,\}\bigr)$$

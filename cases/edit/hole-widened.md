@@ -22,3 +22,7 @@ meet it.
 
 The result is the box from the origin to (40, 30, 8), drilled right through along z by a hole of
 radius 7 through (20, 15).
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,8]\bigr) \setminus \{\,(x-20)^2 + (y-15)^2 \le 7^2\,\}$$

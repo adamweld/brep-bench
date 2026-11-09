@@ -18,3 +18,7 @@ at each end, from z = 2.5 to z = 7.5.
 
 The trimmed curve's area and length have no closed form here, so the case is unsettled until two
 kernels agree.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{25} + \tfrac{y^2}{9} \le 1,\ 0 \le z \le 10\,\} \ominus B_{2.5}$$

@@ -23,3 +23,8 @@ The result is the box less the box from (0.001, 0.001, 0.001) to (9.999, 7.999, 
 times thinner than the box is wide, whose rim is a frame 0.001 wide. Its volume is small beside its
 area, so a kernel whose tolerances are fixed lengths rather than fractions of the solid's size loses
 it.
+
+**As a set:**
+
+$$K \setminus \bigl([0.001,\,9.999]\times[0.001,\,7.999]\times[0.001,\,6]\bigr), \quad K =
+[0,10]\times[0,8]\times[0,6]$$

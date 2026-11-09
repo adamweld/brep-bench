@@ -22,3 +22,7 @@ are not drafted; the top grows to meet the drafted sides.
 The result is an upside-down frustum of a rectangular pyramid, with six faces. Its floor is the
 rectangle from (0, 0, 0) to (20, 12, 0), and its section at height z is that rectangle outset
 z·tan 5° on every side, so its top is outset 10·tan 5° ≈ 0.875.
+
+**As a set:**
+
+$$\{\,s \le x \le 20 - s,\ s \le y \le 12 - s,\ 0 \le z \le 10\,\}, \quad s = -z\tan 5^\circ$$

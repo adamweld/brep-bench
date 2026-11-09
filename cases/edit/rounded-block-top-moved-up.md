@@ -24,3 +24,8 @@ two ends x = 0 and x = 40 run on up to meet the moved round and top.
 
 The result is the box from the origin to (40, 30, 16), with the edge where its top meets its back,
 y = 30, rounded to radius 3.
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,16]\bigr) \setminus \{\,y \ge 27,\ z \ge 13,\ (y-27)^2 + (z-13)^2
+\ge 3^2\,\}$$

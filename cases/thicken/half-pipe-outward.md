@@ -21,3 +21,7 @@ The thickened sheet is the half of the thick-walled tube between radii 5 and 6 w
 z = 0 to z = 10. Its faces are the sheet, the half cylinder of radius 6 it moves to, a half annulus
 at each end, and the two flat strips, each 1 by 10, that its straight edges sweep in the plane
 y = 0.
+
+**As a set:**
+
+$$\{\,5 \le \rho \le 6,\ y \ge 0,\ 0 \le z \le 10\,\}$$

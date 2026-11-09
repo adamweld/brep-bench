@@ -21,3 +21,7 @@ cylinder of radius 1, each corner an eighth of a ball. The hole narrows to radiu
 its rims becomes the inner quarter of a torus's tube: a tube of radius 1 about the rim's circle,
 of radius 3, on the side toward the axis, a saddle. So the hole flares from radius 2 out to
 radius 3 at the grown plate's faces, z = −1 and z = 5, meeting them tangentially.
+
+**As a set:**
+
+$$\bigl(\bigl([-10,10]^2\times[0,4]\bigr) \setminus \{\,\rho \le 3\,\}\bigr) \oplus B_{1}$$

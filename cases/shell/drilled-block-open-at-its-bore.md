@@ -24,3 +24,8 @@ All six of the block's faces are walls, moved 1 inward, and the cavity, the box 
 (19, 19, 9), runs out to the bore's cylinder: the result is a hollow box whose cavity opens into the
 hole. The rim lies on the cylinder of radius 3, in two bands each 1 high, from z = 0 to z = 1 and
 from z = 9 to z = 10, and the inside top and bottom each have the hole of radius 3 through them.
+
+**As a set:**
+
+$$D \setminus \bigl([1,19]^2\times[1,9]\bigr), \quad D = \bigl([0,20]^2\times[0,10]\bigr) \setminus
+\{\,(x-10)^2 + (y-10)^2 \le 3^2\,\}$$

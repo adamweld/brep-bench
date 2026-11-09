@@ -17,3 +17,7 @@ Twelve balls of radius 3, their centers evenly spaced on the circle of radius 10
 in the plane z = 0, the first at (10, 0, 0). Neighboring balls, whose centers are 2·10·sin 15°
 apart, overlap in a lens; no ball meets any other but its two neighbors. Join them, one after
 another, into one ring.
+
+**As a set:**
+
+$$\bigcup_{k=0}^{11} B_3\bigl(10\cos 30^\circ k,\ 10\sin 30^\circ k,\ 0\bigr)$$

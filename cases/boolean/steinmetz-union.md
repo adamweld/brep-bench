@@ -14,3 +14,7 @@ tex = '2\left(2\pi r L + 2\pi r^2\right) - 16r^2'
 +++
 
 Two cylinders of radius 5 and length 30 that cross at right angles. The first lies along the x axis, from x = −15 to 15; the second along the y axis, from y = −15 to 15. Make their union.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 5^2,\ |x| \le 15\,\} \cup \{\,x^2 + z^2 \le 5^2,\ |y| \le 15\,\}$$

@@ -21,3 +21,7 @@ the equator, the circle of radius 5 in the xy plane, where the sphere and the wa
 The union is the cylinder with a spherical cap of height 2 on each end. Each cap stands on a
 ledge, the ring of its end face between radius 4 and radius 5. The equator is not an edge of the
 result: the wall runs through it unbroken.
+
+**As a set:**
+
+$$B_5 \cup \{\,\rho \le 5,\ |z| \le 3\,\}$$

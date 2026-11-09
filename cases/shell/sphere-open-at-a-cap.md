@@ -25,3 +25,7 @@ result is the part of the ball of radius 5 below z = 3 less the part of the ball
 it, its rim the annulus between radii √7 and 4 at z = 3. Neither sphere meets the plane at right
 angles, and the inside one meets it at a different angle from the outside one, so the rim is not the
 outside wall's end moved straight in.
+
+**As a set:**
+
+$$\{\,4 \le \lVert p \rVert \le 5,\ z \le 3\,\}$$

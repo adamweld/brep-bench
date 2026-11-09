@@ -27,3 +27,7 @@ This case is about finding that small loop on a surface no kernel meets in close
 knows paraboloids: a search that samples the surface coarsely can step over it and find nothing,
 or only the vertex. If the paraboloid you make is the parabola turned about the z axis, the loop
 runs around the vertex, where the turned curve meets the axis.
+
+**As a set:**
+
+$$\{\,\rho^2 \le 8z,\ z \le 10^{-4}\,\}$$

@@ -19,3 +19,7 @@ outside is each of them moved 1 outward along its normal, the moved faces extend
 and cut off by the plane of the top, z = 6, which is the rim.
 
 The result is the box from (−1, −1, −1) to (11, 9, 6) less the box from the origin to (10, 8, 6).
+
+**As a set:**
+
+$$\bigl([-1,11]\times[-1,9]\times[-1,6]\bigr) \setminus K, \quad K = [0,10]\times[0,8]\times[0,6]$$

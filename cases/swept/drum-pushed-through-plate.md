@@ -26,3 +26,8 @@ The drum touches what it sweeps along a closed curve: along its side's lowest an
 nowhere (they move along themselves), along the two lines of its side at y = ±2, and across both
 flat ends, which the push keeps in their own planes. The slot is its shadow along the push, the
 rectangle 6 ≤ x ≤ 14, |y| ≤ 2, through the plate.
+
+**As a set:**
+
+$$\bigl([0,20]\times[-5,5]\times[0,4]\bigr) \setminus \bigl(T \oplus \{\,s\,(0,0,16) : 0 \le s \le
+1\,\}\bigr), \quad T = \{\,y^2 + (z+5)^2 \le 2^2,\ 6 \le x \le 14\,\}$$

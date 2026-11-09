@@ -19,3 +19,7 @@ A solid ellipsoid centered on the origin, its three semi-axes along the coordina
 No two of its semi-axes are equal, so it is not a surface of revolution: no circle and no turn
 about an axis makes it. A kernel with no ellipsoid may make it as a ball of radius 1 stretched by
 6, 4 and 3 along x, y and z.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{36} + \tfrac{y^2}{16} + \tfrac{z^2}{9} \le 1\,\}$$

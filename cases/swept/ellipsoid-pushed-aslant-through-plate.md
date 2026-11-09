@@ -24,3 +24,9 @@ the plate. Cut from the plate everything the ellipsoid passes through.
 The ellipsoid touches what it sweeps along one smooth closed curve, where its normal is square to
 the push. That curve's path is the hole's wall, an oblique elliptic cylinder: every level of the
 plate loses the same ellipse.
+
+**As a set:**
+
+$$\bigl([-15,15]^2\times[0,4]\bigr) \setminus \bigl(E \oplus \{\,s\,(4,3,12) : 0 \le s \le
+1\,\}\bigr), \quad E = \bigl\{\,\bigl(\tfrac{x+2}{3}\bigr)^2 + \bigl(\tfrac{y+1.5}{2}\bigr)^2 +
+\bigl(\tfrac{z+4}{1.5}\bigr)^2 \le 1\,\bigr\}$$

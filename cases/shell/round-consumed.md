@@ -26,3 +26,8 @@ The thickness is more than the rounds' radius. A round moved 3 inward would be a
 it, moved, run on past it until they meet in a sharp edge. So the cavity is the sharp-cornered box
 from (3, 3, 3) to (17, 11, 10). The wall is every point of the plate within 3 of its faces other
 than the top, and is 3 thick everywhere but across its corners, where it is thicker.
+
+**As a set:**
+
+$$R \setminus \bigl([3,17]\times[3,11]\times[3,10]\bigr), \quad R = \bigl\{\,d\bigl((x,y),\
+[2,18]\times[2,12]\bigr) \le 2,\ 0 \le z \le 10\,\bigr\}$$

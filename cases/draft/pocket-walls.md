@@ -25,3 +25,8 @@ block's top grows to meet the drafted walls.
 The result is the block less a frustum of a rectangular pyramid, upside down: the pocket's section
 at height z is the rectangle from (8, 8) to (32, 22) outset (z − 5)·tan 5° on every side, so its
 opening is outset 10·tan 5° ≈ 0.875.
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,15]\bigr) \setminus \{\,8 - s \le x \le 32 + s,\ 8 - s \le y \le
+22 + s,\ z \ge 5\,\}, \quad s = (z-5)\tan 5^\circ$$

@@ -24,3 +24,7 @@ about the rim's ellipse: a canal surface whose spine is an ellipse, not a torus.
 E is the complete elliptic integral of the second kind, of parameter m = 1 − b²/a² = 16/25, so p is
 the ellipse's perimeter; M is the side's mean curvature integrated over it, πh, plus each rim's
 length times half its turning angle, π/4.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{25} + \tfrac{y^2}{9} \le 1,\ 0 \le z \le 10\,\} \oplus B_{1}$$

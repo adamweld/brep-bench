@@ -25,3 +25,8 @@ The side, moved 1 inward, is the cylinder of radius 4, and the hemisphere is the
 radius 4 about the same center; they still meet tangentially, along the circle of radius 4 at z =
 10. The result is the capsule less the capsule of radius 4 from z = 0, its rim the annulus between
 radii 4 and 5 at z = 0.
+
+**As a set:**
+
+$$C \setminus \Bigl(\{\,\rho \le 4,\ 0 \le z \le 10\,\} \cup B_4(0,0,10)\Bigr), \quad C = \{\,\rho
+\le 5,\ 0 \le z \le 10\,\} \cup \bigl(B_5(0,0,10) \cap \{\,z \ge 10\,\}\bigr)$$

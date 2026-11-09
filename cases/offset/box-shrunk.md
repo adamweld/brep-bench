@@ -18,3 +18,7 @@ box's outside.
 
 Each face moves 1 inward and the edges stay sharp, so the shrunk box is the box from (1, 1, 1) to
 (9, 7, 5).
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,8]\times[0,6]\bigr) \ominus B_{1}$$

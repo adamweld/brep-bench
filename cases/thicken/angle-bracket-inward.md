@@ -23,3 +23,7 @@ Thicken it by 1 to the inside of the crease, above the floor and in front of the
 The thickened sheet's section in any plane y = const is the L through (0, 0), (10, 0), (10, 1),
 (1, 1), (1, 10) and (0, 10), each given as (x, z), extruded from y = 0 to y = 8: the floor's and
 the wall's strips, overlapping in the square 1 by 1 at the crease.
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,8]\times[0,1]\bigr) \cup \bigl([0,1]\times[0,8]\times[0,10]\bigr)$$

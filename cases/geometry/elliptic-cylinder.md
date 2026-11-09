@@ -16,3 +16,7 @@ tex = '2\pi ab + h\cdot 4aE\left(e^2\right) = 30\pi + 200\,E\left(\tfrac{16}{25}
 A solid elliptic cylinder standing on the xy plane: the ellipse x²/25 + y²/9 ≤ 1 (semi-axes 5
 along x and 3 along y, centered on the z axis) in the plane z = 0, extruded straight up to z = 10.
 It has two flat elliptic ends and one curved side, which is not a circular cylinder anywhere.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{25} + \tfrac{y^2}{9} \le 1,\ 0 \le z \le 10\,\}$$

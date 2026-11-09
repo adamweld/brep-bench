@@ -14,3 +14,7 @@ tex = '4\pi^2 R r'
 +++
 
 A solid torus centered on the origin, about the z axis. The circle through the middle of its tube has radius 10, and the tube has radius 2.
+
+**As a set:**
+
+$$\{\,(\rho - 10)^2 + z^2 \le 2^2\,\}$$

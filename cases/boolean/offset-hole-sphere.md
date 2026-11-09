@@ -17,3 +17,7 @@ parallel to the y axis. The hole's axis is the line x = 5, z = 0, so the hole ru
 x = 11 and stays inside the ball's outline: it enters and leaves through the sphere and never
 breaks out of its side. If you cut the hole with a cylinder, make it run past the ball at both
 ends.
+
+**As a set:**
+
+$$B_{20} \setminus \{\,(x-5)^2 + z^2 \le 6^2\,\}$$

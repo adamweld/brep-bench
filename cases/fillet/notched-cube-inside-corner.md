@@ -28,3 +28,8 @@ reach.
 The result is the notched cube with that material added: along each edge a strip of section
 (1 − π/4)·9, and at the corner the cube from (10, 10, 10) to (13, 13, 13) less the eighth of the
 ball.
+
+**As a set:**
+
+$$[0,20]^3 \setminus \bigl((O \ominus B_3) \oplus B_3\bigr), \quad O = \{\,x \ge 10,\ y \ge 10,\ z
+\ge 10\,\}$$

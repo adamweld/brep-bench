@@ -31,3 +31,8 @@ So the walls are four flat triangles and four conical pieces, alternating around
 the convex hull of the square and the circle: its section at every height is the Minkowski
 combination of the two, a square with rounded corners, the rounding growing from nothing at the
 foot to the whole circle at the top. Its floor and top are flat.
+
+**As a set:**
+
+$$\operatorname{conv}\Bigl(\bigl([-20,20]^2\times\{0\}\bigr) \cup \{\,\rho \le 15,\ z =
+30\,\}\Bigr)$$

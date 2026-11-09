@@ -14,3 +14,7 @@ tex = '2\cdot 2\pi r\left(r - \tfrac{d}{2}\right)'
 +++
 
 Two balls of radius 5, one centered on the origin and one at (6, 0, 0). Make the lens common to both.
+
+**As a set:**
+
+$$B_5(0,0,0) \cap B_5(6,0,0)$$

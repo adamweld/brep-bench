@@ -23,3 +23,8 @@ corners (6, 0), (3, 4), (3.8, 4.6) and (6.8, 0.6), each given as (distance from 
 faces are the sheet, the frustum it moves to (radius 6.8 at z = 0.6 to 3.8 at z = 4.6), and two
 rims that are neither flat nor cylinders: each rim's circle sweeps a frustum of a cone, the bottom
 one from radius 6 at z = 0 to 6.8 at z = 0.6, the top one from 3 at z = 4 to 3.8 at z = 4.6.
+
+**As a set:**
+
+$$\{\,p + s\,n(p) : p \in F,\ 0 \le s \le 1\,\}, \quad F = \{\,\rho = 6 - \tfrac34 z,\ 0 \le z \le
+4\,\},\ n \text{ its unit normal away from the axis}$$

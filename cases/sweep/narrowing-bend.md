@@ -29,3 +29,8 @@ half-width h − 2: 18 × 18 with a hole 14 × 14 at the start, in the xz plane 
 The sides of every section are straight, so each of the eight long faces is swept by one side of
 the section: a straight segment that stays horizontal (or vertical) in its plane through the z
 axis while its ends move along the spirals the section's corners trace. The two ends are flat.
+
+**As a set:**
+
+$$\{\,h - 2 \le \max(|\rho - 30|,\ |z|) \le h,\ 0 \le \varphi \le 90^\circ\,\}, \quad h = 9 -
+3\,\tfrac{\varphi}{90^\circ}$$

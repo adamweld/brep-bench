@@ -25,3 +25,8 @@ to clear past it. Cut from the block everything the mill passes through.
 Its flat end, which the slide keeps in its own plane, touches all over and sweeps the slot's floor;
 the two lines of its side square to the slide sweep the walls, meeting the floor in sharp edges. The
 slot is |y| ≤ 2, z ≥ 7, along the block's whole length.
+
+**As a set:**
+
+$$\bigl([0,20]\times[-5,5]\times[0,10]\bigr) \setminus \bigl(T \oplus \{\,s\,(30,0,0) : 0 \le s \le
+1\,\}\bigr), \quad T = \{\,(x+5)^2 + y^2 \le 2^2,\ 7 \le z \le 15\,\}$$

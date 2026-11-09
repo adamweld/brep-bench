@@ -27,3 +27,7 @@ So each of the four long faces is the ruled surface swept by the straight segmen
 neighboring corner lines at the same y: the face through A, B, B′ and A′ is made of the
 segments from A + t(A′ − A) to B + t(B′ − B) for t from 0 to 1, and so on around. Since the
 square's sides are not parallel to the diamond's, these faces are not flat. The two ends are flat.
+
+**As a set:**
+
+$$\bigcup_{t \in [0,1]} \operatorname{conv}\{A_t,\ B_t,\ C_t,\ D_t\}, \quad X_t = X + t\,(X' - X)$$

@@ -22,3 +22,7 @@ added.
 The thickened sheet is the box from (−1, −1, −1) to (11, 11, 10) less the cube: a tray with walls
 and a floor 1 thick, its rim the flat square ring between the squares of side 12 and 10 at
 z = 10.
+
+**As a set:**
+
+$$\bigl([-1,11]^2\times[-1,10]\bigr) \setminus [0,10]^3$$

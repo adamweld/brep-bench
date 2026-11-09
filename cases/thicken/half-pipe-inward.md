@@ -20,3 +20,7 @@ toward the axis: to the sheet's concave side, where its moved face is smaller th
 The thickened sheet is the half of the thick-walled tube between radii 3 and 5 where y ≥ 0, from
 z = 0 to z = 10. Its faces are the sheet, the half cylinder of radius 3 it moves to, a half annulus
 at each end, and two flat strips, each 2 by 10, in the plane y = 0.
+
+**As a set:**
+
+$$\{\,3 \le \rho \le 5,\ y \ge 0,\ 0 \le z \le 10\,\}$$

@@ -32,3 +32,7 @@ the chamfer x + y = 8 has corners (8, 0, 0), (6, 2, 2), (2, 6, 2), (0, 8, 0), (2
 It is what chamfering the edges one after another leaves, each edge its own chamfer, ending on
 the faces at its ends, the chamfers made before it among them: build it so, with the kernel's
 chamfer, in any order.
+
+**As a set:**
+
+$$\{\,|x| + |y| + |z| \le 10,\ |x| + |y| \le 8,\ |y| + |z| \le 8,\ |z| + |x| \le 8\,\}$$

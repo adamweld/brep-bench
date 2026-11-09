@@ -14,3 +14,7 @@ tex = '2\pi R h + 2\pi r h'
 +++
 
 A ball of radius 5 centered on the origin, with a hole of radius 3 bored right through it along the z axis.
+
+**As a set:**
+
+$$B_5 \setminus \{\,\rho \le 3\,\}$$

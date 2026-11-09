@@ -17,3 +17,7 @@ A solid oblate spheroid centered on the origin, about the z axis: the ellipsoid
 (x² + y²)/36 + z²/9 ≤ 1, of radius 6 at its equator in the plane z = 0 and reaching to z = ±3 at its
 poles. It is the ellipse x²/36 + z²/9 ≤ 1 of the xz plane turned a whole turn about the z axis, its
 short axis the axis of the turn.
+
+**As a set:**
+
+$$\{\,\tfrac{\rho^2}{36} + \tfrac{z^2}{9} \le 1\,\}$$

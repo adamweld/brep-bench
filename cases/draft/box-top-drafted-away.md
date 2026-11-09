@@ -24,3 +24,7 @@ the side of it that holds the box's middle; the top plane, z = 10, cuts nothing 
 That is a hip roof with five faces: the floor, the rectangle from (0, 0, 0) to (30, 10, 0); two
 trapezoids, from the long edges of the floor to the ridge, the line from (5, 5, 5√3) to
 (25, 5, 5√3); and two triangles, from the short edges of the floor to the ridge's ends.
+
+**As a set:**
+
+$$\{\,s \le x \le 30 - s,\ s \le y \le 10 - s,\ 0 \le z \le 10\,\}, \quad s = z\tan 30^\circ$$

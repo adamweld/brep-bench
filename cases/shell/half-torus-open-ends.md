@@ -24,3 +24,7 @@ left as a rim between the outside and the inside.
 The torus, moved 0.5 inward, is the torus whose tube has radius 1.5, and the result is a curved
 pipe: the half torus less the half torus of tube radius 1.5, its rims two annuli between radii 1.5
 and 2 at its ends.
+
+**As a set:**
+
+$$\{\,1.5^2 \le (\rho - 6)^2 + z^2 \le 2^2,\ y \ge 0\,\}$$

@@ -14,3 +14,7 @@ tex = '2\pi r\cdot\tfrac{\pi R}{2} + 2\pi r^2'
 +++
 
 A circle of radius 2 swept along a quarter turn of an arc. The arc lies in the xy plane about the z axis, with radius 10, and runs from (10, 0, 0) to (0, 10, 0). The section stays square to the path, and the ends are flat.
+
+**As a set:**
+
+$$\{\,(\rho - 10)^2 + z^2 \le 2^2,\ x \ge 0,\ y \ge 0\,\}$$

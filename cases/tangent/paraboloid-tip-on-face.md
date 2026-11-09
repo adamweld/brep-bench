@@ -27,3 +27,7 @@ z = 12.5. The vertex is not a vertex of the result: the bottom face stays a whol
 
 If the paraboloid you make is the parabola turned about the z axis, the point of contact is where
 the turned curve meets the axis.
+
+**As a set:**
+
+$$\bigl([-10,10]^2\times[0,10]\bigr) \cup \{\,\rho^2 \le 8z,\ z \le 12.5\,\}$$

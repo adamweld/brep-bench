@@ -27,3 +27,8 @@ square, with a small bulge toward the neck: at the neck's mouth the nearest wall
 (10, 4) and (10, 6), so the pocket there is bounded by the arcs of radius 1.5 about those corners.
 Each arc leaves the line x = 8.5 tangent to it, at y = 4 and y = 6, and the two meet in a point at
 (10 − √5/2, 5). The right pocket is the left's mirror image in x = 12.
+
+**As a set:**
+
+$$\bigl\{\,p \in K : d\bigl(p,\ \partial K \setminus \{z = 6\}\bigr) \le 1.5\,\bigr\}, \quad K =
+\operatorname{poly}\bigl((0,0),(10,0),(10,4),(14,4),(14,0),(24,0),(24,10),(14,10),(14,6),(10,6),(10,10),(0,10)\bigr)\times[0,6]$$

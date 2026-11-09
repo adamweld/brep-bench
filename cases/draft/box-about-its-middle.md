@@ -22,3 +22,7 @@ to meet the drafted sides, and the top shrinks to meet them.
 The result is a frustum of a rectangular pyramid, with six faces. Its section at height z is the
 box's own rectangle, from (0, 0) to (20, 12), inset (z − 5)·tan 5° on every side: outset
 5·tan 5° ≈ 0.437 at the floor, the box's own at z = 5, and inset as much at the top.
+
+**As a set:**
+
+$$\{\,s \le x \le 20 - s,\ s \le y \le 12 - s,\ 0 \le z \le 10\,\}, \quad s = (z-5)\tan 5^\circ$$

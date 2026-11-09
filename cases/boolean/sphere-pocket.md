@@ -14,3 +14,7 @@ tex = '1600 - \pi r^2 + 2\pi r^2'
 +++
 
 A block from (−10, −10, −10) to (10, 10, 0). Cut from it a ball of radius 5 centered on the origin, leaving a hemispherical pocket in its top face.
+
+**As a set:**
+
+$$\bigl([-10,10]^2\times[-10,0]\bigr) \setminus B_5$$

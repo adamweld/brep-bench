@@ -23,3 +23,7 @@ The solid is the region the tube of `geometry/spindle-torus` (middle circle radi
 the plane z = 0. Its surface is the segment's arc turned, which meets the axis at (0, 0, ±4) at an
 angle, so the lemon comes to a sharp point at each end, a cone-like apex where the surface has no
 tangent plane, and is widest, radius 2, at z = 0.
+
+**As a set:**
+
+$$\{\,(\rho + 3)^2 + z^2 \le 5^2\,\}$$

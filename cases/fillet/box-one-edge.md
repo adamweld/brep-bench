@@ -14,3 +14,7 @@ tex = '600 - 2\cdot 10r + \tfrac{\pi}{2}\cdot 10r - 2\left(1 - \tfrac{\pi}{4}\ri
 +++
 
 A cube of side 10 between the origin and (10, 10, 10). Round the edge where its faces x = 10 and y = 10 meet, to radius 2.
+
+**As a set:**
+
+$$[0,10]^3 \setminus \{\,x \ge 8,\ y \ge 8,\ (x-8)^2 + (y-8)^2 \ge 2^2\,\}$$

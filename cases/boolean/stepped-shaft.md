@@ -14,3 +14,7 @@ tex = '25\pi + 16\pi + 9\pi + 2\pi\cdot 5\cdot 10 + 2\pi\cdot 3\cdot 10'
 +++
 
 A stepped shaft on the z axis, made one solid. The first cylinder has radius 5 and runs from z = 0 to z = 10. The second has radius 3 and runs from z = 10 to z = 20, standing on top of the first.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \cup \{\,\rho \le 3,\ 10 \le z \le 20\,\}$$

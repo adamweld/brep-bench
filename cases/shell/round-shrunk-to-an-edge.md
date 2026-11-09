@@ -26,3 +26,8 @@ the inside walls on either side of it meet there in a sharp edge. So the cavity 
 cornered box from (2, 2, 2) to (18, 12, 10), and the inside has no rounded face: its corners are the
 rounds' axes. A kernel that keeps a round of zero radius as a face, or fails to offset it, does not
 make it.
+
+**As a set:**
+
+$$R \setminus \bigl([2,18]\times[2,12]\times[2,10]\bigr), \quad R = \bigl\{\,d\bigl((x,y),\
+[2,18]\times[2,12]\bigr) \le 2,\ 0 \le z \le 10\,\bigr\}$$

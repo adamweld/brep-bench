@@ -24,3 +24,8 @@ tube radius remains strictly positive.
 
 No closed-form volume or area is asserted. The case remains unsettled until independently
 implemented kernels agree under the benchmark's rules.
+
+**As a set:**
+
+$$\bigcup_{t \in [-75^\circ,\,75^\circ]} R_B(-t)\,R_A(0.25\,t)\,T, \quad T =
+\bigl\{\,\bigl(\sqrt{(x-3)^2 + y^2} - 1\bigr)^2 + (z-2)^2 \le 0.015^2\,\bigr\}$$

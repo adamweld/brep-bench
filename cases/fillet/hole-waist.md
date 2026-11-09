@@ -22,3 +22,7 @@ and whose tube has radius 1, so the hole's cylindrical wall vanishes entirely: t
 meet on the waist circle of radius 3 at z = 1, tangent to each other there, and the hole's whole
 surface is the inner half of that torus. The rounds meet the top and bottom faces on the circles
 of radius 4.
+
+**As a set:**
+
+$$\bigl([-10,10]^2\times[0,2]\bigr) \setminus \{\,\rho \le 4 - \sqrt{1 - (z-1)^2}\,\}$$

@@ -22,3 +22,9 @@ from −75° to 75°.
 
 No turn keeps any line of the cube fixed, and its silhouette changes from face to face as it
 tumbles.
+
+**As a set:**
+
+$$\bigcup_{t \in [-75^\circ,\,75^\circ]} R_B(-t)\,R_A(\tfrac t4)\,T, \quad T =
+[2.4,\,3.6]\times[-0.6,\,0.6]\times[1.4,\,2.6],\quad A,\ B \text{ the two lines above, in that
+order}$$

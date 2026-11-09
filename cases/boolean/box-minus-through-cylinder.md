@@ -14,3 +14,7 @@ tex = '600 - 2\cdot 9\pi + 2\pi\cdot 3\cdot 10'
 +++
 
 Take a cube of side 10 between the origin and (10, 10, 10). Drill a hole of radius 3 straight through it along z, centered at x = 5, y = 5. If you cut the hole with a cylinder, make it run past both faces: from z = −1 to z = 11.
+
+**As a set:**
+
+$$[0,10]^3 \setminus \{\,(x-5)^2 + (y-5)^2 \le 3^2\,\}$$

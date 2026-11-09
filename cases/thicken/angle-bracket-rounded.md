@@ -25,3 +25,8 @@ that lies between them.
 The thickened sheet's section in any plane y = const is the floor's strip from z = −1 to 0, the
 wall's strip from x = −1 to 0, and the quarter disk of radius 1 about the origin with x ≤ 0 and
 z ≤ 0 between them, extruded from y = 0 to y = 8.
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,8]\times[-1,0]\bigr) \cup \bigl([-1,0]\times[0,8]\times[0,10]\bigr) \cup
+\{\,x^2 + z^2 \le 1,\ x \le 0,\ z \le 0,\ 0 \le y \le 8\,\}$$

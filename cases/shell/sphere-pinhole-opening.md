@@ -25,3 +25,7 @@ through which the cavity opens. The result is the part of the ball of radius 5 b
 the part of the ball of radius 4 below it, its rim the annulus at z = 3.9999 between that pinhole
 and the outer radius √(25 − 3.9999²). (An annulus between two circles cut from concentric spheres by
 one plane has the area π(5² − 4²) = 9π, whatever the plane.)
+
+**As a set:**
+
+$$\{\,4 \le \lVert p \rVert \le 5,\ z \le 3.9999\,\}$$

@@ -14,3 +14,7 @@ tex = '2\left(20\cdot 10 + 20\cdot 10 + 10\cdot 10\right)'
 +++
 
 Two cubes of side 10, side by side: the first between the origin and (10, 10, 10), the second between (10, 0, 0) and (20, 10, 10). Join them into one solid. They touch along a whole face, which must disappear from the result.
+
+**As a set:**
+
+$$[0,10]^3 \cup \bigl([10,20]\times[0,10]^2\bigr)$$

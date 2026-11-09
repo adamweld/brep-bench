@@ -26,3 +26,9 @@ The two walls at the concave edge, x = 5 and y = 5, moved 1 inward, are x = 4 an
 extended they meet in the line x = 4, y = 4: the wall at the inside corner is thicker than 1 across
 the corner, √2 from the edge to the line. The cavity is the polygon through (1, 1), (19, 1), (19,
 4), (4, 4), (4, 14) and (1, 14), from z = 1 up to the top.
+
+**As a set:**
+
+$$\bigl(\operatorname{poly}\bigl((0,0),(20,0),(20,5),(5,5),(5,15),(0,15)\bigr)\times[0,8]\bigr)
+\setminus
+\Bigl(\operatorname{poly}\bigl((1,1),(19,1),(19,4),(4,4),(4,14),(1,14)\bigr)\times[1,8]\Bigr)$$

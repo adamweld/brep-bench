@@ -23,3 +23,7 @@ Only the bottom is left as a wall. Moved 1 inward it is the plane z = 1, which r
 of the four sides, so the result is the slab from the origin to (10, 8, 1): six faces, its top the
 bottom moved and its four sides the rims of the side openings, each 1 high. A kernel that refuses to
 shell with every face but one open, or that keeps the slivers of the sides, does not make it.
+
+**As a set:**
+
+$$[0,10]\times[0,8]\times[0,1]$$

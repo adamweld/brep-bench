@@ -28,3 +28,7 @@ The result has ten faces. Its section at height z is the floor's outline, the ro
 moved z·tan 5° inward: its straight sides inset z·tan 5° and its corners' radii 4 − z·tan 5°
 about the same centers. At the top they are inset 10·tan 5° ≈ 0.875, the corners of radius
 about 3.125.
+
+**As a set:**
+
+$$\bigl\{\,d\bigl((x,y),\ [4,26]\times[4,16]\bigr) \le 4 - z\tan 5^\circ,\ 0 \le z \le 10\,\bigr\}$$

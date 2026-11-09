@@ -23,3 +23,7 @@ circle. The torus is thicker than the drum: it comes out through each of the dru
 the ring between radius 10 − √8 and 10 + √8. The union is the drum with half of the torus's tube
 standing out of each face. The outer equator is not an edge of the result: the drum's wall runs
 through it unbroken.
+
+**As a set:**
+
+$$\{\,(\rho - 10)^2 + z^2 \le 3^2\,\} \cup \{\,\rho \le 13,\ |z| \le 1\,\}$$

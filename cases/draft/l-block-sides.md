@@ -26,3 +26,9 @@ where their planes cross, the two at the concave edge too.
 The result has eight faces. Its section at height z is the L moved d = z·tan 6° into its material,
 each side parallel to itself: the outline through (d, d), (30 − d, d), (30 − d, 10 − d),
 (10 − d, 10 − d), (10 − d, 25 − d) and (d, 25 − d).
+
+**As a set:**
+
+$$\bigl\{\,(x,y) \in
+\operatorname{poly}\bigl((d,d),(30-d,d),(30-d,10-d),(10-d,10-d),(10-d,25-d),(d,25-d)\bigr),\ 0 \le z
+\le 12\,\bigr\}, \quad d = z\tan 6^\circ$$

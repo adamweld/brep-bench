@@ -32,3 +32,8 @@ into those two patches.
 As a composition: the solid is the union of every ball of radius 3/2 that lies inside the
 pyramid, which is the pyramid shrunk by 3/2 (a hip roof, its ridge that short segment) grown by
 3/2. (Chamfered instead, the apex has no flat face: see `chamfer/octahedron-all-edges`.)
+
+**As a set:**
+
+$$\bigl(K \ominus B_{3/2}\bigr) \oplus B_{3/2}, \quad K = \operatorname{conv}\bigl\{(\pm 10,\ \pm
+6,\ 0),\ (0, 0, 12)\bigr\}$$

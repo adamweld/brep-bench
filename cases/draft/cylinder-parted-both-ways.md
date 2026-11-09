@@ -22,3 +22,7 @@ not drafted; each shrinks to meet its cone.
 
 The result is two frustums of cones joined at their wide ends, with a crease between them along
 the parting line: radius 10 at z = 10, and 10 − 10·tan 3° ≈ 9.476 at z = 0 and at z = 20.
+
+**As a set:**
+
+$$\{\,\rho \le 10 - |z - 10|\tan 3^\circ,\ 0 \le z \le 20\,\}$$

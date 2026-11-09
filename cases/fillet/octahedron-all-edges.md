@@ -30,3 +30,7 @@ are each a square patch of a sphere, bounded by four rounds, not a flat square.
 
 M′ is the shrunk octahedron's twelve edges' lengths, s′√2 each, times half the angle each turns
 through, arccos(1/3).
+
+**As a set:**
+
+$$(K \ominus B_2) \oplus B_2, \quad K = \{\,|x| + |y| + |z| \le 10\,\}$$

@@ -28,3 +28,8 @@ Each corner of the square runs along a conical spiral, the four guides: the corn
 Each of the four walls is swept by one side of the square, a straight horizontal segment between
 two neighboring guides, so the walls are twisted ruled surfaces. The ends are flat: the square of
 side 30 at z = 0 and the square of side 10 at z = 40.
+
+**As a set:**
+
+$$\{\,\max(|u|,\ |v|) \le 15 - \tfrac z4,\ 0 \le z \le 40\,\}, \quad (u, v) = (x\cos\alpha +
+y\sin\alpha,\ -x\sin\alpha + y\cos\alpha),\ \alpha = 4.5^\circ\cdot z$$

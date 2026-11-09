@@ -20,3 +20,7 @@ meets the cylinder's side, and joined to the cylinder.
 So the pad's top is that square, its four sides are vertical, and its bottom is the part of the
 cylinder's side under the square: it reaches z = 10 at its middle, y = 0, and z = √91 ≈ 9.539 at
 its sides y = ±3. The pad and the cylinder are one solid.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 10^2,\ |x| \le 20\,\} \cup \{\,|x| \le 3,\ |y| \le 3,\ 0 \le z \le 15\,\}$$

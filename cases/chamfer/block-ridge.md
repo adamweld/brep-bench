@@ -21,3 +21,7 @@ The chamfer of the edge at y = 0 is the plane through the lines y = 2, z = 6 and
 and the other's the plane through y = 2, z = 6 and y = 4, z = 4, so the top face vanishes
 entirely: the two chamfers meet at right angles along the ridge y = 2, z = 6, and the block's
 ends x = 0 and x = 10 are pentagons, a 4 × 4 square under a triangle.
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,4]\times[0,6]\bigr) \cap \{\,z \le 4 + y,\ z \le 8 - y\,\}$$

@@ -20,3 +20,7 @@ z = 8, where a flat disk closes it.
 
 It is the parabola x² = 8z of the xz plane (from its vertex to x = 8) turned a whole turn about the
 z axis, which it meets at its vertex.
+
+**As a set:**
+
+$$\{\,\rho^2 \le 8z,\ z \le 8\,\}$$

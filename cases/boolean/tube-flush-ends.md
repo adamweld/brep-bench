@@ -14,3 +14,7 @@ tex = '2\pi(5 + 3)\cdot 10 + 2\pi\left(5^2 - 3^2\right)'
 +++
 
 A cylinder of radius 5 on the z axis, from z = 0 to z = 10. Cut from it a cylinder of radius 3 on the same axis that also runs exactly from z = 0 to z = 10. The ends of the cutting cylinder lie in the ends of the first.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \setminus \{\,\rho \le 3,\ 0 \le z \le 10\,\}$$

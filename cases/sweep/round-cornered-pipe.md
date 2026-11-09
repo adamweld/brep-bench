@@ -28,3 +28,8 @@ the corner, the z axis, a quarter turn from square to the first run to square to
 that is a quarter of the ball of radius 3 about the origin. So the pipe is every point within 3
 of the path, cut off flat at its ends, (−30, 0, 0) and (0, 30, 0), by the planes there square to
 the path.
+
+**As a set:**
+
+$$\{\,p : d(p, \gamma) \le 3,\ x \ge -30,\ y \le 30\,\}, \quad \gamma = \text{the path, from }
+(-30,0,0) \text{ to } (0,0,0) \text{ to } (0,30,0)$$

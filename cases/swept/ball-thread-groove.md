@@ -19,3 +19,8 @@ z axis, so it runs on the rod's surface: it starts at (5, 0, −2), turns right-
 both ends. Cut from the rod everything the ball passes through.
 
 Neighboring turns of the groove do not meet: they are 4 apart and the ball is 2 across.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 20\,\} \setminus \bigcup_{\theta \in [0,\,2160^\circ]}
+B_1\bigl(5\cos\theta,\ 5\sin\theta,\ -2 + 4\,\tfrac{\theta}{360^\circ}\bigr)$$

@@ -30,3 +30,7 @@ there.
 If the ball you make has poles and a seam, keep them off the curve and away from its crossing:
 put the poles on the y axis, at (0, ±10, 0), and the seam through (−10, 0, 0). If the cylinder you
 make has a seam, put it on the line x = 0, y = 0, the side of its wall away from (10, 0, 0).
+
+**As a set:**
+
+$$B_{10} \cup \{\,(x-5)^2 + y^2 \le 5^2,\ |z| \le 12\,\}$$

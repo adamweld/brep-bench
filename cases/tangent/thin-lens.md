@@ -19,3 +19,7 @@ overlap to a depth of only 10⁻⁶. Make the lens common to both.
 The lens lies across the plane x = 4.9999995, from x = 4.999999 to x = 5. It is 10⁻⁶ thick at
 its middle and about 0.0045 across, a disk of radius √(5² − 4.9999995²) ≈ 0.002236 at its
 rim, where its two spherical faces meet at an angle of only about 0.05°.
+
+**As a set:**
+
+$$B_5(0,0,0) \cap B_5(9.999999,\ 0,\ 0)$$

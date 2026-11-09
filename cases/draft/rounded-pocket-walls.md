@@ -29,3 +29,8 @@ meet the drafted walls.
 The result is the block less the pocket, whose section at height z is its floor's outline, the
 rounded rectangle, moved (z − 5)·tan 5° outward: its straight sides outset by that and its
 corners' radii 4 + (z − 5)·tan 5° about the same centers.
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,15]\bigr) \setminus \bigl\{\,d\bigl((x,y),\
+[12,28]\times[12,18]\bigr) \le 4 + (z-5)\tan 5^\circ,\ z \ge 5\,\bigr\}$$

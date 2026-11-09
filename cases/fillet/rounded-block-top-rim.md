@@ -21,3 +21,8 @@ The rim is eight edges, four straight and four quarter circles, each running on 
 next, and the round runs around all eight unbroken: along the straight edges it is a quarter of a
 cylinder of radius 1, and around the corners a quarter of the section of a torus, whose tube runs
 around the corner's axis at radius 2. Nowhere do three edges meet, and nowhere does the round end.
+
+**As a set:**
+
+$$\bigl\{\,\max(d - 2,\ 0)^2 + \max(z - 4,\ 0)^2 \le 1,\ 0 \le z \le 5\,\bigr\}, \quad d =
+d\bigl((x,y),\ [-7,7]\times[-3,3]\bigr)$$

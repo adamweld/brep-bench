@@ -24,3 +24,7 @@ the crease, are extended until they meet, so that no round is added.
 The thickened sheet is an angle 1 thick: its section in any plane y = const is the L through
 (−1, −1), (10, −1), (10, 0), (0, 0), (0, 10) and (−1, 10), each given as (x, z), extruded from
 y = 0 to y = 8.
+
+**As a set:**
+
+$$\bigl([-1,10]\times[0,8]\times[-1,0]\bigr) \cup \bigl([-1,0]\times[0,8]\times[-1,10]\bigr)$$

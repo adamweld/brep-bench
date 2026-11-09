@@ -23,3 +23,7 @@ The thickened sheet's section through the axis, on one side of it, is the half a
 radii 2 and 3 about the point at distance 6 from the axis, z = 0, on the axis's side of it. Its
 faces are the sheet, the inner half of the torus of tube radius 3 it moves to, and the two
 cylinders of radius 6 that its boundary circles sweep, from z = 2 to 3 and from z = −2 to −3.
+
+**As a set:**
+
+$$\{\,2^2 \le (\rho - 6)^2 + z^2 \le 3^2,\ \rho \le 6\,\}$$

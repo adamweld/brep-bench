@@ -19,3 +19,7 @@ face with no solid inside it. Thicken it by 1 outward, away from its center.
 The thickened sheet is the hollow ball between the spheres of radius 5 and 6 about the origin. Its
 boundary is two closed shells: the sphere of radius 6 outside, and the sphere of radius 5, which
 bounds the void at its middle and faces inward, toward the center.
+
+**As a set:**
+
+$$\{\,5 \le \lVert p \rVert \le 6\,\}$$

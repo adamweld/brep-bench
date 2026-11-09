@@ -22,3 +22,7 @@ opening, which is left as a rim between the outside and the inside.
 The side, moved 1 inward, is the cylinder of radius 4 on the same axis, and the bottom is the plane
 z = 1: the result is the cylinder less the cylinder of radius 4 from z = 1 to z = 10, a cup, its rim
 the annulus between radii 4 and 5 at z = 10.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \setminus \{\,\rho \le 4,\ z \ge 1\,\}$$

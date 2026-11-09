@@ -14,3 +14,7 @@ tex = '2\cdot\tfrac{\theta}{2}\left(r_o^2 - r_i^2\right) + \theta\left(r_o + r_i
 +++
 
 In the xz plane, take the rectangle with x from 6 to 10 and z from 0 to 4. Revolve it 90° about the z axis, right-handed: from +x toward +y.
+
+**As a set:**
+
+$$\{\,6 \le \rho \le 10,\ 0 \le \varphi \le 90^\circ,\ 0 \le z \le 4\,\}$$

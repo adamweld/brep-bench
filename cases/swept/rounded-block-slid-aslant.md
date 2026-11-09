@@ -26,3 +26,7 @@ solid of everything the block passes through.
 The rounded faces touch along their lines and arcs where their normals are square to the slide, and
 those paths are what the flat sides of a box slid aslant would sweep, rounded: the result is
 everything within 1 of the box from (1, 1, 1) to (9, 5, 3) slid along (8, 5, 3).
+
+**As a set:**
+
+$$\bigl([1,9]\times[1,5]\times[1,3]\bigr) \oplus B_1 \oplus \{\,s\,(8,5,3) : 0 \le s \le 1\,\}$$

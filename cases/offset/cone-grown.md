@@ -21,3 +21,7 @@ whose apex is 1/sin α = 5/3 higher, α = atan(3/4) being the half-angle at the 
 where the side meets the base at an angle of β = atan(4/3) inside the cone, becomes a piece of a
 torus's tube of radius 1 about the rim's circle, turning through π − β. The apex becomes a cap of
 a ball of radius 1 about it, which meets the moved side along a circle of radius 0.8 at z = 4.6.
+
+**As a set:**
+
+$$\{\,\rho \le 3\bigl(1 - \tfrac z4\bigr),\ 0 \le z \le 4\,\} \oplus B_{1}$$
