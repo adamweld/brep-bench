@@ -1,0 +1,10 @@
+//! The regularized difference of two independently swept tori, not of synchronized poses.
+use super::{tumbling_torus_crossed_forward, tumbling_torus_crossed_reverse};
+use cad_kernel::boolean::{combined, Op};
+use cad_kernel::topo::Brep;
+
+pub fn build() -> Result<Brep, String> {
+    let a = tumbling_torus_crossed_forward::build().map_err(|e| format!("forward operand: {e}"))?;
+    let b = tumbling_torus_crossed_reverse::build().map_err(|e| format!("reverse operand: {e}"))?;
+    combined(&a, &b, Op::Cut, 0.).map_err(|e| format!("swept operands' difference: {e}"))
+}

@@ -38,6 +38,12 @@ Everything a tool passes through as it moves, from a ball swung through a block 
 a wheel screwed along a rod, a rack rolled around a gear blank and a torus tumbling through space,
 whose walls are envelopes no kernel here can yet build.
 
+Ten [tumbling-torus regressions](tumbling-torus-regressions.md) isolate thin material,
+nearly perpendicular axes, a longer roll interval, and the union, intersection and difference of
+opposing sweeps. Thickness and interval controls, plus both Boolean operands separately, show
+which stage a kernel reaches. The cases stay unsettled; the originating field-mesher failures
+and native B-rep refusals are recorded separately.
+
 ## Solid sweeps at their hardest (`swept/`, `nurbs/`, from geomsolver's sweep epic)
 
 The degenerate contacts and trims that

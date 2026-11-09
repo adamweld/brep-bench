@@ -17,6 +17,7 @@ use cad_kernel::util::space::{cross, sub, unit};
 use std::collections::BTreeMap;
 
 mod sketch;
+mod tumble;
 
 /// Every case file, found by `build.rs`.
 mod cases {
