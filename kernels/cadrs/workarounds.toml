@@ -2,8 +2,6 @@
 # (SPEC.md, "A workaround is flagged"). Blocks and cylinders are sketches extruded, as in a
 # sketch-based modeller; balls, cones and tori are the kernel's primitives (`Kernel::primitive`).
 
-"loft/square-to-octagon" = "no loft pairing a corner with a side"
-"loft/square-to-round" = "no loft pairing a corner with an arc or a side with a point"
 "sweep/hollow-reducer" = "no loft through a profile with holes"
 "sweep/round-cornered-pipe" = "no round corner on a sweep"
 "swept/ball-along-spline-groove" = "no sweep of a solid along a curve"
