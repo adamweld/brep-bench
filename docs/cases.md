@@ -214,3 +214,14 @@ another; a hoof cut from a cylinder through a diameter of its base, whose curved
 nothing where base, top and side meet; a tube bored off center, its wall a millionth of its
 radius thick on one side; and a lens of two unequal balls, the line through their centers aslant
 to every axis.
+
+## Integration tests (`integration/`)
+
+Whole models that take many of a kernel's features at once, where a case elsewhere tests one. The
+first is the Utah teapot: Martin Newell's 32 bicubic Bézier patches, given by their control points,
+made a solid as the union of its body, lid, spout and handle, each sewn from its patches and
+closed by flat faces bounded by Bézier curves. It asks for surfaces that close to a point (the
+bottom and the knob), faces sewn into solids, Booleans between free-form surfaces where the spout
+and the handle run into the body, a lid lying on the body's flat top, and a point where the
+handle's end touches the body. The four parts' volumes are exact; the union's measures have no
+closed form, so it is unsettled until two kernels agree.
