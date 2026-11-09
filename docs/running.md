@@ -63,6 +63,13 @@ A push to `main` reruns only the cases its changes affect, on top of the last ru
 
 With no last results to build on, a push runs the whole suite. The site is published after every push.
 
+Each kernel to build runs in a job of its own, all at once, so a run takes as long as its slowest
+kernel, not as long as all of them. Each job builds its kernel, runs its cases on top of the last
+results and hands on `results/<kernel>.json` and its triangles; a last job gathers them, records
+what needs no runner (removed cases, cases a kernel has no implementation of), draws the cases and
+keeps the results for the next run. If any kernel's job fails, nothing is kept, and the next run
+starts again from the last results; the site still shows them.
+
 The whole suite also runs nightly, and on a manual dispatch unless its `full` input is unchecked. CI
 allows 120 s per case, not the 60 s default, so a timeout on the board means more than 120 s. CI
 runs with `--one-core`, which roughly doubles the time spent running cases.
