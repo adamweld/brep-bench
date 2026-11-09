@@ -55,3 +55,21 @@ pub fn flat(k: &mut DefaultKernel, z: f64, corners: &[(f64, f64)]) -> Result<Bod
 pub fn sewn(k: &mut DefaultKernel, pieces: &[BodyId]) -> Result<BodyId, Refusal> {
     first(k.sew_solid(pieces, 1e-6)?)
 }
+
+/// The solid lofted through `sections` (each a sketch region, or a point at either end) along
+/// `guides`, each from a corner of the first section to a corner of the last (cadrs's Loft with
+/// guides).
+pub fn guided_loft(
+    k: &mut DefaultKernel,
+    sections: Vec<LoftSection>,
+    guides: Vec<Vec<PathCurve>>,
+) -> Result<BodyId, Refusal> {
+    let spec = LoftSpec {
+        body: BodyKind::Solid,
+        sections,
+        start: LoftEnd::default(),
+        end: LoftEnd::default(),
+        source: 1,
+    };
+    first(k.loft_guided(&spec, &guides)?)
+}

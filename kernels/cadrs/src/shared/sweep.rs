@@ -32,6 +32,47 @@ pub fn on(plane: Plane, curve: Curve2) -> PathCurve {
     PathCurve::Sketch { plane, curve }
 }
 
+/// The conical helix about the axis through `origin` along +z, its radius going from `r0` to
+/// `r1` as it rises `height`, starting at angle `start` (radians, from +x) and turning
+/// right-handed (from +x toward +y) `turns` turns, radius, angle and height each in proportion:
+/// as cadrs's Helix feature draws one on a cone, sixteen quintic Bézier pieces a turn, each
+/// matching the helix's points and first and second derivatives at its ends.
+pub fn conical_helix(origin: P3, r0: f64, r1: f64, height: f64, start: f64, turns: f64) -> Vec<PathCurve> {
+    let n = ((turns.abs() * 16.0).ceil() as usize).max(1);
+    let at2 = |s: f64| {
+        let th = start + TAU * turns * s;
+        let dth = TAU * turns;
+        let (r, dr) = (r0 + (r1 - r0) * s, r1 - r0);
+        let (c, sn) = (th.cos(), th.sin());
+        let (radial, tangential) = (V3::new(c, sn, 0.0), V3::new(-sn, c, 0.0));
+        let z = V3::new(0.0, 0.0, 1.0);
+        (
+            origin + z * (height * s) + radial * r,
+            z * height + radial * dr + tangential * (r * dth),
+            tangential * (2.0 * dr * dth) - radial * (r * dth * dth),
+        )
+    };
+    (0..n)
+        .map(|k| {
+            let (s0, s1) = (k as f64 / n as f64, (k + 1) as f64 / n as f64);
+            let h = s1 - s0;
+            let (p0, d0, a0) = at2(s0);
+            let (p5, d5, a5) = at2(s1);
+            PathCurve::Bezier3 {
+                poles: vec![
+                    p0,
+                    p0 + d0 * (h / 5.0),
+                    p0 + d0 * (2.0 * h / 5.0) + a0 * (h * h / 20.0),
+                    p5 - d5 * (2.0 * h / 5.0) + a5 * (h * h / 20.0),
+                    p5 - d5 * (h / 5.0),
+                    p5,
+                ],
+                weights: vec![],
+            }
+        })
+        .collect()
+}
+
 /// A Bézier curve in space through `poles` (a polynomial one).
 pub fn bezier(poles: &[P3]) -> PathCurve {
     PathCurve::Bezier3 { poles: poles.to_vec(), weights: vec![] }

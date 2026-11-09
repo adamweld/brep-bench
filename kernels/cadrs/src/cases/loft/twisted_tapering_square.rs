@@ -1,19 +1,21 @@
-//! A square column from z = 0 to z = 40 whose section at height z is the square of side
-//! 30 − z/2 centered on the z axis, turned 4.5° per unit of height (right-handed about +z): from
-//! the square −15 ≤ x, y ≤ 15 at its foot to −5 ≤ x, y ≤ 5 at its top, half a turn round.
+
 //!
-//! The square at its foot swept up the z axis with cadrs's `Kernel::sweep_with_law`, twisting
-//! half a turn about the path and scaled to a third, both in proportion to the height: its
-//! corners run along the four conical spirals, its sides sweep the twisted ruled walls.
-use crate::bench::{line, p2, rectangle, sketch, xy, xz};
-use crate::shared::sweep::{on, sweep_law};
+//! cadrs's Loft with guides: the square of side 30 sketched at z = 0 and the one of side 10 at
+//! z = 40, along the four spirals through their corners, each a conical helix drawn as cadrs's
+//! Helix feature draws one on a cone (from radius 15√2 to 5√2, half a turn).
+use crate::bench::{p3, rectangle, sketch, xy};
+use crate::shared::loft::guided_loft;
+use crate::shared::sweep::conical_helix;
 use crate::Refusal;
-use cadrs_kernel::{BodyId, DefaultKernel};
-use std::f64::consts::PI;
+use cadrs_kernel::{BodyId, DefaultKernel, LoftSection};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let foot = sketch(xy(0.0), vec![rectangle(-15.0, -15.0, 15.0, 15.0)]);
-    // The z axis from 0 to 40, drawn on the Front plane (its sketch y is the model's z).
-    let path = vec![on(xz(0.0), line(p2(0.0, 0.0), p2(0.0, 40.0)))];
-    sweep_law(k, &foot, path, PI, 1.0 / 3.0)
+    let head = sketch(xy(40.0), vec![rectangle(-5.0, -5.0, 5.0, 5.0)]);
+    let r = 2f64.sqrt();
+    let guides = [45.0f64, 135.0, 225.0, 315.0]
+        .iter()
+        .map(|a| conical_helix(p3(0.0, 0.0, 0.0), 15.0 * r, 5.0 * r, 40.0, a.to_radians(), 0.5))
+        .collect();
+    guided_loft(k, vec![LoftSection::Profile(foot), LoftSection::Profile(head)], guides)
 }
