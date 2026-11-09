@@ -12,6 +12,6 @@ use cadrs_kernel::{BodyId, DefaultKernel, HealOp, Kernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let b = ball(k, p3(0.0, 0.0, 0.0), 5.0)?;
-    let spline = first(k.heal(b, &[HealOp::ToBSpline])?)?;
+    let spline = first(Kernel::heal(k, b, &[HealOp::ToBSpline])?)?;
     grown(k, spline, 2.0)
 }

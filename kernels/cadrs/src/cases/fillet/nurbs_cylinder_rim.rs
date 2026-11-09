@@ -14,7 +14,7 @@ use cadrs_kernel::{BodyId, DefaultKernel, HealOp, Kernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let c = cylinder(k, p3(0.0, 0.0, 0.0), v3(0.0, 0.0, 1.0), 5.0, 10.0)?;
-    let spline = first(k.heal(c, &[HealOp::ToBSpline])?)?;
+    let spline = first(Kernel::heal(k, c, &[HealOp::ToBSpline])?)?;
     let rim = edge_at(k, spline, p3(0.0, 5.0, 10.0))?;
     fillet(k, spline, &[rim], 1.0)
 }
