@@ -157,3 +157,41 @@ pub fn torus_slid(
     let shadow = extrude(k, &sketch(xy(center.z), vec![stadium]), rise)?;
     Ok(vec![start, shadow, end])
 }
+
+/// A tumbling torus (`swept/tumbling-torus-*`): what the torus about `center` (axis along z, major
+/// radius 1, tube radius `tube`) fills as, at each roll t from `rolls.0` to `rolls.1` degrees, it is
+/// turned by `rate`·t about the upright line through (2, 0, 0), then by `sign`·t about the line
+/// through q = (0, h cos ℓ, h sin ℓ) along u = (cos α, sin α cos ℓ, sin α sin ℓ), `(ℓ, α, h)` the
+/// second axis's lean, tilt and offset (degrees, degrees, length). Cadrs's sweep of a solid, with
+/// the rigid motion of its two turns, the second axis fixed in the world.
+pub fn tumbling_torus(
+    k: &mut DefaultKernel,
+    center: P3,
+    tube: f64,
+    (lean, tilt, h): (f64, f64, f64),
+    rate: f64,
+    sign: f64,
+    rolls: (f64, f64),
+) -> Result<BodyId, Refusal> {
+    let t = crate::bench::torus(k, center, v3(0.0, 0.0, 1.0), 1.0, tube)?;
+    let (l, a) = (lean.to_radians(), tilt.to_radians());
+    let q = p3(0.0, h * l.cos(), h * l.sin());
+    let u = v3(a.cos(), a.sin() * l.cos(), a.sin() * l.sin());
+    let (t0, t1) = (rolls.0.to_radians(), rolls.1.to_radians());
+    let motion = SolidMotion::Rigid {
+        steps: vec![
+            RigidStep::Turn { axis: axis(p3(2.0, 0.0, 0.0), v3(0.0, 0.0, 1.0)), from: rate * t0, to: rate * t1 },
+            RigidStep::Turn { axis: axis(q, u), from: sign * t0, to: sign * t1 },
+        ],
+    };
+    first(k.sweep_solid(t, &motion)?)
+}
+
+/// The two operands of `swept/tumbling-torus-crossed-*`: the torus (center (3, 0, 2), tube 0.22)
+/// rolled from −100° to 100° at 0.7 about the upright axis, the second axis leaning 45° and
+/// tilted 20° at 0.7071, turned against the roll (A) and with it (B).
+pub fn crossed_tori(k: &mut DefaultKernel) -> Result<(BodyId, BodyId), Refusal> {
+    let a = tumbling_torus(k, p3(3.0, 0.0, 2.0), 0.22, (45.0, 20.0, 0.7071), 0.7, -1.0, (-100.0, 100.0))?;
+    let b = tumbling_torus(k, p3(3.0, 0.0, 2.0), 0.22, (45.0, 20.0, 0.7071), 0.7, 1.0, (-100.0, 100.0))?;
+    Ok((a, b))
+}
