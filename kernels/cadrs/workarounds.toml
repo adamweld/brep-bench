@@ -2,4 +2,3 @@
 # (SPEC.md, "A workaround is flagged"). Blocks and cylinders are sketches extruded, as in a
 # sketch-based modeller; balls, cones and tori are the kernel's primitives (`Kernel::primitive`).
 
-"swept/ball-along-spline-groove" = "no sweep of a solid along a curve"
