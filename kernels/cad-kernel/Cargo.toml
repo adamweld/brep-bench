@@ -7,9 +7,8 @@ description = "The brep-bench runner for cad-kernel: one cad-kernel program per 
 publish = false
 
 [dependencies]
-# a commit of geomsolver, exactly, until the release after 0.5.0 carries its ring sweep
-# (`swept::closed::ring`): the scoreboard says which, and moving to another is a change made here
-cad-kernel = { git = "https://github.com/bmander/geomsolver", rev = "a6caf46400400e3c81f9d05cbbfd9356c1ef9324" }
+# a release, exactly: the scoreboard says which, and moving to another is a change made here
+cad-kernel = "=0.6.0"
 
 [profile.release]
 debug = 0
