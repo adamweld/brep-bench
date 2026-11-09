@@ -1,12 +1,15 @@
 # Run the kernels over the cases, and publish the scoreboard to GitHub Pages: on every push to main,
 # nightly, and by hand.  Pages must be set to deploy from GitHub Actions (Settings ▸ Pages).
 #
-# Three jobs. `plan` decides what to run (harness/changed.py): on a push, the cases it touched, with
-# the kernels whose implementations of them it touched. `bench` runs that on top of the last run's
-# results, which the Actions cache keeps under a key naming the commit they were made at; with
-# nothing to run it is skipped, building nothing. `site` renders the newest results there are and
-# deploys them, every time, even when the bench fails. The nightly run, and a run by hand unless
-# told otherwise, runs the whole suite.
+# Four jobs. `plan` decides what to run (harness/changed.py): on a push, the cases it touched, with
+# the kernels whose implementations of them it touched. `run` is a job per kernel to build, all at
+# once: each builds its kernel and runs its cases on top of the last run's results, which the
+# Actions cache keeps under a key naming the commit they were made at, and hands on its results.
+# `merge` gathers them into the last results, records what needs no runner (cases removed, cases a
+# kernel has no implementation of), draws the cases and keeps the results for the next run; with
+# nothing to run or draw it is skipped, building nothing. `site` renders the newest results there
+# are and deploys them, every time, even when the bench fails. The nightly run, and a run by hand
+# unless told otherwise, runs the whole suite.
 name: bench
 
 on:
@@ -43,7 +46,13 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     outputs:
-      bench: ${{ steps.plan.outputs.work }}
+      work: ${{ steps.plan.outputs.work }}
+      full: ${{ steps.plan.outputs.full }}
+      # the kernels to build and run, a job each, as a JSON list
+      kernels: ${{ steps.plan.outputs.kernels }}
+      # the key of the last results, which every later job restores exactly, so that all of them
+      # plan from the same results; empty for a run of the whole suite from nothing
+      last: ${{ steps.last.outputs.cache-matched-key }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,22 +68,32 @@ jobs:
           key: ${{ env.KEY }}
           restore-keys: bench-results-
           lookup-only: true
+      # planned from the committed results, not the last ones, which are not downloaded here: the
+      # kernels it names are a superset of those the jobs below find to build from the last ones
       - name: Plan what to run
         id: plan
         env:
           LAST: ${{ steps.last.outputs.cache-matched-key }}
         run: |
-          if [ "$FULL" = true ]; then
+          if [ "$FULL" = true ] || [ -z "$LAST" ]; then
             python3 harness/changed.py --full
           else
             base=${LAST#bench-results-}
             python3 harness/changed.py --base "${base%%-*}"
           fi
 
-  bench:
+  run:
     needs: plan
-    if: needs.plan.outputs.bench == 'true'
+    if: needs.plan.outputs.work == 'true' && needs.plan.outputs.kernels != '[]'
     runs-on: ubuntu-latest
+    strategy:
+      # the others' results are still worth seeing in their logs; `merge` needs every one
+      fail-fast: false
+      matrix:
+        kernel: ${{ fromJSON(needs.plan.outputs.kernels) }}
+    name: run (${{ matrix.kernel }})
+    env:
+      KERNEL: ${{ matrix.kernel }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,47 +103,115 @@ jobs:
         with:
           python-version: "3.12"
       - name: Restore the last results
-        id: last
-        if: env.FULL != 'true'
+        if: needs.plan.outputs.full != 'true'
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.STATE }}
-          key: ${{ env.KEY }}
-          restore-keys: bench-results-
-      # planned again from what was restored: with nothing restored, the whole suite runs
+          key: ${{ needs.plan.outputs.last }}
+          fail-on-cache-miss: true
+      # planned again from what was restored, and narrowed to this kernel
+      - name: Plan what to run
+        id: plan
+        if: needs.plan.outputs.full != 'true'
+        env:
+          LAST: ${{ needs.plan.outputs.last }}
+        run: |
+          base=${LAST#bench-results-}
+          python harness/changed.py --base "${base%%-*}" > all.json
+          jq --arg k "$KERNEL" '.run |= with_entries(select(.key == $k))' all.json > plan.json
+          cat plan.json
+      # for Aetheris, a .NET kernel
+      - uses: actions/setup-dotnet@v4
+        if: matrix.kernel == 'aetheris'
+        with:
+          dotnet-version: "10.0.x"
+      # the plan's `build` is space separated, so it is padded to match the whole name
+      - name: Build the adapter
+        if: >-
+          needs.plan.outputs.full == 'true' ||
+          contains(format(' {0} ', steps.plan.outputs.build), format(' {0} ', matrix.kernel))
+        run: python harness/build.py "$KERNEL"
+      # each case a kernel builds is run again pinned to one core, for what its other cores buy it
+      - name: Run the cases
+        run: |
+          if [ "${{ needs.plan.outputs.full }}" = true ]; then
+            python harness/run.py --kernel "$KERNEL" --timeout 120 --one-core
+          else
+            python harness/run.py --plan plan.json --timeout 120 --one-core
+          fi
+      # this kernel's results and its triangles, for `merge`
+      - name: Hand on the results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.kernel }}
+          path: |
+            results/${{ matrix.kernel }}.json
+            results/meshes/${{ matrix.kernel }}/
+          retention-days: 3
+
+  merge:
+    needs: [plan, run]
+    # with no kernel to build, `run` is skipped, and there may still be cases to draw or drop
+    if: >-
+      !cancelled() && needs.plan.outputs.work == 'true' &&
+      (needs.run.result == 'success' || needs.run.result == 'skipped')
+    runs-on: ubuntu-latest
+    env:
+      KERNELS: ${{ needs.plan.outputs.kernels }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore the last results
+        if: needs.plan.outputs.last != ''
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.STATE }}
+          key: ${{ needs.plan.outputs.last }}
+          fail-on-cache-miss: true
+      # planned again from what was restored, before the new results are added to it
       - name: Plan what to run
         id: plan
         env:
-          LAST: ${{ steps.last.outputs.cache-matched-key }}
+          LAST: ${{ needs.plan.outputs.last }}
         run: |
-          if [ "$FULL" = true ] || [ -z "$LAST" ]; then
+          if [ "${{ needs.plan.outputs.full }}" = true ]; then
             python harness/changed.py --full > plan.json
           else
             base=${LAST#bench-results-}
             python harness/changed.py --base "${base%%-*}" > plan.json
           fi
           cat plan.json
-      # for Aetheris, a .NET kernel: only when it is built. The plan's `build` is space separated,
-      # so it is padded to match the whole name
-      - uses: actions/setup-dotnet@v4
-        if: contains(format(' {0} ', steps.plan.outputs.build), ' aetheris ')
+      # each kernel run replaces its triangles whole, so that none of the last run's is left over
+      - name: Clear the kernels run
+        run: |
+          for k in $(jq -r '.[]' <<< "$KERNELS"); do rm -rf "results/meshes/$k"; done
+      - name: Gather the kernels' results
+        if: needs.run.result == 'success'
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: "10.0.x"
-      - name: Build the adapters
-        if: steps.plan.outputs.build != ''
-        env:
-          BUILD: ${{ steps.plan.outputs.build }}
-        run: python harness/build.py $BUILD
-      # each case a kernel builds is run again pinned to one core, for what its other cores buy it
-      - name: Run the cases
-        run: python harness/run.py --plan plan.json --timeout 120 --one-core
+          pattern: results-*
+          merge-multiple: true
+          path: results
+      # the rest of the plan, which asks no runner: the kernels not built record the cases they
+      # have no implementation of, and every kernel drops the rows of cases removed
+      - name: Record the rest
+        if: steps.plan.outputs.full != 'true'
+        run: |
+          jq --argjson ks "$KERNELS" '.run |= with_entries(select(.key as $n | $ks | index($n) | not))' \
+            plan.json > rest.json
+          python harness/run.py --plan rest.json
       - name: Draw the cases
         if: steps.plan.outputs.draw != ''
         env:
           DRAW: ${{ steps.plan.outputs.draw }}
         run: |
           if [ "$DRAW" = all ]; then python harness/draw.py; else python harness/draw.py $DRAW; fi
-      # only when every step succeeded: else the next run starts again from the last results
+      # only when every kernel's run succeeded: else the next run starts again from the last results
       - name: Keep the results for the next run
         uses: actions/cache/save@v4
         with:
@@ -132,7 +219,7 @@ jobs:
           key: ${{ env.KEY }}
 
   site:
-    needs: [plan, bench]
+    needs: [plan, run, merge]
     # whether the bench ran, was skipped or failed: the site shows the newest results there are
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
