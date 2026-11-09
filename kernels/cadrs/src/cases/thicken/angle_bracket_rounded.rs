@@ -3,21 +3,14 @@
 //! (0, 0, 0) to (0, 8, 10)), thickened by 1 to the outside of the crease (−z and −x), the gap the
 //! moved faces leave at the crease closed by the quarter cylinder of radius 1 about it.
 //!
-//! cadrs's Thicken of the sheet (the L surface-extruded) gives each face its own slab and leaves
-//! the gap between them at the crease open (a sheet whose free edges are not flat loops is not
-//! shelled, and slabs are not joined). So the angle is built as the sheet's profile extruded thin
-//! instead (the L (10, 0), (0, 0), (0, 10) on the Front plane, a wall 1 thick to its outside,
-//! extruded 8 along +y, its outer corner mitred along (−1, y, −1)), and that corner edge is
-//! filleted to radius 1: the round lies 1 from both moved faces, on the cylinder of radius 1
-//! about the crease.
-use crate::bench::{edge_at, p3};
-use crate::shared::thicken::thin_angle;
+//! The sheet is the L (10, 0), (0, 0), (0, 10) on the Front plane surface-extruded 8 along +y;
+//! cadrs's Thicken of it, 1 toward −z from the floor (and so −x from the wall), its bend rounded (the cylinder of radius 1 about the crease).
+use crate::bench::{p3, v3};
+use crate::shared::thicken::{angle_sheet, thicken_toward_with};
 use crate::Refusal;
-use cadrs_kernel::{BodyId, DefaultKernel, Kernel};
+use cadrs_kernel::{BodyId, DefaultKernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let angle = thin_angle(k)?;
-    let corner = edge_at(k, angle, p3(-1.0, 4.0, -1.0))?;
-    let r = k.fillet(angle, &[corner], 1.0)?;
-    r.bodies.first().copied().ok_or_else(|| Refusal::from("the fillet made no body"))
+    let sheet = angle_sheet(k)?;
+    thicken_toward_with(k, sheet, p3(5.0, 4.0, 0.0), v3(0.0, 0.0, -1.0), 1.0, false)
 }
