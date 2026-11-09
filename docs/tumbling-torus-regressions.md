@@ -19,10 +19,9 @@ exercise the Boolean. Keeping the separate operands makes that distinction visib
 - OCCT adapter: refuses the same unavailable continuous rigid-motion sweep as the existing
   `swept/tumbling-torus` implementation. No finite union of sampled poses is substituted.
 
-The [Solvent inputs](reproductions/tumbling-tori/) are diagnostic reproductions, **not canonical
-implementations or a language for kernels to translate**. The descriptions under `cases/` alone
-define the benchmark solids. Solvent numeric lengths are millimeters; benchmark lengths are
-unitless with the same numeric values. Solvent's front-plane coordinates (u, v) map to (x, 0, z).
+The descriptions under `cases/` define the benchmark solids. The investigation used Solvent
+models with lengths in millimeters; benchmark lengths are unitless with the same numeric values.
+Solvent's front-plane coordinates (u, v) map to (x, 0, z).
 
 ## Corrected axis label
 
@@ -112,9 +111,8 @@ The standalone document matters for reproduction: when all three Boolean roots w
 one document and rendered in one process, the intersection produced a preview, while the union
 and difference still failed protection. That run does not establish which changed detail
 (solve perturbation, field/cache state, or traversal) tipped the result. It is additional evidence
-of numerical sensitivity, not proof of a root cause. The fixtures below keep the original
-standalone inputs and commands; do not replace them with one multi-output document when comparing
-these diagnostics.
+of numerical sensitivity, not proof of a root cause. The observations above were made with
+standalone documents, one Boolean result per run.
 
 ### Union and difference: close feature curves hit the spacing floor
 
@@ -187,29 +185,3 @@ python3 harness/run.py --kernel occt --case swept/tumbling-torus- --timeout 30
 These are subset runs; they do not overwrite the published result tables. The full suite's case
 loader parsed all 346 descriptions, including the ten additions. Both adapters were exercised,
 and the Rust adapter was compiled against its pinned release.
-
-For the original field pipeline, build `solventc` from the pinned geomsolver commit, then run from
-this repository (output paths below are scratch files):
-
-```sh
-solventc docs/reproductions/tumbling-tori/needle.sv --solid tumbled --png /tmp/needle.png
-solventc docs/reproductions/tumbling-tori/needle.sv --set tube=0.12mm --solid tumbled --png /tmp/thicker.png
-solventc docs/reproductions/tumbling-tori/near-orthogonal.sv --solid tumbled --png /tmp/orthogonal.png
-solventc docs/reproductions/tumbling-tori/near-orthogonal.sv --set tube=0.16mm --solid tumbled --png /tmp/orthogonal-thick.png
-solventc docs/reproductions/tumbling-tori/multi-turn.sv --set start=-90deg --set finish=90deg --solid tumbled --png /tmp/short.png
-solventc docs/reproductions/tumbling-tori/multi-turn.sv --set start=-180deg --set finish=180deg --solid tumbled --png /tmp/full.png
-solventc docs/reproductions/tumbling-tori/crossed-union.sv --solid tumbled --png /tmp/operand-a.png
-solventc docs/reproductions/tumbling-tori/crossed-union.sv --solid other --png /tmp/operand-b.png
-solventc docs/reproductions/tumbling-tori/crossed-union.sv --solid body --png /tmp/union.png
-solventc docs/reproductions/tumbling-tori/crossed-intersection.sv --solid body --png /tmp/common.png
-solventc docs/reproductions/tumbling-tori/crossed-difference.sv --solid body --png /tmp/cut.png
-```
-
-Set `SOLVENT_REFINE_TRACE=1` to get the refinement faults and blocking-ball diagnostics.
-The included [field-probe.rs](reproductions/tumbling-tori/field-probe.rs) is a diagnostic executable,
-not a benchmark adapter. Build it in a scratch Cargo package with a path dependency on the pinned
-geomsolver's `rust/gcs-core`, then call it as `field-probe INPUT.sv SOLID FINENESS X Y Z`.
-It uses only public APIs to record exact/cached readings at the supplied witness and the
-phase-by-phase snapshots; `DONE` with zero triangles is recorded as empty, not accepted as a
-successful solid. For the needle use witness `4 0 2`; for near-orthogonal use `3.02 0 1` and fineness
-1 or 4. The latter fineness-4 diagnostic took about a minute on the investigation machine.
