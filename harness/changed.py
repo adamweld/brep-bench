@@ -9,7 +9,9 @@ The plan is JSON: {"full": true} for a run of the whole suite, else {"full": fal
 `run.py --plan` drops. What
 changed decides it:
 
-- a case (cases/<case>.md): every kernel runs it again;
+- a case (cases/<case>.md), added or changed in its header (what is graded: its closed forms,
+  whether it is settled): every kernel runs it again. A change to its description alone runs
+  nothing: no result holds it, and the site, made again every time, reads it from the file;
 - a kernel's implementation of a case: that kernel runs that case again;
 - anything else of a kernel's (kernels/<kernel>/): that kernel runs every case again, except its
   workarounds.toml and elegance.toml, which only the site reads;
@@ -70,6 +72,29 @@ def kernels_at(base):
         return None
 
 
+def header(text):
+    """A case file's header, the part between its `+++` lines, or None if it has none."""
+    parts = text.split("+++", 2)
+    return parts[1].strip() if text.startswith("+++") and len(parts) == 3 else None
+
+
+def redescribed(base, paths):
+    """The cases among `paths` whose header is as it was at `base`: only their words changed."""
+    out = set()
+    for path in paths:
+        if not (path.startswith("cases/") and path.endswith(".md")):
+            continue
+        old = git("show", f"{base}:{path}")
+        try:
+            with open(os.path.join(ROOT, path), encoding="utf-8") as f:
+                new = header(f.read())
+        except OSError:
+            continue  # removed
+        if old.returncode == 0 and new is not None and header(old.stdout) == new:
+            out.add(path)
+    return out
+
+
 def implementation(pattern):
     """A kernel's `source` pattern as a regex matching any case's implementation."""
     out = re.escape(pattern)
@@ -79,9 +104,10 @@ def implementation(pattern):
     return re.compile(out + "$")
 
 
-def plan(paths, results_dir, old_kernels=None):
+def plan(paths, results_dir, old_kernels=None, described=()):
     """What to run for `paths` changed; `old_kernels`, the kernels by name before them, is needed
-    when kernels.json is among them (without it, the whole suite runs)."""
+    when kernels.json is among them (without it, the whole suite runs). `described` is the cases
+    among `paths` changed only in their description, which need nothing run."""
     runnable = [k for k in kernels() if k.get("command")]
     ids = [c["id"] for c in cases()]
     if paths is None or WHOLE_SUITE & set(paths):
@@ -112,7 +138,9 @@ def plan(paths, results_dir, old_kernels=None):
             redraw_all = True
         if path.startswith("cases/") and path.endswith(".md"):
             cid = path[len("cases/"):-len(".md")]
-            if cid in ids:
+            if path in described:
+                pass
+            elif cid in ids:
                 for k in runnable:
                     run.setdefault(k["name"], set()).add(cid)
             else:
@@ -144,7 +172,8 @@ def main():
     args = ap.parse_args()
     paths = None if args.full else changed_files(args.base)
     old = kernels_at(args.base) if paths and "kernels.json" in paths else None
-    p = plan(paths, os.path.join(ROOT, "results"), old)
+    described = redescribed(args.base, paths) if paths else ()
+    p = plan(paths, os.path.join(ROOT, "results"), old, described)
     json.dump(p, sys.stdout, indent=1)
     print()
     if p["full"]:
@@ -162,6 +191,8 @@ def main():
             print(f"{name}: {len(got)} cases", file=sys.stderr)
         if p["removed"]:
             print(f"removed: {' '.join(p['removed'])}", file=sys.stderr)
+        if described:
+            print(f"{len(described)} cases changed only in their description", file=sys.stderr)
         if not p["run"]:
             print("no case to run", file=sys.stderr)
     if os.environ.get("GITHUB_OUTPUT"):

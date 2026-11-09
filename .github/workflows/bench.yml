@@ -1,7 +1,8 @@
 # Run the kernels over the cases, and publish the scoreboard to GitHub Pages: on every push to main,
 # nightly, and by hand.  Pages must be set to deploy from GitHub Actions (Settings ▸ Pages).
 #
-# Four jobs. `plan` decides what to run (harness/changed.py): on a push, the cases it touched, with
+# Four jobs. `plan` decides what to run (harness/changed.py): on a push, the cases whose headers it
+# touched (a description alone runs nothing), with
 # the kernels whose implementations of them it touched. `run` is a job per kernel to build, all at
 # once: each builds its kernel and runs its cases on top of the last run's results, which the
 # Actions cache keeps under a key naming the commit they were made at, and hands on its results.
