@@ -2,26 +2,33 @@
 //! of radii 2.5 and 2 centred at (5, 0, 0), its axis leaning 25° from z towards +y, turned rigidly
 //! about z from −140° to +140°.
 //!
-//! Refused. cad-kernel sweeps a solid (`swept::closed`) under a turn only where its faces are
-//! planes, balls, cylinders and cones, and this tool is a torus leaning to the turn's axis. The
-//! cutter's points stay within about 64° of the x axis about z, so over a turn of ±140° every point
-//! of the block at a distance ρ from the z axis and a height z that some point of the cutter has is
-//! passed through: the groove is the cutter's shadow on a half-plane through the z axis, revolved
-//! (`build::revolve` turns a planar profile). But that shadow is not a profile cad-kernel can draw.
-//! The torus is the union of the balls of radius 2 about the circle through its tube's centres, and
-//! each ball's shadow is the disc of radius 2 about where its centre stands in (ρ, z); leaning,
-//! that circle's image is a curve that is no line, circle or conic, and the shadow's boundary is
-//! its parallel curve at 2 — the envelope of the discs, the curve where the turn's velocity lies
-//! tangent to the torus. It would have to be computed and fitted, and that is geometry made outside
-//! the kernel.
+//! Built by the kernel's sweep of a ring cut from a blank (`swept::closed::ring_cut_from`): a torus
+//! is a tool of revolution whose meridian is a loop clear of its axis, so its contact under the
+//! turn is read meridian by meridian in closed form though its axis is skew to the turn's, and
+//! each contact curve sweeps a tube, fitted. The sector is split by the tubes and the torus where
+//! it starts and stops at once, and kept where the sweep is not: no closed solid is built and then
+//! subtracted.
+use crate::sketch::polygon;
+use cad_kernel::build::{revolve, torus};
+use cad_kernel::swept::closed::ring_cut_from;
 use cad_kernel::topo::Brep;
+use cad_kernel::trajectory::{Screw, Trajectory};
+
+const LEAN: f64 = 25f64.to_radians();
+const TURN: f64 = 140f64.to_radians();
+/// How closely the torus is meshed for the sweep's membership reads: a two-hundredth of its tube's
+/// radius.
+const BAR: f64 = 0.01;
+/// The tolerance the tubes are fitted and met to: a two-hundred-thousandth of the tube's radius.
+const TOL: f64 = 1e-5;
 
 pub fn build() -> Result<Brep, String> {
-    Err("cad-kernel sweeps a solid (`swept::closed`) under a turn only where its faces are planes, \
-         balls, cylinders and cones, and refuses a torus leaning to the turn's axis \
-         (`Unbuilt::Curved`), and revolve only a planar profile: the profile this groove needs — \
-         the leaning cutter's shadow on a half-plane through the z axis — is bounded by the \
-         envelope of the torus under the turn (the parallel curve at 2 of its tube's centre \
-         circle's image), which it cannot build"
-        .into())
+    // the sector: its section in the xz plane turned 60° about z
+    let section = polygon(&[[8., 0., -1.], [12., 0., -1.], [12., 0., 1.], [8., 0., 1.]]);
+    let sector = revolve(&section, [0., 0., 0.], [0., 0., 1.], 60f64.to_radians())?;
+    let cutter = torus([5., 0., 0.], [0., LEAN.sin(), LEAN.cos()], 2.5, 2.)?;
+    // the turn about z: a screw that does not advance
+    let path = Trajectory::Twist(Screw { origin: [0., 0., 0.], axis: [0., 0., 1.], ratio: 1., advance: 0. });
+    ring_cut_from(&sector, &cutter, &path, [-TURN, TURN], BAR, TOL)
+        .map_err(|why| format!("the cutter's sweep not built: {why:?}"))
 }
