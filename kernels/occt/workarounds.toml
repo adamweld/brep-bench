@@ -2,6 +2,7 @@
 # (SPEC.md, "A workaround is flagged").
 
 "chamfer/octahedron-all-edges-mitered" = "no miter where four chamfers meet"
+"edit/holes-widened-until-merged" = "no face offset that merges these two holes; their walls are enlarged by Boolean cuts"
 "edit/rounded-block-top-moved-up" = "no move of a face that carries its round"
 "fillet/conic-edge" = "no conic blend"
 "fillet/octahedron-all-edges" = "no rolling-ball corner where four rounds meet"
