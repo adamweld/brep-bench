@@ -26,3 +26,8 @@ The ring's top and bottom circles stay in their planes and sweep flat annuli; it
 and farthest from the z axis at each height sweep the inner and outer walls. The result is a solid
 ring about the z axis, from 4 to 12 out, its section in each half-plane through the z axis a
 stadium: the band |z| ≤ 1 between 5 and 11 out, ended by half discs of radius 1.
+
+**As a set:**
+
+$$\bigcup_{\theta \in [0,\,360^\circ]} R_z(\theta)\,T, \quad T = \bigl\{\,\bigl(\sqrt{(x-8)^2 + y^2}
+- 3\bigr)^2 + z^2 \le 1\,\bigr\}$$

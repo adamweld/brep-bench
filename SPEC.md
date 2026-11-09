@@ -1,4 +1,4 @@
-# brep-bench specification, version 1.14
+# brep-bench specification, version 1.15
 
 brep-bench works like Rosetta Code. Each **case** describes a solid in plain words and gives its
 volume and area as closed forms. Each **kernel** has its own **implementation** of each case,
@@ -109,6 +109,50 @@ How a description is written:
   the thickness consumes a face, closes a gap or never reaches an opening, what is left. It then
   states the result exactly, as a composition with one answer: the solid less its cavity, given
   as a solid, or for a wall grown outward the solid grown less the solid.
+
+### The solid as a set
+
+A description may end with a paragraph headed `**As a set:**` and one formula in display math: the
+solid again, as the set of its points. It is optional, and it is not a script. It names no
+operation of any kernel and no order of construction, only which points are in the solid, so it
+stays within "no canonical script": there is nothing in it to translate, and an implementation
+still builds from the description. The words are the definition. The formula restates them, and
+where the two differ that is a bug in the case. It is not graded.
+
+It is worth writing where it is shorter than the words or settles something they leave to care:
+which side, which corner, which of two readings. And since a set is a test of whether a point is
+in the solid, it gives any reader, a person or a program, an estimate of the volume that owes
+nothing to a kernel. It is left out where the case is about what bounds the solid and not which
+points it holds (a ball whose one face is a NURBS is the same set as a ball), and where the
+formula would be longer or harder to read than the description.
+
+What a formula may use, written in LaTeX in the case and shown here in plain symbols:
+
+- `p = (x, y, z)` is a point, `ρ = √(x² + y²)` its distance from the z axis, and `φ` its angle
+  about the z axis from +x toward +y. `‖p‖` is its distance from the origin.
+- `{ conditions }` is every point that meets the conditions: `{ ρ ≤ 5, 0 ≤ z ≤ 10 }` is a
+  cylinder. A condition that leaves a coordinate out leaves it free, so `{ ρ ≤ 3 }` is the whole
+  cylinder about the z axis, without ends.
+- The solid is the closure of the interior of the set written. So `≤` and `<` say the same thing,
+  a difference leaves no skin behind, and a part with no volume (a face, a slit, a point) is no
+  part of the solid.
+- `[a, b] × [c, d] × [e, f]` is a box, and `A × [e, f]` the plane region `A` of x and y extruded
+  from z = e to z = f. `poly(…)` is the polygon through the points given, in order, and
+  `conv(…)` the convex hull of what is given.
+- `B_r(c)` is the ball of radius r about c, and `B_r` the one about the origin. `d(p, A)` is the
+  distance from p to the nearest point of A, which may be a line, a curve, a region or a solid;
+  `d((x, y), A)` is the same in the plane.
+- `∪`, `∩` and `∖` are union, common part and difference, and `⋃` a union over everything its
+  index runs through, a continuous interval included.
+- `A ⊕ B = { a + b : a ∈ A, b ∈ B }`. So `A ⊕ B_r` is A grown by r, every point within r of it,
+  and `A ⊕ { s·v : 0 ≤ s ≤ 1 }` is everything A passes through as it slides along v.
+  `A ⊖ B_r = { p : B_r(p) ⊆ A }` is A shrunk by r. Then `(A ⊖ B_r) ⊕ B_r` is the union of every
+  ball of radius r inside A: A with its convex edges and corners rounded to r.
+- `R_ℓ(θ)` is the turn by θ about the line ℓ, right-handed, and `R_z` the turn about the z axis.
+  Motions are applied right to left: `R_B(−t) R_A(t/4) T` is T turned about A and then about B.
+  `⋃ M_t T` over t in an interval is everything T passes through as it moves.
+- A letter may stand for a set or a line the description has named (K the solid started from, A
+  and B two axes), given after the formula or left to the words where they are plain.
 
 ## An implementation
 
@@ -329,6 +373,9 @@ One entry per kernel:
 
 ## Versions
 
+- **1.15:** a description may end with its solid stated again as a set of points, under
+  `**As a set:**`, in a notation this file defines. It is optional and not graded, and the words
+  remain the definition. Grading is as in 1.9.
 - **1.14:** every runner whose kernel can write STEP should; a kernel that cannot says why in
   `kernels.json`. A writer's declining is a refusal (`step_error`), told apart from a failure, and
   the harness judges each file (B-rep, faceted, triangles, open or empty), shown and not graded.

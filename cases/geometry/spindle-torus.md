@@ -24,3 +24,7 @@ shape, bounded only by the outer arc of the tube's circle, turned, which meets t
 (0, 0, ±4) in a dimple above and below. The inner part of the torus's surface, the lemon the tube
 sweeps where it crosses the axis (`geometry/lemon`), lies inside the solid and is no part of its
 boundary.
+
+**As a set:**
+
+$$\{\,(\rho - 3)^2 + z^2 \le 5^2\,\}$$

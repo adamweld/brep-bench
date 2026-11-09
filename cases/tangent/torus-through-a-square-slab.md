@@ -28,3 +28,7 @@ rectangle.
 
 If the torus you make has a seam where its angle about z starts, turn it 45° about z, so that the
 seam does not pass through a point of contact.
+
+**As a set:**
+
+$$\{\,(\rho - 10)^2 + z^2 \le 3^2\,\} \cup \bigl([-13,13]^2\times[-1,1]\bigr)$$

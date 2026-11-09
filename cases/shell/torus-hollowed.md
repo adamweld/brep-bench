@@ -18,3 +18,7 @@ of radius 6. Hollow it to a wall 0.5 thick with no opening: the torus stays as t
 moved 0.5 inward it is the inside, the torus whose tube has radius 1.5 about the same middle circle.
 The result is the torus less that torus, one solid bounded by two tori, the inner one facing in,
 toward the void, which goes around the hole.
+
+**As a set:**
+
+$$\{\,1.5^2 \le (\rho - 6)^2 + z^2 \le 2^2\,\}$$

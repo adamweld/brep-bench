@@ -21,3 +21,7 @@ face is drafted. The top and the sides y = 0 and y = 12 are trimmed to the draft
 The result is a prism along y. Its section in any plane y = const is the trapezoid through (0, 0),
 (20, 0), (20 − 10·tan 10°, 10) and (0, 10), each given as (x, z), and it runs from y = 0 to
 y = 12.
+
+**As a set:**
+
+$$\{\,0 \le x \le 20 - z\tan 10^\circ,\ 0 \le y \le 12,\ 0 \le z \le 10\,\}$$

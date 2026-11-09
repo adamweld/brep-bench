@@ -14,3 +14,7 @@ tex = '2\left(10\cdot 20 + 20\cdot 30 + 10\cdot 30\right)'
 +++
 
 A rectangular block 10 long in x, 20 in y and 30 in z, with one corner at the origin and the opposite corner at (10, 20, 30).
+
+**As a set:**
+
+$$[0,10]\times[0,20]\times[0,30]$$

@@ -24,3 +24,7 @@ the one plane y = 4: the cavity, the box from (4, 4, 4) to (6, 4, 6), is flat an
 every point of the box is within 4 of a wall. Nothing is hollowed, and the result is the box itself,
 its six faces as they were. A kernel that leaves the two coincident inside walls as a slit of zero
 thickness, or faces bounding nothing, does not make it.
+
+**As a set:**
+
+$$K \setminus \bigl([4,6]\times[4,4]\times[4,6]\bigr) = K, \quad K = [0,10]\times[0,8]\times[0,6]$$

@@ -19,3 +19,7 @@ single point, the middle of the face, and lies everywhere else strictly inside t
 
 Make the solid common to both. It is the whole ball: the six points where the sphere touches the
 cube's faces cut nothing from it.
+
+**As a set:**
+
+$$[0,10]^3 \cap B_5(5,5,5)$$

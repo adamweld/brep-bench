@@ -24,3 +24,8 @@ joining the two faces beside it, which have moved in to x = 4 and y = 4.
 So the shrunk plate runs from z = 1 to z = 7, and its section is the polygon through (1, 1),
 (19, 1), (19, 4), (5, 4), (4, 5), (4, 14) and (1, 14) with its edge from (5, 4) to (4, 5) replaced
 by the quarter circle of radius 1 about (5, 5).
+
+**As a set:**
+
+$$\bigl(\operatorname{poly}\bigl((0,0),(20,0),(20,5),(5,5),(5,15),(0,15)\bigr)\times[0,8]\bigr)
+\ominus B_{1}$$

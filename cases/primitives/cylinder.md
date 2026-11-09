@@ -14,3 +14,7 @@ tex = '2\pi r h + 2\pi r^2'
 +++
 
 A solid cylinder of radius 5 and height 10 whose axis is the z axis, standing on the xy plane: it runs from z = 0 to z = 10.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\}$$

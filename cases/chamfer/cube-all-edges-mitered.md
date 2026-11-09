@@ -31,3 +31,7 @@ meet at the point (9, 9, 9), each pair along a line from it to a square's corner
 It is what chamfering the edges one after another leaves, each edge its own chamfer, ending on
 the faces at its ends, the chamfers made before it among them: build it so, with the kernel's
 chamfer, in any order.
+
+**As a set:**
+
+$$[0,10]^3 \cap \{\,|x-5| + |y-5| \le 8,\ |y-5| + |z-5| \le 8,\ |z-5| + |x-5| \le 8\,\}$$

@@ -29,3 +29,8 @@ Put α = acos(5/6), in radians. The overlapping disks have intersection area 72�
 so their union has area U = 72(π − α) + 10√11 and perimeter 24(π − α). The volume is
 the remaining planar area times 8. The surface area is the two planar ends, the box's outside
 walls of area 140·8, and the opening's perimeter times 8.
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,8]\bigr) \setminus \bigl(\{\,(x-15)^2 + (y-15)^2 \le 6^2\,\} \cup
+\{\,(x-25)^2 + (y-15)^2 \le 6^2\,\}\bigr)$$

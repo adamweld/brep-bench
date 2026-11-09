@@ -23,3 +23,7 @@ The sphere, moved 1 inward, is the sphere of radius 4 about the origin, which me
 at right angles: the result is a bowl, the half ball less the half ball of radius 4, its rim the
 annulus between radii 4 and 5 at z = 0 and both its curved faces passing through their poles at (0,
 0, −5) and (0, 0, −4).
+
+**As a set:**
+
+$$\{\,4 \le \lVert p \rVert \le 5,\ z \le 0\,\}$$

@@ -20,3 +20,7 @@ across the top and 5 down the side.
 The top face shrinks to its center, and the chamfer is the cone from the circle of radius 5 at
 z = 5 up to its apex at (0, 0, 10), its half-angle 45°. The solid is a cylinder from z = 0 to
 z = 5 under that cone.
+
+**As a set:**
+
+$$\{\,\rho \le \min(5,\ 10 - z),\ z \ge 0\,\}$$

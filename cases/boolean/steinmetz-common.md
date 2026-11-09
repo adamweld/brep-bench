@@ -14,3 +14,7 @@ tex = '16r^2'
 +++
 
 Two cylinders of radius 5 and length 30 that cross at right angles. The first lies along the x axis, from x = −15 to 15; the second along the y axis, from y = −15 to 15. Make the solid common to both. Their surfaces meet in two ellipses, which cross each other at two points.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 5^2,\ |x| \le 15\,\} \cap \{\,x^2 + z^2 \le 5^2,\ |y| \le 15\,\}$$

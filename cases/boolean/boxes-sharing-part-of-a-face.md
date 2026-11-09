@@ -14,3 +14,7 @@ tex = '600 + 600 - 2\cdot 5\cdot 10'
 +++
 
 Two cubes of side 10, joined into one solid. The first lies between the origin and (10, 10, 10). The second lies between (5, 0, 10) and (15, 10, 20): it stands on the first, and its bottom covers half of the first's top.
+
+**As a set:**
+
+$$[0,10]^3 \cup \bigl([5,15]\times[0,10]\times[10,20]\bigr)$$

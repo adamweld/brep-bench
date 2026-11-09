@@ -20,3 +20,7 @@ dome standing on the flat ellipse x²/36 + y²/16 ≤ 1 in the plane z = 0, risi
 The cut runs through the ellipsoid's widest section, where its surface stands upright, so the dome
 meets its floor at a right angle all around. If you cut with a block, make it reach past the
 ellipsoid everywhere but at z = 0.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{36} + \tfrac{y^2}{16} + \tfrac{z^2}{9} \le 1,\ z \ge 0\,\}$$

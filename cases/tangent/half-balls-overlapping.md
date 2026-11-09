@@ -25,3 +25,7 @@ half of the plane z = 0 where x < 0 and the half of the plane x = 0 where z < 0.
 This case is about curved faces that coincide over part of their extent, each parametrized its own
 way. If the balls you make have poles, put the first's on the z axis, at (0, 0, ±5), and the
 second's on the x axis, at (±5, 0, 0), so that each half's flat face holds the other's poles.
+
+**As a set:**
+
+$$\bigl(B_5 \cap \{\,z \ge 0\,\}\bigr) \cup \bigl(B_5 \cap \{\,x \ge 0\,\}\bigr)$$

@@ -19,3 +19,7 @@ a single point, the middle of the face, and lies everywhere else strictly inside
 
 The union is the cube itself. The six points of contact are not edges or vertices of the result,
 and nothing of the sphere is left in it.
+
+**As a set:**
+
+$$[0,10]^3 \cup B_5(5,5,5)$$

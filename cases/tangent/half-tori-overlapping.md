@@ -27,3 +27,8 @@ x < 0; and the two half disks of radius 3 the plane x = 0 cuts from it where z <
 This case is about curved faces that coincide over part of their extent. If the tori you make
 have a seam where their angle about z starts, turn the second a quarter turn about z from the
 first, so that the faces that coincide are not split in the same places.
+
+**As a set:**
+
+$$\bigl(T \cap \{\,z \ge 0\,\}\bigr) \cup \bigl(T \cap \{\,x \ge 0\,\}\bigr), \quad T = \{\,(\rho -
+10)^2 + z^2 \le 3^2\,\}$$

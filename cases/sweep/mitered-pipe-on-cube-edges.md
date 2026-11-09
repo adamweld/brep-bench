@@ -26,3 +26,8 @@ is cut by, and they meet in, the plane through the corner that bisects it, squar
 the two runs' directions. At (30, 0, 0) that is the plane x + y = 30, and at (30, 30, 0) the
 plane y + z = 30; each miter is an ellipse in its plane, with half-axes 2 and 2√2. The pipe's
 ends are flat and square to the path, at (0, 0, 0) and at (30, 30, 30).
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 2^2,\ x \ge 0,\ x + y \le 30\,\} \cup \{\,(x-30)^2 + z^2 \le 2^2,\ x + y \ge
+30,\ y + z \le 30\,\} \\ \cup \{\,(x-30)^2 + (y-30)^2 \le 2^2,\ y + z \ge 30,\ z \le 30\,\}$$

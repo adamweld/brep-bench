@@ -25,3 +25,7 @@ the surface is the sphere, left in eight three-sided patches, one over each corn
 which touch one another only at those same twelve points. The solid is one piece and its surface
 is a manifold: at each edge midpoint two disks and two sphere patches meet at a point,
 alternating around it.
+
+**As a set:**
+
+$$[-5,5]^3 \cap B_{5\sqrt2}$$

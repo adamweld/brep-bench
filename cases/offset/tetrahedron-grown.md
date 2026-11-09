@@ -20,3 +20,7 @@ Each face moves 1 outward. The faces meet at an angle of acos(1/3), about 70.53�
 becomes a piece of a cylinder of radius 1 about it, turning through π − acos(1/3), about 109.47°.
 Each corner becomes a piece of a ball of radius 1 about it, bounded by three arcs, which together
 make the whole ball.
+
+**As a set:**
+
+$$\operatorname{conv}\bigl\{(3,3,3),\ (3,-3,-3),\ (-3,3,-3),\ (-3,-3,3)\bigr\} \oplus B_{1}$$

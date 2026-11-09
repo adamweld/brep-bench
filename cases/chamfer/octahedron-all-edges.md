@@ -33,3 +33,8 @@ through (6, 2, 2), (6, −2, 2), (6, −2, −2) and (6, 2, −2).
 Those four corners lie in one plane by the octahedron's symmetry. Where they do not, as at the
 apex of a pyramid on a rectangle, no flat face closes the corner, and only the miter
 (`chamfer/octahedron-all-edges-mitered`) is one solid.
+
+**As a set:**
+
+$$\{\,|x| + |y| + |z| \le 10,\ |x| + |y| \le 8,\ |y| + |z| \le 8,\ |z| + |x| \le 8,\ |x| \le 6,\ |y|
+\le 6,\ |z| \le 6\,\}$$

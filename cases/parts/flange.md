@@ -25,3 +25,9 @@ radius 24 about the z axis, one every 60°: at (x, y) = (24, 0), (12, 12√3), (
 (−12, −12√3) and (12, −12√3). The holes stay clear of the hub (their nearest point is 21 from the
 axis, the hub's side 15) and of the plate's rim (furthest point 27, rim 32). If you cut the holes
 with cylinders, make them run past both faces of the plate.
+
+**As a set:**
+
+$$\bigl(\{\,\rho \le 32,\ 0 \le z \le 6\,\} \cup \{\,\rho \le 15,\ 6 \le z \le 16\,\}\bigr)
+\setminus \Bigl(\{\,\rho \le 8\,\} \cup \bigcup_{k=0}^{5} \{\,(x - 24\cos 60^\circ k)^2 + (y -
+24\sin 60^\circ k)^2 \le 3^2\,\}\Bigr)$$

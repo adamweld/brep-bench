@@ -22,3 +22,7 @@ whose four control points are (−10, −10, 22.5), (10, −10, −2.5), (−10,
 axis, a B-spline face trimmed by an outer loop and with a hole. The bore, of radius 3, runs from
 the floor to the saddle, which it meets at heights from 9.4375 to 10.5625. If you cut it with a
 cylinder, make it run past the floor and the saddle.
+
+**As a set:**
+
+$$\{\,3 \le \rho \le 8,\ 0 \le z \le 10 + \tfrac{xy}{8}\,\}$$

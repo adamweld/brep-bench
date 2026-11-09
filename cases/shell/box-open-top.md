@@ -22,3 +22,7 @@ left as a rim between the outside and the inside.
 The result is a box open at the top, the textbook shell: the box less the box from (1, 1, 1) to (9,
 7, 6). Its eleven faces are the five outside walls, the five inside walls, and the rim at z = 6, a
 rectangular frame 1 wide.
+
+**As a set:**
+
+$$K \setminus \bigl([1,9]\times[1,7]\times[1,6]\bigr), \quad K = [0,10]\times[0,8]\times[0,6]$$

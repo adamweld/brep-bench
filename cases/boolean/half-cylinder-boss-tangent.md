@@ -14,3 +14,7 @@ tex = '2\left(100 + \tfrac{\pi r^2}{2}\right) + 300 + \pi r h'
 +++
 
 Take a cube of side 10 between the origin and (10, 10, 10). Unite it with a cylinder of radius 5 and height 10 that stands on the xy plane, its axis at x = 10, y = 5. Half of the cylinder lies inside the cube. Its surface touches the cube's faces y = 0 and y = 10 exactly along the cube's edges at x = 10.
+
+**As a set:**
+
+$$[0,10]^3 \cup \{\,(x-10)^2 + (y-5)^2 \le 5^2,\ 0 \le z \le 10\,\}$$

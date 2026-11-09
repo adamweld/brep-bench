@@ -14,3 +14,7 @@ tex = '2\pi\left(r_o^2 - r_i^2\right) + 2\pi\left(r_o + r_i\right)h'
 +++
 
 In the xz plane, take the rectangle with x from 6 to 10 and z from 0 to 4. Revolve it a full turn about the z axis.
+
+**As a set:**
+
+$$\{\,6 \le \rho \le 10,\ 0 \le z \le 4\,\}$$

@@ -24,3 +24,7 @@ The cavity is the box from (1, 0, 1) to (9, 7, 6): it reaches both openings, and
 shared, along y = 0, z = 6, is cut away between x = 1 and x = 9. What is left of it is two pieces 1
 long at its ends, where the top rim and the front rim meet. The result is the box less that cavity:
 a bottom, a back and two sides, each 1 thick.
+
+**As a set:**
+
+$$K \setminus \bigl([1,9]\times[0,7]\times[1,6]\bigr), \quad K = [0,10]\times[0,8]\times[0,6]$$

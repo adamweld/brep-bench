@@ -24,3 +24,8 @@ so the wall there is rounded, its inside a quarter of the cylinder of radius 1 a
 y = 5, from (5, 4) to (4, 5) in section, tangent to the inside walls y = 4 and x = 4 on either side.
 The cavity is the outline shrunk by 1 (the polygon through (1, 1), (19, 1), (19, 4), (5, 4), (4, 5),
 (4, 14) and (1, 14), its corner at (5, 4)–(4, 5) that quarter arc), from z = 1 up to the top.
+
+**As a set:**
+
+$$\bigl\{\,p \in K : d\bigl(p,\ \partial K \setminus \{z = 8\}\bigr) \le 1\,\bigr\}, \quad K =
+\operatorname{poly}\bigl((0,0),(20,0),(20,5),(5,5),(5,15),(0,15)\bigr)\times[0,8]$$

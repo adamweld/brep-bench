@@ -23,3 +23,8 @@ The walls at y = 0 and y = 8, moved 3.99 inward, come within 0.02 of each other:
 box from (3.99, 3.99, 3.99) to (6.01, 4.01, 6), a slot 2.02 long, 0.02 wide and 2.01 deep, open at
 the top. The rim is the top less the slot's mouth, so the outside, the rim and the inside bottom
 together are the box's faces again, and the area is theirs plus the slot's four walls.
+
+**As a set:**
+
+$$K \setminus \bigl([3.99,6.01]\times[3.99,4.01]\times[3.99,6]\bigr), \quad K =
+[0,10]\times[0,8]\times[0,6]$$

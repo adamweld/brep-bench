@@ -25,3 +25,7 @@ length follow from the ellipse's own (Steiner): πab − pd + πd² and p − 2�
 
 E is the complete elliptic integral of the second kind, of parameter m = 1 − b²/a² = 16/25, so p is
 the ellipse's perimeter.
+
+**As a set:**
+
+$$\{\,\tfrac{x^2}{25} + \tfrac{y^2}{9} \le 1,\ 0 \le z \le 10\,\} \ominus B_{1}$$

@@ -29,3 +29,8 @@ facing it by a flat triangle: the corner (20, −20, 0) to the side from (6, −
 (14, −6, 30), and so on around. So the loft pairs each of the square's four corners with a whole
 side of the octagon, and its eight walls are flat: four trapezoids and four triangles, alternating
 around. The solid is the convex hull of the square and the octagon; its floor and top are flat.
+
+**As a set:**
+
+$$\operatorname{conv}\Bigl(\bigl([-20,20]^2\times\{0\}\bigr) \cup \{\,|x| \le 14,\ |y| \le 14,\ |x|
++ |y| \le 20,\ z = 30\,\}\Bigr)$$

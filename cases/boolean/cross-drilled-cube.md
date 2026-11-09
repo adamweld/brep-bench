@@ -24,3 +24,9 @@ Each of the nine points (x, y, 15) with x and y in 7.5, 15 and 22.5 is on three 
 one along each of x, y and z: there three holes of one radius cross square to each other, and
 each pair of them meets in two ellipses that cross. No two holes meet anywhere else. If you cut the
 holes with cylinders, make them run past the faces at both ends.
+
+**As a set:**
+
+$$[0,30]^3 \setminus \Bigl(\,\bigcup_{a \in A} \{\,(y-a)^2 + (z-15)^2 \le 2.5^2\,\} \cup \bigcup_{a
+\in A} \{\,(x-a)^2 + (z-15)^2 \le 2.5^2\,\} \cup \bigcup_{a, b \in A} \{\,(x-a)^2 + (y-b)^2 \le
+2.5^2\,\}\Bigr), \quad A = \{7.5,\ 15,\ 22.5\}$$

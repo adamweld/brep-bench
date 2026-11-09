@@ -24,3 +24,8 @@ Where the flange met the drum, its two inside edges (the circles of radius 8 at 
 z = 3.8) become concave pieces of tori, tubes of radius 1 about those circles, running from the
 side at radius 7 outward and meeting each other in a sharp ridge, the circle of radius 7.4 at
 z = 3. So a low ridge, 0.4 high, is all that is left of the flange.
+
+**As a set:**
+
+$$\bigl(\{\,\rho \le 8,\ 0 \le z \le 6\,\} \cup \{\,\rho \le 11,\ 2.2 \le z \le 3.8\,\}\bigr)
+\ominus B_{1}$$

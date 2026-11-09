@@ -28,3 +28,8 @@ rounding three of them.
 For side s, put θ = acos(1/3), in radians. Each spherical patch has area
 s²(2π − 9θ/2), giving the total area above. The closed form for the Reuleaux tetrahedron's
 volume is s³(3√2 + 32π − 81θ)/12.
+
+**As a set:**
+
+$$B_{10}(0,0,0) \cap B_{10}(10,0,0) \cap B_{10}\bigl(5,\,5\sqrt3,\,0\bigr) \cap
+B_{10}\bigl(5,\,\tfrac{5\sqrt3}{3},\,10\sqrt{\tfrac23}\bigr)$$

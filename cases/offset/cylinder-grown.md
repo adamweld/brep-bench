@@ -18,3 +18,7 @@ within 1 of the cylinder.
 
 The side moves out to radius 6, the ends to z = −1 and z = 11, and each rim becomes the outer
 quarter of a torus's tube: a tube of radius 1 about the rim's circle, of radius 5.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \oplus B_{1}$$

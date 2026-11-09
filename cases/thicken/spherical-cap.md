@@ -20,3 +20,7 @@ Every point of the sheet moves along the radius through it, so the rim's circle 
 cone, not a cylinder: the cone with its apex at the origin, about the z axis, whose half angle α
 has cos α = 3/5 (about 53.13°), from 10 to 12 along its side. The thickened sheet is the solid
 between the spheres of radius 10 and 12 that lies inside that cone, above the origin.
+
+**As a set:**
+
+$$\{\,10 \le \lVert p \rVert \le 12,\ z \ge \tfrac35 \lVert p \rVert\,\}$$

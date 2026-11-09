@@ -21,3 +21,7 @@ The cone's tip touches the block's bottom face from inside, at a single point. B
 cone lies inside the block; above it the cone stands out of the top face as a frustum, from
 radius 10/3 at z = 10 to radius 5 at z = 15. The tip is not a vertex of the result: the bottom
 face stays a whole square.
+
+**As a set:**
+
+$$\bigl([-10,10]^2\times[0,10]\bigr) \cup \{\,\rho \le \tfrac z3,\ 0 \le z \le 15\,\}$$

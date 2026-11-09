@@ -25,3 +25,7 @@ z = 1 and does not reach the axis.
 The lens has area L = 8π/3 − 2√3 and perimeter P = 8π/3. The centroids of both its area and its
 boundary lie at radius 5 by symmetry. Pappus's theorems therefore give volume 2π·5·L and area
 2π·5·P. The angles in these formulas are in radians.
+
+**As a set:**
+
+$$\{\,(\rho - 5)^2 + (z+1)^2 \le 2^2\,\} \cap \{\,(\rho - 5)^2 + (z-1)^2 \le 2^2\,\}$$

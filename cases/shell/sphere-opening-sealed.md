@@ -26,3 +26,7 @@ cannot reach the opening and no rim is made. The flat face stays as it was, ever
 of radius 5 below z = 4.5 less the ball of radius 4, one solid bounded by two shells. A kernel that
 cannot tell that the opening is never reached may refuse; one that removes the flat face anyway, or
 opens a hole in it, is wrong.
+
+**As a set:**
+
+$$\bigl(B_5 \cap \{\,z \le 4.5\,\}\bigr) \setminus B_4$$

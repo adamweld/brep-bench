@@ -22,3 +22,7 @@ surface of an opening, which is left as a rim between the outside and the inside
 With two openings opposite each other the cavity runs right through: the result is a rectangular
 tube, the box less the box from (1, 1, 0) to (9, 7, 6), with a hole through it (genus 1) and a rim
 at each end.
+
+**As a set:**
+
+$$K \setminus \bigl([1,9]\times[1,7]\times[0,6]\bigr), \quad K = [0,10]\times[0,8]\times[0,6]$$

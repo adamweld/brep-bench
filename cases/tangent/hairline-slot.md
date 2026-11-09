@@ -20,3 +20,7 @@ block, make that block run past the cube's front, back and top.
 
 The slot's two walls, 10 × 5 each, are 10⁻⁶ apart. They are two faces of the result, and so are
 the slot's floor and the two halves of the top face.
+
+**As a set:**
+
+$$[0,10]^3 \setminus \bigl([5,\ 5.000001]\times[0,10]\times[5,10]\bigr)$$

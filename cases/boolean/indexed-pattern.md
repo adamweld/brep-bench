@@ -19,3 +19,8 @@ straight through it along z, their axes on the circle of radius 12 about the z a
 (12, 0), and each of the others the first turned about the z axis by 60°, 120°, 180°, 240° and
 300°. Cut them one after another, each hole its own cut. If you cut a hole with a cylinder, make
 it run past both faces of the disk.
+
+**As a set:**
+
+$$\{\,\rho \le 20,\ -5 \le z \le 0\,\} \setminus \bigcup_{k=0}^{5} \{\,(x - 12\cos 60^\circ k)^2 +
+(y - 12\sin 60^\circ k)^2 \le 2^2\,\}$$

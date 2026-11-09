@@ -17,3 +17,7 @@ A cylinder of radius 5 on the z axis, from z = 0 to z = 10, with a hole of radiu
 through it along z, its axis the line x = 0.999999, y = 0. The hole stays inside the cylinder,
 but only just: at (5, 0, z) the wall between them is 10⁻⁶ thick, a millionth of the cylinder's
 radius. If you cut the hole with a cylinder, make it run past both ends: from z = −1 to z = 11.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \setminus \{\,(x - 0.999999)^2 + y^2 \le 4^2\,\}$$

@@ -22,3 +22,7 @@ wall run on up to meet it there.
 
 The result is the box from the origin to (40, 30, 16), drilled right through along z by the hole of
 radius 5 through (20, 15).
+
+**As a set:**
+
+$$\bigl([0,40]\times[0,30]\times[0,16]\bigr) \setminus \{\,(x-20)^2 + (y-15)^2 \le 5^2\,\}$$

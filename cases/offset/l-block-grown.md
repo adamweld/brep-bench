@@ -26,3 +26,8 @@ edges beside it meet in a sharp concave crease.
 The grown plate's section at any height from z = 0 to z = 8 is the outline grown by 1 (its sides
 moved out 1, its five convex corners rounded to radius 1, its inside corner sharp), of area
 A + Pd + kd², where A and P are the outline's area and perimeter.
+
+**As a set:**
+
+$$\bigl(\operatorname{poly}\bigl((0,0),(20,0),(20,5),(5,5),(5,15),(0,15)\bigr)\times[0,8]\bigr)
+\oplus B_{1}$$

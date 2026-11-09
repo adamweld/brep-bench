@@ -24,3 +24,7 @@ consumes both faces entirely: the round is a quarter of the cylinder of radius 7
 x = 10, z = 10, and it meets the faces x = 10 and z = 10 at right angles along the lines
 (10, y, 3) and (3, y, 10). The section becomes the square from (0, 0) to (10, 10) less the
 quarter disk of radius 7 centered at its corner (10, 10).
+
+**As a set:**
+
+$$\{\,0 \le x \le 10,\ 0 \le z \le 10,\ (x-10)^2 + (z-10)^2 \ge 7^2,\ 0 \le y \le 10\,\}$$

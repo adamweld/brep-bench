@@ -20,3 +20,7 @@ where it meets the others.
 
 The thickened sheet is the cube less the box from (1, 1, 1) to (9, 9, 10): a tray with walls and a
 floor 1 thick, its rim the flat square ring between the squares of side 10 and 8 at z = 10.
+
+**As a set:**
+
+$$[0,10]^3 \setminus \bigl([1,9]^2\times[1,10]\bigr)$$

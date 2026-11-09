@@ -22,3 +22,7 @@ origin, where the disk touches the axis. There the surface pinches, every meridi
 passing through it: what was the hole is two dimples, above and below, each a cusp narrowing to
 the axis (its radius about z²/10 near the origin), whose tips meet there. It is one solid, with no
 hole through it.
+
+**As a set:**
+
+$$\{\,(\rho - 5)^2 + z^2 \le 5^2\,\}$$

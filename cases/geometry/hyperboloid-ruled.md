@@ -24,3 +24,7 @@ lines sweep the solid's side; the disks the circles bound are its ends.
 The side is a hyperboloid of one sheet, x² + y² = 25/2 + z²/2: its waist, in the plane z = 0, has
 radius 5/√2, where each line passes nearest the axis. Build the side as a ruled surface, as the
 lines are given, rather than as a hyperbola turned.
+
+**As a set:**
+
+$$\{\,\rho^2 \le \tfrac{25}{2} + \tfrac{z^2}{2},\ |z| \le 5\,\}$$

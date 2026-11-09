@@ -20,3 +20,7 @@ The ball's equator is the rim of the top face, so the whole top face goes, and t
 dish meets the cylinder's wall tangentially along that circle: the rim is a knife edge, where
 the wall's thickness falls to zero. The result has three faces, the wall, the flat bottom and the
 dish, and the dish's lowest point is at z = 5.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 10\,\} \setminus B_5(0,0,10)$$

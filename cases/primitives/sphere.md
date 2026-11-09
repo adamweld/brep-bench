@@ -14,3 +14,7 @@ tex = '4\pi r^2'
 +++
 
 A solid ball of radius 5 centered on the origin.
+
+**As a set:**
+
+$$\{\,x^2 + y^2 + z^2 \le 5^2\,\}$$

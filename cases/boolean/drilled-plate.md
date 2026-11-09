@@ -14,3 +14,8 @@ tex = '6400 - 9\cdot 2\pi\cdot 2^2 + 9\cdot 2\pi\cdot 2\cdot 10'
 +++
 
 A plate from the origin to (100, 20, 10). Drill nine holes of radius 2 through it along z, at y = 10 and x = 10, 20, 30, … 90. Drill them one after another, each hole its own cut.
+
+**As a set:**
+
+$$\bigl([0,100]\times[0,20]\times[0,10]\bigr) \setminus \bigcup_{k=1}^{9} \{\,(x-10k)^2 + (y-10)^2
+\le 2^2\,\}$$

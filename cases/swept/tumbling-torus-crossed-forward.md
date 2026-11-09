@@ -24,3 +24,8 @@ itself.
 
 No closed-form volume or area is asserted. The case remains unsettled until independently
 implemented kernels agree under the benchmark's rules.
+
+**As a set:**
+
+$$\bigcup_{t \in [-100^\circ,\,100^\circ]} R_B(-t)\,R_A(0.7\,t)\,T, \quad T =
+\bigl\{\,\bigl(\sqrt{(x-3)^2 + y^2} - 1\bigr)^2 + (z-2)^2 \le 0.22^2\,\bigr\}$$

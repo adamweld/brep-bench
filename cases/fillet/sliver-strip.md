@@ -20,3 +20,8 @@ What is left of the face y = 10 is a strip 20 long and only 0.0002 tall, from z 
 z = 1.0001, between the two rounds, which are quarters of the cylinders of radius 0.9999 on the
 lines y = 9.0001, z = 0.9999 and y = 9.0001, z = 1.0001. The strip is a real face of the solid,
 tangent to both rounds.
+
+**As a set:**
+
+$$\bigl([0,20]\times[0,10]\times[0,2]\bigr) \setminus \bigl\{\,y \ge 10 - r,\ (y - 10 + r)^2 + (|z -
+1| - 1 + r)^2 \ge r^2,\ |z - 1| \ge 1 - r\,\bigr\}, \quad r = 0.9999$$

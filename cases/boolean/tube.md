@@ -14,3 +14,7 @@ tex = '2\pi(5 + 3)\cdot 10 + 2\pi\left(5^2 - 3^2\right)'
 +++
 
 A cylinder of radius 5 on the z axis, from z = 0 to z = 10, with a hole of radius 3 bored along the axis. If you cut the hole with a cylinder, make it run past both ends: from z = −1 to z = 11.
+
+**As a set:**
+
+$$\{\,3 \le \rho \le 5,\ 0 \le z \le 10\,\}$$

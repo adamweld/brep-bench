@@ -30,3 +30,8 @@ The solid is the cube cut by the twelve chamfer planes, x + y ≤ 18 for the edg
 to (10, 10, 10) and the others likewise, and by the eight corner planes, x + y + z ≤ 26 at the
 corner (10, 10, 10) and the others likewise. Without the corner planes the chamfers miter, the
 three at each corner meeting in a point: that is `chamfer/cube-all-edges-mitered`.
+
+**As a set:**
+
+$$[0,10]^3 \cap \{\,|x-5| + |y-5| \le 8,\ |y-5| + |z-5| \le 8,\ |z-5| + |x-5| \le 8,\ |x-5| + |y-5|
++ |z-5| \le 11\,\}$$

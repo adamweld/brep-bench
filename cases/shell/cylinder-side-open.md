@@ -22,3 +22,7 @@ opening, which is left as a rim between the outside and the inside.
 Only the two ends are walls. Moved 1 inward they are the planes z = 1 and z = 9, and each runs out
 to the cylinder's surface, where its rim is a band 1 high. Nothing joins them: the result is two
 separate solids, the disks of radius 5 from z = 0 to z = 1 and from z = 9 to z = 10.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 1\,\} \cup \{\,\rho \le 5,\ 9 \le z \le 10\,\}$$

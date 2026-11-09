@@ -25,3 +25,9 @@ cylinder of radius 4 on the same axis. The result is a cup with a tube standing 
 block less the box from (1, 1, 1) to (19, 19, 10) outside the cylinder of radius 4. The tube is the
 annulus between radii 3 and 4, and the bottom, from z = 0 to z = 1, keeps the hole of radius 3; the
 rim is the top less the hole and the cavity's mouth.
+
+**As a set:**
+
+$$D \setminus \Bigl(\bigl([1,19]^2\times[1,10]\bigr) \setminus \{\,(x-10)^2 + (y-10)^2 \le
+4^2\,\}\Bigr), \quad D = \bigl([0,20]^2\times[0,10]\bigr) \setminus \{\,(x-10)^2 + (y-10)^2 \le
+3^2\,\}$$

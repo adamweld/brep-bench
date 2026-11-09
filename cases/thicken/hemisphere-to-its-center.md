@@ -19,3 +19,7 @@ bounded by its equator. Thicken it by 5 toward the sphere's center: by its whole
 The sheet's face, moved 5 toward the center, shrinks to a single point, the origin, and is no face
 of the solid. The thickened sheet is the half ball of radius 5 where z ≥ 0: the sheet, and the
 flat disk of radius 5 in the xy plane that the equator sweeps as it closes on the center.
+
+**As a set:**
+
+$$\{\,\lVert p \rVert \le 5,\ z \ge 0\,\}$$

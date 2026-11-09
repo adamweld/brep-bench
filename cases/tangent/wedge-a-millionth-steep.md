@@ -28,3 +28,7 @@ This case is about two planes that are nearly parallel: where they meet is a wel
 but a kernel that takes planes closer than its tolerance for the same plane over the whole face
 finds no wedge, or the whole half. (The wedge lies at z = 0 so that its corners keep their
 heights in an STL file's single-precision coordinates.)
+
+**As a set:**
+
+$$\bigl([-5,5]^2\times[-10,0]\bigr) \cap \{\,z \ge 10^{-6}\,y\,\}$$

@@ -29,3 +29,7 @@ This case is about that contact of high order, where a search for where the two 
 them nearly coincide over a whole patch. If the ball you make has poles, put them on the z axis,
 so that its pole is the point of contact; if the paraboloid is the parabola turned about the z
 axis, that is where the turned curve meets the axis.
+
+**As a set:**
+
+$$\{\,\rho^2 \le 10z,\ z \le 5\,\} \cup B_5(0,0,5)$$

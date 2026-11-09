@@ -24,3 +24,8 @@ runs on out to x = 25, and the two sides y = 0 and y = 20 are reshaped to match.
 
 The result is the L-block whose section is the polygon through (0, 0), (40, 0), (40, 10), (25, 10),
 (25, 30), (0, 30), from y = 0 to y = 20.
+
+**As a set:**
+
+$$\bigl(\{\,0 \le x \le 40,\ 0 \le z \le 10\,\} \cup \{\,0 \le x \le 25,\ 0 \le z \le 30\,\}\bigr)
+\cap \{\,0 \le y \le 20\,\}$$

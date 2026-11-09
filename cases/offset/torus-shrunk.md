@@ -18,3 +18,7 @@ circle of radius 10. Shrink it by 1.5: the solid of every point at least 1.5 fro
 outside.
 
 The shrunk solid is the torus about the same middle circle whose tube has radius 1.5.
+
+**As a set:**
+
+$$\{\,(\rho - 10)^2 + z^2 \le 3^2\,\} \ominus B_{1.5}$$

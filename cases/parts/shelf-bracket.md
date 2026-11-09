@@ -29,3 +29,9 @@ y = −5 to y = 5. In the xz plane (the first number is x and the second z), the
 So it is a post 20 wide and 120 tall with an arm 20 deep reaching out to x = 100 along its top,
 the inside corner between them rounded to radius 8, the round tangent to the post at z = 92 and
 to the arm at x = 28.
+
+**As a set:**
+
+$$\Bigl(\{\,0 \le x \le 20,\ 0 \le z \le 120\,\} \cup \{\,0 \le x \le 100,\ 100 \le z \le 120\,\}
+\cup \{\,20 \le x \le 28,\ 92 \le z \le 100,\ (x-28)^2 + (z-92)^2 \ge 8^2\,\}\Bigr) \cap \{\,|y| \le
+5\,\}$$

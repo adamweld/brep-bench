@@ -28,3 +28,8 @@ groove.
 
 In a section through the axis, Q is the integral of the distance from the axis over the grown
 drum with no groove, and M over the notch.
+
+**As a set:**
+
+$$\bigl(\{\,\rho \le 10,\ 0 \le z \le 10\,\} \setminus \{\,\rho \ge 7,\ 4.2 \le z \le 5.8\,\}\bigr)
+\oplus B_{1}$$

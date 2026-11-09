@@ -14,3 +14,7 @@ tex = '2\cdot 175 + 10P,\quad P = 60\ \text{(the perimeter)}'
 +++
 
 Two blocks 10 high, both standing on the xy plane. The first spans x and y from 0 to 10; the second spans x and y from 5 to 15. Make their union. Their tops lie in one plane, and so do their bottoms.
+
+**As a set:**
+
+$$\bigl([0,10]^2\times[0,10]\bigr) \cup \bigl([5,15]^2\times[0,10]\bigr)$$

@@ -23,3 +23,7 @@ The solid is the box cut by those four planes. Its top face is the rectangle fro
 along a slanting line from the box's corner at z = 4 to the top face's corner, from (20, 10, 4)
 to (19, 9, 6) and so on. Each chamfer face is a trapezoid; four faces meet at each of the points
 such as (20, 10, 4).
+
+**As a set:**
+
+$$\bigl([0,20]\times[0,10]\times[0,6]\bigr) \cap \{\,z \le 4 + 2\min(x,\ 20 - x,\ y,\ 10 - y)\,\}$$

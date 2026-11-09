@@ -34,3 +34,7 @@ crescent around to the other, pinched to that point, where its surface is not a 
 
 If the torus you make has a seam where the tube's section was turned from, put it in the plane
 x = 0, on the side y > 0, away from the two tangent points.
+
+**As a set:**
+
+$$\{\,(\rho - 5)^2 + z^2 \le 3^2,\ z \le \tfrac34 x\,\}$$

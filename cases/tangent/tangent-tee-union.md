@@ -24,3 +24,7 @@ leaves cross each other at (0, 0, 5). Around that point the surface is four wedg
 the main's wall toward +x and toward −x (one face, joined around under the branch) and the
 branch's wall toward +y and toward −y (two faces, one on each side of the main). The solid's
 surface is a manifold there, but the main's wall is pinched to a point.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 5^2,\ |x| \le 15\,\} \cup \{\,x^2 + (z-2)^2 \le 3^2,\ |y| \le 15\,\}$$

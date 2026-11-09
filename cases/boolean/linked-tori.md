@@ -27,3 +27,8 @@ outside it. Neither ring lies inside the material or a closed cavity of the othe
 The volume and area are the sums for two complete tori. Their specified placement matters to
 this case's geometry, although the suite's scalar measures and mesh-closure checks alone cannot
 distinguish this link from two unlinked rings of the same dimensions.
+
+**As a set:**
+
+$$\{\,(\rho - 3)^2 + z^2 \le 0.5^2\,\} \cup \bigl\{\,\bigl(\sqrt{(x-3)^2 + z^2} - 3\bigr)^2 + y^2
+\le 0.5^2\,\bigr\}$$

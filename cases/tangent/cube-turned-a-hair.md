@@ -22,3 +22,7 @@ crosses the other's at 0.001°, about 4.4e-5 from its middle. The tops lie in on
 the bottoms; the sides do not. The union is larger than the cube by 8.7e-6 of its volume and of
 its area, more than a pass allows: a kernel that takes the turned cube's sides for the cube's
 own does not pass.
+
+**As a set:**
+
+$$Q \cup R_z(0.001^\circ)\,Q, \quad Q = [-5,5]^2\times[0,10]$$

@@ -26,3 +26,9 @@ the inside wall x = 19: the tube around the bore runs into the wall and the two 
 the box from (1, 1, 1) to (19, 19, 10) outside the cylinder of radius 4; the cylinder meets the
 inside wall x = 19 in two vertical lines at y = 10 ± √15/2, and the arc of it beyond x = 19, an
 angle 2·acos(7/8) wide, is no part of the result.
+
+**As a set:**
+
+$$D \setminus \Bigl(\bigl([1,19]^2\times[1,10]\bigr) \setminus \{\,(x-15.5)^2 + (y-10)^2 \le
+4^2\,\}\Bigr), \quad D = \bigl([0,20]^2\times[0,10]\bigr) \setminus \{\,(x-15.5)^2 + (y-10)^2 \le
+3^2\,\}$$

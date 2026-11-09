@@ -26,3 +26,7 @@ rim is about 5.8° across seen from the center, so no two dimples meet.
 If the balls you make have poles, put each ball's on the vertical through its center. The rims
 then run past the poles of the small balls at every distance, and some pass within a few degrees
 of one without reaching it.
+
+**As a set:**
+
+$$B_{10} \setminus \bigcup_{i=1}^{62} B_{1.2}(10.6\,u_i), \quad u_i \text{ the 62 unit directions}$$

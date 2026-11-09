@@ -22,3 +22,8 @@ everything the ball passes through.
 
 The groove is a round-bottomed channel: a quarter of a torus's tube below the top face, closed at
 each end by a quarter of the ball.
+
+**As a set:**
+
+$$\bigl([-6,18]^2\times[-8,0]\bigr) \setminus \bigcup_{\theta \in [0,\,90^\circ]} B_3(12\cos\theta,\
+12\sin\theta,\ 0)$$

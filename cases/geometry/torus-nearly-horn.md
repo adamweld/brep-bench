@@ -17,3 +17,7 @@ A solid torus centered on the origin, about the z axis: the circle through the m
 has radius 5, and the tube has radius 4.99. Its hole, in the plane z = 0, is a circle of radius
 0.01 about the axis, two hundredths across, and it widens away from that plane only slowly: the
 surface passes within 0.01 of the axis and curves around it with a radius of 4.99.
+
+**As a set:**
+
+$$\{\,(\rho - 5)^2 + z^2 \le 4.99^2\,\}$$

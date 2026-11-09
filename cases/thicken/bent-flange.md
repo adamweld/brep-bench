@@ -25,3 +25,8 @@ the wall, to +x.
 The thickened sheet is a bracket 1 thick, its bend's inner radius 2 and outer radius 3. Its
 section in any plane y = const is the profile's strip 1 wide on that side: the floor from
 z = −1 to 0, a quarter annulus between radii 2 and 3 about (0, 2), and the wall from x = 2 to 3.
+
+**As a set:**
+
+$$\Bigl(\{\,-10 \le x \le 0,\ -1 \le z \le 0\,\} \cup \{\,2^2 \le x^2 + (z-2)^2 \le 3^2,\ x \ge 0,\
+z \le 2\,\} \cup \{\,2 \le x \le 3,\ 2 \le z \le 12\,\}\Bigr) \cap \{\,0 \le y \le 8\,\}$$

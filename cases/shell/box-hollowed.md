@@ -20,3 +20,7 @@ shells, the outer one facing out and the cavity's facing in, toward the void.
 
 A volume taken by the divergence theorem counts the cavity's shell negatively, so a cavity whose
 faces face the wrong way, or one left out, shows in the volume.
+
+**As a set:**
+
+$$K \setminus \bigl([1,9]\times[1,7]\times[1,5]\bigr), \quad K = [0,10]\times[0,8]\times[0,6]$$

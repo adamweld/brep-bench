@@ -18,3 +18,7 @@ y = −15 to y = 15, with its axis on the line x = 0, z = 9.99. Make the solid c
 The two overlap only to a depth of 0.01, between z = 4.99 and z = 5. The common part is a small
 cushion, about 0.63 long in x and in y and 0.01 thick, bounded by one patch of each cylinder's
 wall; the two patches meet along a single closed curve, and neither cylinder's end is reached.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 5^2,\ |x| \le 15\,\} \cap \{\,x^2 + (z - 9.99)^2 \le 5^2,\ |y| \le 15\,\}$$

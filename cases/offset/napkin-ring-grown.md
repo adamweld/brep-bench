@@ -21,3 +21,7 @@ of its rims, the circle of radius 3 at z = 4 or z = −4 where the sphere meets 
 of θ = atan(4/3) (about 53.13°) inside the ring, becomes a piece of a torus's tube of radius 1
 about the rim's circle, turning through π − θ (about 126.87°) from the bore to the sphere: from
 z = ±4 on the bore to the point (3.6, ±4.8) of a section through the axis.
+
+**As a set:**
+
+$$\bigl(B_5 \setminus \{\,\rho \le 3\,\}\bigr) \oplus B_{1}$$

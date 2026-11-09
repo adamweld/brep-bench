@@ -18,3 +18,7 @@ solid behind it. Thicken it by 2 to its +z side.
 
 The thickened sheet is the box from the origin to (10, 8, 2): the sheet, the sheet moved 2 along
 +z, and the four walls its edges sweep as it moves.
+
+**As a set:**
+
+$$[0,10]\times[0,8]\times[0,2]$$

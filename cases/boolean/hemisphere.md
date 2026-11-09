@@ -14,3 +14,7 @@ tex = '2\pi r^2 + \pi r^2'
 +++
 
 A ball of radius 5 centered on the origin, with everything below the xy plane cut away.
+
+**As a set:**
+
+$$\{\,x^2 + y^2 + z^2 \le 5^2,\ z \ge 0\,\}$$

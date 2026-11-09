@@ -18,3 +18,7 @@ A flat lug: a plate from (0, −5, 0) to (80, 5, 40), so it is 80 long in x, 40 
 thick in y. A round pin hole of radius 8 goes straight through its thickness, along y, its axis
 the line x = 60, z = 20. If you cut the hole with a cylinder, make it run past both faces of the
 plate.
+
+**As a set:**
+
+$$\bigl([0,80]\times[-5,5]\times[0,40]\bigr) \setminus \{\,(x-60)^2 + (z-20)^2 \le 8^2\,\}$$

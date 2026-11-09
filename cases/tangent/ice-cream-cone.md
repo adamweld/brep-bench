@@ -22,3 +22,7 @@ z = −9: every line from the apex up the cone's side touches the sphere there. 
 inside the ball, its rim on the sphere. The union is an ice-cream cone: the cone's side from the
 apex up to that circle, and above it the sphere, the two meeting along the circle with a common
 tangent plane.
+
+**As a set:**
+
+$$B_{15} \cup \{\,\rho \le \tfrac34(z + 25),\ -25 \le z \le -9\,\}$$

@@ -27,3 +27,8 @@ the sphere of radius 5 about (0, 0, 10) in the circle of radius 4 at z = 13. The
 the plane z = 1. So the cavity is the cylinder of radius 4 from z = 1 up to z = 13 together with the
 cap of the ball above z = 13, and the rim is the zone of the sphere between z = 10 and z = 13, a
 band whose inner edge, at z = 13, is a sharp lip where it meets the inside wall.
+
+**As a set:**
+
+$$C \setminus \{\,\rho \le 4,\ z \ge 1\,\}, \quad C = \{\,\rho \le 5,\ 0 \le z \le 10\,\} \cup
+\bigl(B_5(0,0,10) \cap \{\,z \ge 10\,\}\bigr)$$

@@ -27,3 +27,7 @@ This case is about finding that small loop: a search for where the plane meets t
 samples the sphere coarsely can step right over it and find nothing, or find only the point where
 the plane would touch the sphere. If the ball you make has poles, put them on the z axis, so that
 the loop runs around the pole at (0, 0, 5).
+
+**As a set:**
+
+$$B_5 \cap \{\,z \ge 4.9999\,\}$$

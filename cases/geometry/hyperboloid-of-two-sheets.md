@@ -21,3 +21,7 @@ Its curved side is the upper sheet z²/9 − (x² + y²)/16 = 1, which comes to 
 z = 6, where a flat disk closes it. It is the hyperbola z²/9 − x²/16 = 1 of the xz plane (its branch
 with z > 0, from its vertex to x = 4√3) turned a whole turn about the z axis, which it meets at its
 vertex: a surface of revolution with a pole there.
+
+**As a set:**
+
+$$\{\,3\sqrt{1 + \tfrac{\rho^2}{16}} \le z \le 6\,\}$$

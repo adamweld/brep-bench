@@ -23,3 +23,7 @@ faces are not drafted; the hole's circle in the top face grows to meet the cone.
 
 The result is the block less a frustum of a cone: radius 6 at z = 0 and 6 + 20·tan 3° ≈ 7.048 at
 z = 20.
+
+**As a set:**
+
+$$\bigl([-15,15]^2\times[0,20]\bigr) \setminus \{\,\rho \le 6 + z\tan 3^\circ\,\}$$

@@ -18,3 +18,7 @@ The box from the origin to (10, 8, 6), grown by 1: the solid of every point with
 Each face moves 1 outward, each edge becomes a quarter of a cylinder of radius 1 about it, and
 each corner an eighth of a ball of radius 1 about it. The grown box runs from (−1, −1, −1) to
 (11, 9, 7).
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,8]\times[0,6]\bigr) \oplus B_{1}$$

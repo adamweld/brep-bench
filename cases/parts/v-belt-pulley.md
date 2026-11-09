@@ -28,3 +28,8 @@ root is the circle of radius 22 at z = 0, 6 deep below the rim's face, and its t
 that open 5 in z for every 7 outward in radius, meeting the rim's face (radius 28) at
 z = ±30/7. The triangle reaches 1 past the rim's face so the groove opens cleanly; if you cut it
 with a revolved triangle, keep it reaching past the rim like that.
+
+**As a set:**
+
+$$\bigl(\{\,\rho \le 12,\ |z| \le 14\,\} \cup \{\,\rho \le 28,\ |z| \le 9\,\}\bigr) \setminus
+\bigl(\{\,\rho \le 6\,\} \cup \{\,\rho \ge 22 + \tfrac75 |z|\,\}\bigr)$$

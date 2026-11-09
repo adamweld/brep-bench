@@ -5,6 +5,11 @@ description in plain words. This page tours the suite in roughly the order it gr
 solids to the hardest ground. Each heading names the directories under `cases/` it draws from. How
 a case is written and graded is in [SPEC.md](../SPEC.md).
 
+Many descriptions end by stating the solid once more as a set of points, under **As a set:**, in
+[a notation the specification defines](../SPEC.md#the-solid-as-a-set): the napkin ring is
+`B₅ ∖ { ρ ≤ 3 }`, a box grown by 1 is the box `⊕ B₁`. It is optional, it is not graded, and the
+words stay the definition.
+
 ## Textbook solids (`primitives/`, `boolean/`, `sweep/`, `fillet/`)
 
 - **Primitives:** box, cylinder, cone, sphere, torus, extrusion, revolution.

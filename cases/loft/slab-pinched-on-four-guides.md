@@ -31,3 +31,8 @@ Each of the four walls is swept by one side of the rectangle, a straight horizon
 between two neighboring guides: the wall facing +x is made of the segments parallel to the y
 axis from each point (p, −q, z) of one guide to the point (p, q, z) of the other, and the wall
 facing +y of the segments parallel to the x axis from (−p, q, z) to (p, q, z). The ends are flat.
+
+**As a set:**
+
+$$\bigl\{\,(x,\ y,\ z(t)) : |x| \le p(t),\ |y| \le q(t),\ 0 \le t \le 1\,\bigr\}, \quad (p, q, z)(t)
+\text{ the Bézier guide through the corner with } x, y > 0$$

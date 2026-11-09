@@ -24,3 +24,8 @@ Five balls, none of them sharing a center:
 Each lies inside the one before it without touching it. The solid is the first ball less the
 second, joined with the third less the fourth, joined with the fifth: three bodies, not touching,
 each inside the hollow of the one around it. A hollow ball holds a hollow ball, which holds a ball.
+
+**As a set:**
+
+$$\bigl(B_{10}(0,0,0) \setminus B_8(1,0,0)\bigr) \cup \bigl(B_6(1,1,0) \setminus B_4(1,1,1)\bigr)
+\cup B_2(1,1.5,1.5)$$

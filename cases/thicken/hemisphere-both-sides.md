@@ -19,3 +19,7 @@ that it is 2 thick in all with the sheet in its middle.
 
 The thickened sheet is the solid between the spheres of radius 4 and 6 about the origin where
 z ≥ 0: a hemispherical dome whose rim is the flat annulus between radii 4 and 6 in the xy plane.
+
+**As a set:**
+
+$$\{\,4 \le \lVert p \rVert \le 6,\ z \ge 0\,\}$$

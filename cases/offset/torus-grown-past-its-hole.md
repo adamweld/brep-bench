@@ -26,3 +26,7 @@ angle, as a cone does at its apex.
 
 Its section through the axis, on one side of it, is the disk of radius 5 about (4, 0) less the
 part of that disk beyond the axis.
+
+**As a set:**
+
+$$\{\,(\rho - 4)^2 + z^2 \le 2^2\,\} \oplus B_{3}$$

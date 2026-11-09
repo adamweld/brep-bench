@@ -18,3 +18,8 @@ it along the z axis: everything with x²/36 + y²/9 < 1 (semi-axes 6 along x and
 removed, from the bottom face to the top. The hole's wall stays clear of the block's sides, 6 from
 the ends at x = ±12 and 5 from the sides at y = ±8. If you cut it with an elliptic cylinder, make it
 run past both faces.
+
+**As a set:**
+
+$$\bigl([-12,12]\times[-8,8]\times[0,8]\bigr) \setminus \{\,\tfrac{x^2}{36} + \tfrac{y^2}{9} \le
+1\,\}$$

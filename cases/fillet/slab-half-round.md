@@ -20,3 +20,8 @@ The two rounds are quarters of the same cylinder of radius 2 on the line y = 2, 
 face vanishes entirely: the rounds meet along the line y = 2, z = 6, tangent to each other there,
 and the block's top is a half-cylinder. The two ends x = 0 and x = 10 are each a 4 × 4 square
 under a half disk.
+
+**As a set:**
+
+$$\bigl([0,10]\times[0,4]\times[0,4]\bigr) \cup \{\,(y-2)^2 + (z-4)^2 \le 2^2,\ z \ge 4,\ 0 \le x
+\le 10\,\}$$

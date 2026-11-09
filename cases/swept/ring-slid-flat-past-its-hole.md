@@ -26,3 +26,7 @@ everything the ring passes through.
 The torus's top and bottom circles, of radius 6 at z = ±2, stay in their planes as it slides, so
 each sweeps a flat face: the region within 6 of the segment from (0, 0) to (15, 0). The slide is
 longer than the hole is wide, so the hole is filled; the inner half of the torus touches nowhere.
+
+**As a set:**
+
+$$\{\,(\rho - 6)^2 + z^2 \le 2^2\,\} \oplus \{\,s\,(15,0,0) : 0 \le s \le 1\,\}$$

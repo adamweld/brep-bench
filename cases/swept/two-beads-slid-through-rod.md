@@ -24,3 +24,9 @@ y axis through (11.5, 0, −9):
 The two beads overlap, and the wheel is their union. It starts below the rod, as placed, and slides
 without turning 40 along the z axis, up to where it is wholly above the rod. Cut from the rod
 everything the wheel passes through.
+
+**As a set:**
+
+$$\{\,\rho \le 5,\ 0 \le z \le 20\,\} \setminus \bigl(T \oplus \{\,s\,(0,0,40) : 0 \le s \le
+1\,\}\bigr), \quad T = \bigl\{\,\bigl(\sqrt{(x-11.5)^2 + (z+9)^2} - 6\bigr)^2 + y^2 \le 2^2\,\bigr\}
+\cup \bigl\{\,\bigl(\sqrt{(x-11.5)^2 + (z+9)^2} - 6\bigr)^2 + (y-1.5)^2 \le 1.5^2\,\bigr\}$$

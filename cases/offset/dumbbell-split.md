@@ -30,3 +30,8 @@ The right body is the reflection of the left in x = 12.
 The bulge's area is β = 3 − √5/2 − (9/4)·asin(2/3), and each section's perimeter is
 26 + 3·asin(2/3), with the angles in radians. Multiply the two section areas by height 3 for
 the volume; the four ends and the two perimeters times 3 give the surface area.
+
+**As a set:**
+
+$$\bigl(\operatorname{poly}\bigl((0,0),(10,0),(10,4),(14,4),(14,0),(24,0),(24,10),(14,10),(14,6),(10,6),(10,10),(0,10)\bigr)\times[0,6]\bigr)
+\ominus B_{1.5}$$

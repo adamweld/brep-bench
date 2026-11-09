@@ -27,3 +27,8 @@ The result is the prism along y whose section in any plane y = const is the trap
 (0, 0), (30, 0), (30 − 20·tan 8°, 20) and (20·tan 8°, 20), each given as (x, z), from y = 0 to
 y = 20, less the cylinder of radius 4 about the hole's axis. Along its axis the hole runs from
 x = 10·tan 8° to x = 30 − 10·tan 8°.
+
+**As a set:**
+
+$$\{\,z\tan 8^\circ \le x \le 30 - z\tan 8^\circ,\ 0 \le y \le 20,\ 0 \le z \le 20\,\} \setminus
+\{\,(y-10)^2 + (z-10)^2 \le 4^2\,\}$$

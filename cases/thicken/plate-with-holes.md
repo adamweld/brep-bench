@@ -20,3 +20,8 @@ sheet in its middle.
 
 The thickened sheet is the plate from z = −1 to z = 1 over the square, holed right through by two
 cylinders of radius 3: the walls the two circles sweep.
+
+**As a set:**
+
+$$\bigl([-10,10]^2\times[-1,1]\bigr) \setminus \bigl(\{\,(x+5)^2 + y^2 \le 3^2\,\} \cup \{\,(x-5)^2
++ y^2 \le 3^2\,\}\bigr)$$

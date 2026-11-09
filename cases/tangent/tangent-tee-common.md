@@ -25,3 +25,7 @@ meet cross each other at (0, 0, 5), and around that point the surface is four we
 alternating: the first's wall toward +y and toward −y (two faces, one at each end of the
 piece) and the second's wall toward +x and toward −x (one face, a strip running around under
 the piece from one side of the point to the other). The solid's surface is a manifold there.
+
+**As a set:**
+
+$$\{\,y^2 + z^2 \le 5^2,\ |x| \le 15\,\} \cap \{\,x^2 + (z-2)^2 \le 3^2,\ |y| \le 15\,\}$$

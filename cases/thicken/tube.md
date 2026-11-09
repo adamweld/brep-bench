@@ -20,3 +20,7 @@ leaves no wall. Thicken it by 1 away from the axis.
 
 The thickened sheet is the tube between radii 5 and 6 from z = 0 to z = 10: the sheet, the
 cylinder of radius 6, and a flat annulus at each end.
+
+**As a set:**
+
+$$\{\,5 \le \rho \le 6,\ 0 \le z \le 10\,\}$$

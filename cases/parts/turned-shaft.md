@@ -30,3 +30,8 @@ runs:
 So it is a cylinder of radius 20 from z = 0 to z = 60 and a cylinder of radius 12 from z = 60 to
 z = 160, with the inside corner where the shoulder meets the thin part rounded to radius 4: the
 round is tangent to the shoulder face at radius 16 and to the thin part's side at z = 64.
+
+**As a set:**
+
+$$\{\,\rho \le 20,\ 0 \le z \le 60\,\} \cup \{\,\rho \le 12,\ 60 \le z \le 160\,\} \cup \{\,12 \le
+\rho \le 16,\ 60 \le z \le 64,\ (\rho - 16)^2 + (z - 64)^2 \ge 4^2\,\}$$

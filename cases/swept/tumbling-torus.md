@@ -22,3 +22,9 @@ then by −t about the second. Make the solid of everything the torus passes thr
 runs from −75° to 75°.
 
 No turn keeps any line of the torus fixed, so the boundary is an envelope of no simpler kind.
+
+**As a set:**
+
+$$\bigcup_{t \in [-75^\circ,\,75^\circ]} R_B(-t)\,R_A(\tfrac t4)\,T, \quad T =
+\bigl\{\,\bigl(\sqrt{(x-3)^2 + y^2} - 1\bigr)^2 + (z-2)^2 \le 0.5^2\,\bigr\},\quad A,\ B \text{ the
+two lines above, in that order}$$

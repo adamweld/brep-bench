@@ -24,3 +24,8 @@ The side, moved 1 inward, is the cone with the same half-angle whose apex is 1/s
 (0, 0, 19/3); it meets the plane z = 0 in the circle of radius 19/4. The apex, a point where the
 side has no normal, moves along the axis. The result is the cone less that cone, its rim the annulus
 between radii 19/4 and 6 at z = 0.
+
+**As a set:**
+
+$$\{\,\rho \le \tfrac34(8 - z),\ z \ge 0\,\} \setminus \{\,\rho \le \tfrac34\bigl(\tfrac{19}{3} -
+z\bigr)\,\}$$

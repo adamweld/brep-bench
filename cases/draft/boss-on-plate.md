@@ -23,3 +23,7 @@ drafted; the top shrinks to meet the cone.
 
 The result is the plate with a frustum of a cone on it: radius 8 at z = 5 and
 8 − 12·tan 4° ≈ 7.161 at its top, z = 17.
+
+**As a set:**
+
+$$\bigl([-20,20]^2\times[0,5]\bigr) \cup \{\,\rho \le 8 - (z-5)\tan 4^\circ,\ 5 \le z \le 17\,\}$$

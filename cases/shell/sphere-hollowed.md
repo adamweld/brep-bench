@@ -17,3 +17,7 @@ A ball of radius 5 centered on the origin, hollowed to a wall 1 thick with no op
 stays as the outside, and moved 1 inward it is the inside, the sphere of radius 4 about the origin.
 The result is the ball less the ball of radius 4, one solid bounded by two spheres, the inner one
 facing in, toward the void.
+
+**As a set:**
+
+$$\{\,4 \le \lVert p \rVert \le 5\,\}$$

@@ -23,3 +23,8 @@ about the corner.
 The result is the box grown by 1 (every point within 1 of it) and cut off at z = 6, less the box
 itself: a cup whose inside is the box, with sharp edges, and whose outside is rounded, 23 faces in
 all.
+
+**As a set:**
+
+$$\bigl((K \oplus B_1) \cap \{\,z \le 6\,\}\bigr) \setminus K, \quad K =
+[0,10]\times[0,8]\times[0,6]$$
