@@ -18,15 +18,21 @@ from their control points, faces sewn into solids, surfaces that close to a poin
 bounded by spline curves, and Booleans between free-form surfaces, with coincident faces and a
 point of contact.
 
-**A patch** is S(u, v) = Σᵢ Σⱼ Bᵢ(u) Bⱼ(v) Pᵢⱼ for u, v from 0 to 1, over its 4 × 4 control
-points Pᵢⱼ (row i, column j, each from 0 to 3), with the cubic Bernstein polynomials
-B₀(t) = (1 − t)³, B₁(t) = 3t(1 − t)², B₂(t) = 3t²(1 − t), B₃(t) = t³.
+**A patch** is
+
+$$S(u, v) = \sum_{i=0}^{3} \sum_{j=0}^{3} B_i(u)\, B_j(v)\, P_{ij}, \qquad 0 \le u, v \le 1,$$
+
+over its 4 × 4 control points $P_{ij}$ (row $i$, column $j$, each from 0 to 3), with the cubic
+Bernstein polynomials
+
+$$B_0(t) = (1 - t)^3, \quad B_1(t) = 3t(1 - t)^2, \quad B_2(t) = 3t^2(1 - t), \quad B_3(t) = t^3.$$
 
 **The rings.** The rim, the body, the bottom, the knob and the lid are rings of four patches. Each
-ring is made from a profile of four points (rᵢ, zᵢ). Its first patch, spanning the quarter from +x
-to −y, has row i
+ring is made from a profile of four points $(r_i, z_i)$. Its first patch, spanning the quarter
+from +x to −y, has row $i$
 
-Pᵢ₀ = (rᵢ, 0, zᵢ), Pᵢ₁ = (rᵢ, −0.56rᵢ, zᵢ), Pᵢ₂ = (0.56rᵢ, −rᵢ, zᵢ), Pᵢ₃ = (0, −rᵢ, zᵢ),
+$$P_{i0} = (r_i, 0, z_i), \quad P_{i1} = (r_i, -0.56\,r_i, z_i), \quad
+P_{i2} = (0.56\,r_i, -r_i, z_i), \quad P_{i3} = (0, -r_i, z_i),$$
 
 and its other three are that patch turned 90°, 180° and 270° about the z axis. The one exception
 is the knob's row 1, which is (0.8, 0, 3.15), (0.8, −0.45, 3.15), (0.45, −0.8, 3.15),
@@ -41,7 +47,7 @@ is the knob's row 1, which is (0.8, 0, 3.15), (0.8, −0.45, 3.15), (0.45, −0.
 | knob | (0, 3.15) | (0.8, 3.15) | (0, 2.85) | (0.2, 2.7) |
 | lid | (0.2, 2.7) | (0.4, 2.55) | (1.3, 2.55) | (1.3, 2.4) |
 
-A row with r = 0 is one point on the axis: the bottom's patches close to a point at the origin,
+A row with $r = 0$ is one point on the axis: the bottom's patches close to a point at the origin,
 the knob's at (0, 0, 3.15), and the knob's row 2 is the one point (0, 0, 2.85). The rings are not
 surfaces of revolution: a quarter's Bézier curve is not a circle (it would need 0.5523, not 0.56),
 so each section bulges by 0.4% at 45° between the axes. The rim is a rolled bead, from radius 1.4
@@ -49,7 +55,7 @@ up to about z = 2.5 and out to radius 1.5, where the body begins. The bottom is 
 shallow dish touching the plane z = 0 at the origin alone.
 
 **The spout and the handle** are each two patches on the side y ≤ 0 and their mirror images in
-the plane y = 0. The patches on y ≤ 0, their control points Pᵢⱼ by row i and column j:
+the plane y = 0. The patches on y ≤ 0, their control points $P_{ij}$ by row $i$ and column $j$:
 
 | patch | row | column 0 | column 1 | column 2 | column 3 |
 |---|---|---|---|---|---|

@@ -59,6 +59,13 @@ is no closed form. It is a TOML literal string (in single quotes), so its backsl
 
 The header may also say where a case came from: `origin = "geomsolver rust/examples/solid_flange.sv"`.
 
+The description is Markdown, which the case's page renders (`harness/markdown.py`): paragraphs,
+**bold** and *emphasis*, `code`, lists, tables, links, and math in LaTeX, `$P_{ij}$` in a line and
+`$$S(u, v) = \sum_i \sum_j B_i(u) B_j(v) P_{ij}$$` standing alone, which KaTeX typesets as it does
+the closed forms. A dollar meant as a dollar is written `\$`. Plain words and Unicode (πr², x ≤ 3)
+are as good where they read clearly; math is for what they cannot say well, such as sums and
+subscripts.
+
 How a description is written:
 
 - **Coordinates** are right-handed x, y, z, with z up. Lengths have no unit. Angles are in degrees,

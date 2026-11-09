@@ -5,9 +5,9 @@
 - the board's pages, harness/web/ copied, the addresses of their scripts and of board.json
   versioned: the overview (index.html), the explorer of every case (explore.html) and a kernel's
   page (kernel.html?k=NAME), which read board.json;
-- a page for each case (cases/<case>.html), written here: its description, its closed forms, its
-  drawing, a table of every kernel's entry at a glance (outcome, errors, time and lines of code),
-  and the entry picked (#k=NAME in the address picks one): its result in 3D, its time, its notes,
+- a page for each case (cases/<case>.html), written here: its description (Markdown with LaTeX
+  math, harness/markdown.py), its closed forms, its drawing, a table of every kernel's entry at a
+  glance (outcome, errors, time and lines of code), and the entry picked (#k=NAME in the address picks one): its result in 3D, its time, its notes,
   its measures and its STL file, and its implementation, the code highlighted
   (harness/highlight.py).
 
@@ -28,6 +28,7 @@ from decimal import ROUND_HALF_UP, Decimal
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import step  # noqa: E402
 from highlight import highlight, loc  # noqa: E402
+import markdown  # noqa: E402
 from run import FROM_MESH  # noqa: E402
 from suite import ROOT, cases as read_cases, kernels as read_kernels, source  # noqa: E402
 SITE = os.path.join(ROOT, "site")
@@ -146,15 +147,6 @@ def flags(kernel, name):
         return {}
     with open(path, "rb") as f:
         return tomllib.load(f)
-
-
-def paragraphs(text):
-    """A description's paragraphs as HTML: blank lines part them, `code` is code."""
-    out = []
-    for para in re.split(r"\n\s*\n", text.strip()):
-        h = html.escape(" ".join(para.split()))
-        out.append("<p>" + re.sub(r"`([^`]+)`", r"<code>\1</code>", h) + "</p>")
-    return "\n".join(out)
 
 
 def board(registry, results, cases, drawings):
@@ -351,7 +343,9 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
     out.append(f"<p class=muted>{' · '.join(steps)}</p>")
     tags = ", ".join(f"<a href='{up}explore.html?tag={q(t)}'>{e(t)}</a>" for t in c["tags"])
     out.append(f"<h1>{e(c['title'])}</h1><p class=muted>{e(cid)} · {tags}</p>")
-    out.append(f"<div class=description>{paragraphs(c['description'])}</div>")
+    # the description is Markdown, its math typeset by KaTeX like the closed forms (TEX)
+    description = markdown.render(c["description"])
+    out.append(f"<div class=description>{description}</div>")
     exp = c["expect"]
     if exp is None:
         out.append("<p><strong>Unsettled.</strong> This solid has no closed form, and no two kernels "
@@ -519,7 +513,7 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
                "the case as written.</p>")
     if has_mesh:
         out.append(VIEWER.replace("{cdn}", THREE).replace("{occt}", OCCT_JS))
-    if exp and any(exp[k]["tex"] for k in exp):
+    if (exp and any(exp[k]["tex"] for k in exp)) or "class='math" in description:
         out.append(TEX.replace("{cdn}", KATEX))
     out.append("</body></html>")
     path = os.path.join(SITE, "cases", cid + ".html")
@@ -786,8 +780,11 @@ TEX = """<link rel=stylesheet href='{cdn}/katex.min.css'>
 <script src='{cdn}/katex.min.js'></script>
 <script>
 if (window.katex) {
-  for (const el of document.querySelectorAll('.tex')) {
-    katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false });
+  // the closed forms (.tex) stand alone; a description's math (.math) runs in its text, but
+  // where it is marked display
+  for (const el of document.querySelectorAll('.tex, .math')) {
+    const display = !el.classList.contains('math') || el.classList.contains('display');
+    katex.render(el.dataset.tex, el, { displayMode: display, throwOnError: false });
   }
 }
 </script>
