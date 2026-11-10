@@ -28,3 +28,16 @@ pub fn offset_face(
     let r = k.offset(body, &spec)?;
     r.bodies.first().copied().ok_or_else(|| Refusal::from("the offset made no body"))
 }
+
+/// `body` with each of `faces` moved `distance` along its outward normal at once (Move face,
+/// Offset; negative moves them into the material), the other faces kept and trimmed to meet them.
+pub fn offset_faces(
+    k: &mut DefaultKernel,
+    body: BodyId,
+    faces: &[FaceId],
+    distance: f64,
+) -> Result<BodyId, Refusal> {
+    let spec = OffsetSpec { distance: 0.0, faces: faces.iter().map(|&f| (f, distance)).collect(), sharp: true };
+    let r = k.offset(body, &spec)?;
+    r.bodies.first().copied().ok_or_else(|| Refusal::from("the offset made no body"))
+}

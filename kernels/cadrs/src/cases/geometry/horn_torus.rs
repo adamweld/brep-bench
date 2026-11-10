@@ -2,8 +2,7 @@
 //! its tube has radius 5, and the tube has radius 5 too, so the tube closes its hole to a single
 //! point, the origin.
 //!
-//! The disk (x − 5)² + z² ≤ 25 sketched on the Front (xz) plane, touching the z axis at the
-//! origin, revolved a whole turn about z (cadrs has no torus primitive).
+//! cadrs's torus primitive (`Primitive::Torus`), its tube as wide as its ring.
 use crate::bench::{p3, torus, v3};
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel};

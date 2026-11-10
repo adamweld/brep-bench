@@ -4,10 +4,9 @@
 //!
 //! The torus is cadrs's torus primitive; cadrs's `Kernel::sweep_solid` with the rigid motion of
 //! its two turns (by t/4 about the first line, then by −t about the second) gives what it fills.
-//! The kernel finds that region as the points some place of the torus holds (the torus's signed
-//! distance at the deepest instant) and bounds it by a mesh (marching tetrahedra on a grid of a
-//! hundredth of its reach, made coarser where the grid gave more triangles than the surface
-//! needs): a solid of planar faces, within about a thousandth of the volume.
+//! The kernel builds it exactly: the sheets of the torus's envelope (its core circle's sweep, a
+//! tube radius either side), trimmed where the motion covers them and fitted as B-spline faces,
+//! closed by the torus where the motion starts and where it stops.
 use crate::bench::{axis, p3, torus, v3};
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel, Kernel, RigidStep, SolidMotion};

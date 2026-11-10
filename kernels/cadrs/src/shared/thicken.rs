@@ -93,28 +93,28 @@ pub fn tray(k: &mut DefaultKernel) -> Result<(BodyId, Vec<FaceId>), Refusal> {
     Ok((cube, faces))
 }
 
-/// The angle-bracket cases' L profile, (10, 0), (0, 0), (0, 10) on the Front plane (its (x, z)),
-/// extruded 8 along +y as a thin wall 1 thick to the outside of the crease (−z and −x): the left
-/// of the chain seen from the plane's normal (−y). cadrs's thin extrude mitres the wall's outer
-/// corner, its offset lines extended until they meet.
-pub fn thin_angle(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let s = open_chain(xz(0.0), polyline(&[(10.0, 0.0), (0.0, 0.0), (0.0, 10.0)]));
-    let spec = ExtrudeSpec {
-        body: BodyKind::Thin { left: 1.0, right: 0.0 },
-        ..ExtrudeSpec::blind(unit(v3(0.0, 1.0, 0.0)), 8.0)
-    };
-    first(k.extrude_with(&s, &spec)?)
-}
-
-/// Thickens the sheet `sheet`: `along` along its faces' normals and `against` against them.
+/// Thickens the sheet `sheet`: `along` along its faces' normals and `against` against them,
+/// its bends rounded.
 pub fn thicken(
     k: &mut DefaultKernel,
     sheet: BodyId,
     along: f64,
     against: f64,
 ) -> Result<BodyId, Refusal> {
+    thicken_with(k, sheet, along, against, false)
+}
+
+/// [`thicken`], its bends rounded, or mitred with `sharp` (the moved faces extended until they
+/// meet).
+pub fn thicken_with(
+    k: &mut DefaultKernel,
+    sheet: BodyId,
+    along: f64,
+    against: f64,
+    sharp: bool,
+) -> Result<BodyId, Refusal> {
     let spec =
-        ThickenSpec { bodies: vec![sheet], faces: vec![], profiles: vec![], along, against, source: 1 };
+        ThickenSpec { bodies: vec![sheet], faces: vec![], profiles: vec![], along, against, sharp, source: 1 };
     first(k.thicken_surfaces(&spec)?)
 }
 
@@ -127,8 +127,21 @@ pub fn thicken_faces(
     along: f64,
     against: f64,
 ) -> Result<BodyId, Refusal> {
+    thicken_faces_with(k, body, faces, along, against, false)
+}
+
+/// [`thicken_faces`], their corners rounded, or mitred with `sharp` (the moved faces extended
+/// until they meet).
+pub fn thicken_faces_with(
+    k: &mut DefaultKernel,
+    body: BodyId,
+    faces: &[FaceId],
+    along: f64,
+    against: f64,
+    sharp: bool,
+) -> Result<BodyId, Refusal> {
     let faces = faces.iter().map(|&face| FaceInput { body, face, source: 0 }).collect();
-    let spec = ThickenSpec { bodies: vec![], faces, profiles: vec![], along, against, source: 1 };
+    let spec = ThickenSpec { bodies: vec![], faces, profiles: vec![], along, against, sharp, source: 1 };
     first(k.thicken_surfaces(&spec)?)
 }
 
@@ -140,8 +153,15 @@ pub fn thicken_sketch(
     along: f64,
     against: f64,
 ) -> Result<BodyId, Refusal> {
-    let spec =
-        ThickenSpec { bodies: vec![], faces: vec![], profiles: vec![profile], along, against, source: 1 };
+    let spec = ThickenSpec {
+        bodies: vec![],
+        faces: vec![],
+        profiles: vec![profile],
+        along,
+        against,
+        sharp: false,
+        source: 1,
+    };
     first(k.thicken_surfaces(&spec)?)
 }
 
@@ -155,12 +175,25 @@ pub fn thicken_toward(
     toward: V3,
     t: f64,
 ) -> Result<BodyId, Refusal> {
+    thicken_toward_with(k, sheet, at, toward, t, false)
+}
+
+/// [`thicken_toward`], its bends rounded, or mitred with `sharp` (the moved faces extended until
+/// they meet).
+pub fn thicken_toward_with(
+    k: &mut DefaultKernel,
+    sheet: BodyId,
+    at: P3,
+    toward: V3,
+    t: f64,
+    sharp: bool,
+) -> Result<BodyId, Refusal> {
     let face = crate::bench::face_at(k, sheet, at)?;
     let n = k.face_normals_at(sheet, face, &[at])?;
     let n = n.first().ok_or_else(|| Refusal::from("the sheet has no normal there"))?;
     if n.dot(&toward) > 0.0 {
-        thicken(k, sheet, t, 0.0)
+        thicken_with(k, sheet, t, 0.0, sharp)
     } else {
-        thicken(k, sheet, 0.0, t)
+        thicken_with(k, sheet, 0.0, t, sharp)
     }
 }

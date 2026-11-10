@@ -2,19 +2,14 @@
 //! walls, with no top (an open tray), thickened by 1 out of the cube with its edges kept sharp: the
 //! moved faces extended until they meet.
 //!
-//! cadrs's Thicken of the floor and walls shells the solid they bound with its corners rounded (a
-//! cylinder round each edge, a ball at each corner), with no option to keep them sharp. So the
-//! tray is built with cadrs's Shell instead, which has that option: the cube (a square on the Top
-//! plane extruded 10) shelled 1 outward with its top removed, the walls' corners extended sharp.
-use crate::bench::{block, face_at, p3};
+//! The tray is the cube (a square on the Top plane extruded 10) with its floor and four walls
+//! picked; cadrs's Thicken of them, 1 along their normals (out of the cube), its corners mitred
+//! (`sharp`: the moved faces extended until they meet).
+use crate::shared::thicken::{thicken_faces_with, tray};
 use crate::Refusal;
-use cadrs_kernel::{BodyId, DefaultKernel, Kernel, ShellSpec};
+use cadrs_kernel::{BodyId, DefaultKernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let cube = block(k, p3(0.0, 0.0, 0.0), p3(10.0, 10.0, 10.0))?;
-    let top = face_at(k, cube, p3(5.0, 5.0, 10.0))?;
-    let spec =
-        ShellSpec { remove: vec![top], thickness: 1.0, outward: true, hollow: false, sharp: true };
-    let r = k.shell_with(cube, &spec)?;
-    r.bodies.first().copied().ok_or_else(|| Refusal::from("the shell made no body"))
+    let (cube, faces) = tray(k)?;
+    thicken_faces_with(k, cube, &faces, 1.0, 0.0, true)
 }

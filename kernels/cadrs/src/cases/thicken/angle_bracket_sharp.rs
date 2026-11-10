@@ -3,16 +3,14 @@
 //! (0, 0, 0) to (0, 8, 10)), thickened by 1 to the outside of the crease (−z and −x), the moved
 //! faces extended until they meet, so the corner stays sharp.
 //!
-//! cadrs's Thicken of the sheet (the L surface-extruded) gives each face its own slab and leaves
-//! the gap between them at the crease open (a sheet whose free edges are not flat loops is not
-//! shelled, and slabs are not joined), with no option to extend the moved faces. So the angle is
-//! built as the sheet's profile extruded thin instead: the L (10, 0), (0, 0), (0, 10) on the
-//! Front plane, a wall 1 thick to its outside, extruded 8 along +y; the thin extrude mitres the
-//! outer corner, extending the offset lines until they meet.
-use crate::shared::thicken::thin_angle;
+//! The sheet is the L (10, 0), (0, 0), (0, 10) on the Front plane surface-extruded 8 along +y;
+//! cadrs's Thicken of it, 1 toward −z from the floor (and so −x from the wall), its bend mitred (`sharp`: the moved faces extended until they meet).
+use crate::bench::{p3, v3};
+use crate::shared::thicken::{angle_sheet, thicken_toward_with};
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    thin_angle(k)
+    let sheet = angle_sheet(k)?;
+    thicken_toward_with(k, sheet, p3(5.0, 4.0, 0.0), v3(0.0, 0.0, -1.0), 1.0, true)
 }

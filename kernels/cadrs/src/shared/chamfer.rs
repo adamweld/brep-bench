@@ -30,22 +30,6 @@ pub fn chamfer_with(
     r.bodies.first().copied().ok_or_else(|| Refusal::from("the chamfer made no body"))
 }
 
-/// `body` with a corner cut flat by the plane through `point` square to `outward`: a disc of
-/// `radius` about `point` sketched on that plane, extruded `depth` along `outward` (past the
-/// corner) and cut away.
-pub fn cut_corner(
-    k: &mut DefaultKernel,
-    body: BodyId,
-    point: P3,
-    outward: V3,
-    radius: f64,
-    depth: f64,
-) -> Result<BodyId, Refusal> {
-    let disc = sketch(square_to(point, outward), vec![round((0.0, 0.0), radius)]);
-    let tool = extrude(k, &disc, depth)?;
-    cut(k, body, tool)
-}
-
 /// The octahedron |x| + |y| + |z| ≤ `a`: the square through its four corners in the plane z = 0
 /// lofted to a point at each of its other two corners, (0, 0, a) and (0, 0, −a), the two
 /// pyramids united.

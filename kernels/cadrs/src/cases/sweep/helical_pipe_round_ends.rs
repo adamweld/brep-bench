@@ -2,22 +2,15 @@
 //! (10, 0, 0) three right-handed turns, each end closed by a half ball of radius 1, as a ball
 //! rolled along the helix would leave.
 //!
-//! cadrs's sweep of a solid (`Kernel::sweep_solid`) fits a screwed body's outline with splines,
-//! so the ball's sweep is built as what it is, exactly: the disc square to
-//! the helix swept along it (as in `sweep/helical-pipe`), and the ball at each end of the helix,
-//! (10, 0, 0) and (10, 0, 15), whose half beyond the pipe's flat end closes it (the other half
-//! lies inside the pipe). Each ball is cadrs's sphere primitive.
-use crate::bench::{ball, p3, round, sketch, square_to, union_each};
-use crate::shared::sweep::{helix, helix_at, sweep};
+//! The ball is cadrs's sphere primitive, centred where the helix starts; the pipe is what it
+//! fills as it is screwed along the helix, cadrs's sweep of a solid along a screw
+//! (`Kernel::sweep_solid`: turned about the z axis from 0° to 1080° while rising 5 a turn).
+use crate::bench::{ball, p3};
+use crate::shared::swept::{screwed, z_axis};
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel};
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let o = p3(0.0, 0.0, 0.0);
-    let (start, tangent) = helix_at(o, 10.0, 5.0, 0.0, 0.0);
-    let section = sketch(square_to(start, tangent), vec![round((0.0, 0.0), 1.0)]);
-    let pipe = sweep(k, &section, helix(o, 10.0, 5.0, 0.0, 3.0))?;
-    let first = ball(k, p3(10.0, 0.0, 0.0), 1.0)?;
-    let last = ball(k, p3(10.0, 0.0, 15.0), 1.0)?;
-    union_each(k, pipe, &[first, last])
+    let tool = ball(k, p3(10.0, 0.0, 0.0), 1.0)?;
+    screwed(k, tool, z_axis(), 5.0, 0.0, 1080.0)
 }

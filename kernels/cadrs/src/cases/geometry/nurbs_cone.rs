@@ -5,25 +5,39 @@
 //! (0, 0, 0, ¼, ¼, ½, ½, ¾, ¾, 1, 1, 1)) and whose second row is nine copies of the apex; closed
 //! by a flat disk at its base.
 //!
-//! cadrs makes no face from a bare surface (its `face_from_surface` takes a face of a body), so
-//! the side is made by the operation that makes it: a loft of two sections, the circle of radius
-//! 5 sketched on the Top plane and the point (0, 0, 10). cadrs skins it with one ruled B-spline
-//! face from the circle, which it holds as that rational quadratic of nine points, to the apex: the
-//! net above, its whole edge v = 1 collapsed to the apex. The loft's cap at the circle is the
-//! base's disk. No cone surface is used.
-use crate::bench::{p3, round, sketch, xy};
+//! The side is cadrs's face on a B-spline surface given by its net (`Kernel::bspline_face`), which
+//! bounds it by its base circle, its seam and its pole at the apex; the base is the Fill of that
+//! circle (`Kernel::fill`), a flat disk; the two are sewn into a solid (`Kernel::sew_solid`).
+use crate::bench::{edge_at, p3};
+use crate::shared::sweep::first;
 use crate::Refusal;
-use cadrs_kernel::{BodyId, BodyKind, DefaultKernel, Kernel, LoftEnd, LoftSection, LoftSpec};
+use cadrs_kernel::{BodyId, BsplineSurface, DefaultKernel, FillCurve, FillSpec, Kernel};
+use nalgebra::Point3;
+
+/// The control points cᵢ of the unit circle as a rational quadratic, and their weights.
+fn circle() -> ([(f64, f64); 9], [f64; 9]) {
+    let s = std::f64::consts::FRAC_1_SQRT_2;
+    (
+        [(1.0, 0.0), (1.0, 1.0), (0.0, 1.0), (-1.0, 1.0), (-1.0, 0.0), (-1.0, -1.0), (0.0, -1.0), (1.0, -1.0), (1.0, 0.0)],
+        [1.0, s, 1.0, s, 1.0, s, 1.0, s, 1.0],
+    )
+}
+
+/// The knots of [`circle`].
+const AROUND: [f64; 12] = [0.0, 0.0, 0.0, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1.0, 1.0, 1.0];
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let base = sketch(xy(0.0), vec![round((0.0, 0.0), 5.0)]);
-    let spec = LoftSpec {
-        body: BodyKind::Solid,
-        sections: vec![LoftSection::Profile(base), LoftSection::Point(p3(0.0, 0.0, 10.0))],
-        start: LoftEnd::default(),
-        end: LoftEnd::default(),
-        source: 1,
+    let (c, w) = circle();
+    let surface = BsplineSurface {
+        degree_u: 2,
+        degree_v: 1,
+        knots_u: AROUND.to_vec(),
+        knots_v: vec![0.0, 0.0, 1.0, 1.0],
+        poles: c.iter().map(|&(x, y)| vec![Point3::new(5.0 * x, 5.0 * y, 0.0), Point3::new(0.0, 0.0, 10.0)]).collect(),
+        weights: w.iter().map(|&wi| vec![wi, wi]).collect(),
     };
-    let r = k.loft_with(&spec)?;
-    r.bodies.first().copied().ok_or_else(|| Refusal::from("the loft made no body"))
+    let side = first(k.bspline_face(&surface, None)?)?;
+    let rim = edge_at(k, side, p3(-5.0, 0.0, 0.0))?;
+    let base = first(k.fill(&FillSpec { curves: vec![FillCurve::Edge { body: side, edge: rim }], source: 1 })?)?;
+    first(k.sew_solid(&[side, base], 1e-7)?)
 }
