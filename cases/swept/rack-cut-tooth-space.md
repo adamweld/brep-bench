@@ -2,7 +2,14 @@
 title = "A tooth space cut by a rack"
 tags = ["swept", "solid-sweep", "generating", "gear", "involute", "envelope", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/rack.sv"
-settled = false
+
+[volume]
+value = 9042.502788955
+exact = "no closed form: next.BREP and cadrs agree to 8e-11; the mean of their values"
+
+[area]
+value = 3872.68353226
+exact = "no closed form: next.BREP and cadrs agree to 1e-10; the mean of their values"
 +++
 
 A gear blank with one tooth space cut by a rack tooth rolled around it, as a gear is generated:
