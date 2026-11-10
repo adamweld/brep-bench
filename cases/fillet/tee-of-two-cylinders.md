@@ -1,7 +1,14 @@
 +++
 title = "A tee of two cylinders with its junction rounded"
 tags = ["fillet", "cylinder", "concave", "saddle"]
-settled = false
+
+[volume]
+value = 4786.206212384999
+exact = "no closed form: next.BREP and cad-kernel agree to 2e-12; the mean of their values"
+
+[area]
+value = 1906.16972839
+exact = "no closed form: next.BREP and cad-kernel agree to 7e-11; the mean of their values"
 +++
 
 A tee of two solid cylinders joined: the cross bar, the cylinder of radius 6 about the x axis from

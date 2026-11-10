@@ -2,7 +2,14 @@
 title = "A ring lying flat, swung partway into a curved block"
 tags = ["swept", "solid-sweep", "turn", "torus", "ring-in-plane", "stopped", "boolean", "cut"]
 origin = "geomsolver #721, box D2 (a ring kept in a plane the motion keeps)"
-settled = false
+
+[volume]
+value = 70.5860824791
+exact = "no closed form: next.BREP, cad-kernel and OCCT give the same volume and area to the twelve figures the board publishes"
+
+[area]
+value = 181.759218941
+exact = "no closed form: next.BREP, cad-kernel and OCCT give the same volume and area to the twelve figures the board publishes"
 +++
 
 A curved block with a notch cut into it by a ring lying flat, swung partway into it.

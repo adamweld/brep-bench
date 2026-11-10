@@ -2,7 +2,14 @@
 title = "A drum plunged aslant into a plate, stopping inside"
 tags = ["swept", "solid-sweep", "slide", "cylinder", "oblique", "stopped", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/stopped_punch.sv"
-settled = false
+
+[volume]
+value = 665.4129339765
+exact = "no closed form: next.BREP and cad-kernel agree to 3e-11; the mean of their values"
+
+[area]
+value = 680.6777202185
+exact = "no closed form: next.BREP and cad-kernel agree to 4e-12; the mean of their values"
 +++
 
 A plate, the box from (0, −5, 0) to (20, 5, 4), with a pocket cut into its underside by a drum

@@ -2,7 +2,14 @@
 title = "A curved block grooved by a leaning cutter turned past it"
 tags = ["swept", "solid-sweep", "turn", "torus", "envelope", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/turn.sv"
-settled = false
+
+[volume]
+value = 57.5718996751
+exact = "no closed form: next.BREP and cadrs agree to 1e-9; the mean of their values"
+
+[area]
+value = 115.83662531
+exact = "no closed form: next.BREP and cadrs agree to 3e-9; the mean of their values"
 +++
 
 A curved block, grooved by a cutter turned past it about the block's own axis.

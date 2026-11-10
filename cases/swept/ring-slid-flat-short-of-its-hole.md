@@ -2,7 +2,14 @@
 title = "A ring lying flat, slid across less than its hole"
 tags = ["swept", "solid-sweep", "slide", "torus", "ring-in-plane", "lens"]
 origin = "geomsolver #721, box D2 (a ring kept in a plane the motion keeps)"
-settled = false
+
+[volume]
+value = 1031.876234895
+exact = "no closed form: next.BREP and cad-kernel agree to 4e-9; the mean of their values"
+
+[area]
+value = 748.65781772
+exact = "no closed form: next.BREP and cad-kernel agree to 4e-9; the mean of their values"
 +++
 
 The solid a ring fills as it slides across, square to its own axis, by less than the width of its
