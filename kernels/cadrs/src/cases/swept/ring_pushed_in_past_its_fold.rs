@@ -3,8 +3,8 @@
 //! inside it.
 //!
 //! The ring is cadrs's torus primitive; what it passes through (one slide) is cut from
-//! the block by cadrs's cut by a swept solid (the exact sweep cut from it where it can be, else
-//! meshed).
+//! the block by cadrs's cut by a swept solid (the torus's exact sweep, its envelope trimmed where
+//! it folds, cut from it).
 use crate::bench::{block, p3, torus, v3};
 use crate::shared::swept::{cut_swept, slide};
 use crate::Refusal;

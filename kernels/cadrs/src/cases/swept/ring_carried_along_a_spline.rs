@@ -3,8 +3,8 @@
 //! Bézier curve on (0, 0, 0), (10, 0, 0), (20, 20, 0), (30, 20, 0) by a frame along its tangent,
 //! upright.
 //!
-//! What the ring passes through is cadrs's sweep of a solid along a path (meshed: the region the
-//! ring's places hold, from its distance in closed form), cut from the block.
+//! What the ring passes through is cadrs's sweep of a solid along a path (exact: the envelope of
+//! the torus, trimmed along the folds a wheel's sweep has), cut from the block.
 use crate::bench::{block, cut, p3, torus, v3};
 use crate::shared::swept::{bezier_path, carried};
 use crate::Refusal;

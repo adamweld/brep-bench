@@ -3,7 +3,7 @@
 //! cubic Bézier curve on (0, 0, 0), (30, 20, 0), (−10, 20, 0), (20, 0, 0), which loops over itself.
 //!
 //! The mill is its half section turned about its axis; what it passes through is cadrs's sweep of
-//! a solid along a path (meshed), cut from the block.
+//! a solid along a path (exact: an upright solid of revolution's slot), cut from the block.
 use crate::bench::{block, cut, p3, v3, xz};
 use crate::shared::geometry::Section;
 use crate::shared::swept::{bezier_path, carried};

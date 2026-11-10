@@ -5,7 +5,8 @@
 //! upright.
 //!
 //! The mill is its half section turned about its axis; what it passes through is cadrs's sweep of
-//! a solid along a path (meshed), cut from the block.
+//! a solid along a path (exact: the four sheets of the mill's envelope, closed by the mill's own
+//! faces where it starts and stops), cut from the block.
 use crate::bench::{block, cut, p3, plane, v3};
 use crate::shared::geometry::Section;
 use crate::shared::swept::{bezier_path, carried};

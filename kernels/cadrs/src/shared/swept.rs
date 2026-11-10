@@ -73,7 +73,8 @@ pub fn screwed(
 
 /// Everything `tool` (drawn in the frame where `path` starts) passes through as a frame rides
 /// `path` upright: its origin the path's point, its x axis the path's tangent, its z axis up
-/// (cadrs's sweep of a solid along a path, meshed).
+/// (cadrs's sweep of a solid along a path: exact for a prism in its plane, a torus, and an end
+/// or bull-nose mill; else the region its places hold, meshed).
 pub fn carried(k: &mut DefaultKernel, tool: BodyId, path: Vec<cadrs_kernel::PathCurve>) -> Result<BodyId, Refusal> {
     let motion = SolidMotion::Path { path, up: crate::bench::unit(v3(0.0, 0.0, 1.0)) };
     first(k.sweep_solid(tool, &motion)?)

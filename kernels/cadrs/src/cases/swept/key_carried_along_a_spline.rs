@@ -3,8 +3,8 @@
 //! Bézier curve on (0, 0, 0), (10, 0, 0), (20, 20, 0), (30, 20, 0) by a frame along its tangent,
 //! upright.
 //!
-//! What the key passes through is cadrs's sweep of a solid along a path (meshed: the region the
-//! key's places hold, from its mesh's distance), cut from the block.
+//! What the key passes through is cadrs's sweep of a solid along a path (exact: a prism carried
+//! in its own plane), cut from the block.
 use crate::bench::{block, cut, p3};
 use crate::shared::swept::{bezier_path, carried};
 use crate::Refusal;
