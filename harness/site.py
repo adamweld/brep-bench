@@ -536,9 +536,9 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
         neat = " ✦ an elegant solution." if any(en["neat"] for en in entries) else ""
         facets = (" ▦ a faceted solid: a mesh stored as B-rep faces." if
                   any(en["facets"] is not None for en in entries) else "")
-        ref_note = (" <em>reference</em> is the case's own solid, to look at beside the "
-                    "entries; in the viewer, <em>Overlay reference</em> draws it over the entry "
-                    "picked." if ref_en else "")
+        ref_note = (" <em>reference</em> is the original solid, not a kernel's result; "
+                    "<em>Overlay reference</em> under the viewer draws it over whichever entry "
+                    "is picked." if ref_en else "")
         out.append(f"<p class=muted>† works around a missing feature.{neat}{facets}{ref_note} "
                    "Pick an entry to see its solid, its measures and its code.</p>")
 
@@ -637,10 +637,10 @@ def reference_section(en, exp):
     out = [f"<section class=entry data-k='reference' data-src='{en['stl'] or ''}' "
            f"data-step='{en['step'] or ''}' hidden aria-label='reference'>"]
     out.append("<h3>Notes</h3>")
-    out.append("<p><span class='badge reference'>reference</span> The case's own solid, which a "
-               "pass is: no kernel built it, and it is graded against nothing. Pick an entry to "
-               "see a kernel's solid, and <em>Overlay reference</em> in the viewer to draw this "
-               "one over it.</p>")
+    out.append("<p><span class='badge reference'>reference</span> The original solid this case "
+               "asks for, loaded from its STEP file. It is not a kernel's result and is not "
+               "graded: a kernel passes by matching it. To compare, pick a kernel's entry and "
+               "turn on <em>Overlay reference</em> under the viewer.</p>")
     if en["origin"]:
         out.append(f"<p class=muted>{e(en['origin'])}</p>")
     out.append("<h3>Data</h3>")
