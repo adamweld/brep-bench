@@ -1,10 +1,10 @@
 //! The block under the bicubic Bézier dome of `nurbs/bezier-dome` (the square 0 ≤ x, y ≤ 20,
 //! its floor at z = 0), the edge where the dome meets the side y = 0 rounded to radius 1.
 //!
-//! Refused, by the kernel: "`` (bspline) has no offset in closed form, so no ball rolls on it yet:
-//! planes, cylinders, cones, spheres and tori are rounded (rung 2)". `fillet::roll` stands the
-//! ball's centre off each face along its normal by the surface's offset in closed form, and a
-//! freeform patch has none.
+//! `fillet::roll` stands the ball's centre off each face along its normal. A freeform patch has no
+//! offset in closed form, and until 0.14.0 the kernel refused it ("no ball rolls on it yet");
+//! since, the patch's offset is read by its signed distance (`Surface::Offset`), on the sheet
+//! carried on past its domain by its own polynomials, and the ball rolls on it.
 use crate::cases::nurbs::bezier_dome;
 use cad_kernel::boolean::{combined, Op};
 use cad_kernel::fillet::roll;

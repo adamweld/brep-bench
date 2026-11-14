@@ -3,9 +3,10 @@
 //! The helix's radius of curvature, about 1.65, is less than the ball's radius, so the tube about
 //! it folds through itself, and the turns, 3 apart, overlap.
 //!
-//! Refused by the kernel: under a screw its closed sweep enters a ball's pipe about its centre's
-//! helix, and refuses one whose radius reaches the helix's radius of curvature, where the pipe
-//! folds (`Unbuilt::Folded`): the fold is not yet cut where it lies.
+//! Under a screw the kernel's closed sweep enters a ball's pipe about its centre's helix. One whose
+//! radius reaches the helix's radius of curvature, where the pipe folds, it refused by name
+//! (`Unbuilt::Folded`) until 0.14.0, which takes the folded pipe the contact's road: its trim
+//! keeps of the folded sheet what bounds the sweep.
 use cad_kernel::build::sphere;
 use cad_kernel::geom::{tolerance, V};
 use cad_kernel::swept::closed::closed;

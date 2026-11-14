@@ -3,10 +3,11 @@
 //! its seam on the half plane y = 0, x ≥ 0) and its ends flat discs, the rim where the side meets
 //! the top rounded to radius 1.
 //!
-//! Refused, by the kernel: "`east` (bspline) has no offset in closed form, so no ball rolls on it
-//! yet: planes, cylinders, cones, spheres and tori are rounded (rung 2)". `fillet::roll` stands
-//! the ball's centre off each face along its normal by the surface's offset in closed form, and a
-//! B-spline face is not read as the cylinder it lies on.
+//! Refused, by the kernel: "a fillet's run cannot be cut off where it ends: a shell of the
+//! arrangement is kept on one side of a plane (`end`) and dropped on another: two of its cells
+//! joined round an edge". Since 0.14.0 a ball rolls on a B-spline sheet (`Surface::Offset`, the
+//! sheet's offset read by its signed distance), so the round along `east`'s rim is made; it is the
+//! cutting off of that run at its ends (`fillet::trimmed`) that the kernel refuses.
 use cad_kernel::boolean::{combined, Op};
 use cad_kernel::build::{disc, face, grid_sheet};
 use cad_kernel::fillet::roll;
