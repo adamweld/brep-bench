@@ -67,6 +67,8 @@ td.wrong, .badge.wrong { background: var(--wrong); }
 td.crashed, td.timeout, .badge.crashed, .badge.timeout { background: var(--crashed); }
 td.missing { color: var(--muted); }
 td.built, .badge.built { background: var(--built); }
+/* a reference shape's entry on a case page: the case's own solid, graded against nothing */
+.badge.reference { border: 1px solid var(--accent); color: var(--accent); }
 td.kernel small { display: block; white-space: normal; max-width: 30ch; }
 td.wrap { white-space: normal; min-width: 12ch; max-width: 22ch; }
 .wa { color: var(--muted); }
