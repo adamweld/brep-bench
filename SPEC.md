@@ -187,6 +187,9 @@ is inside a solid where the winding number of the faces it crosses is above noug
 volumes are integrated exactly along each column. So a mesh with gaps or doubled faces is read as
 the solid its faces wind round.
 
+The case's page shows the reference as an entry beside the kernels' (it is not graded), and its
+viewer can draw the reference over any kernel's solid.
+
 ## An implementation
 
 Each kernel lives in `kernels/<kernel>/`, listed in `kernels.json`. The directory holds a runner and

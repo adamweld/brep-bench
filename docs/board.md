@@ -51,7 +51,11 @@ descending, then back to the order drawn, with blank cells last. It has:
   by curve, its topology, how many faces are flat triangles and how many edges are unpaired; or
   why it has none);
   and its code. `#k=NAME` in the address picks a kernel's entry, as the explorer's and the kernel
-  pages' links do.
+  pages' links do. A case that names a reference shape (SPEC.md) has one more entry, first:
+  *reference*, the original solid the case asks for, shown in the viewer from its STEP file, with its files
+  to download and what its STEP file is made of; and, at a click on *Overlay reference* under the
+  viewer, its triangles are drawn over any kernel's solid, tinted and see-through, so a result can
+  be held against the original.
 - **Faceted solids,** marked ▦: a solid stored as a mesh in B-rep form, a face for every
   triangle or two, where the other kernels bound the same solid by a few curved faces. The board
   marks a result faceted where its solid has at least ten times as many faces as the median of

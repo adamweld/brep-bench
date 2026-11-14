@@ -327,7 +327,7 @@ def megabytes_text(x):
 def spent(en, field, text):
     """An entry's measure of its run for the case page, as `text` writes it: nothing where it has
     not run, a dash where it was not measured."""
-    if en["outcome"] == "missing":
+    if en["outcome"] in ("missing", "reference"):
         return ""
     x = en["row"].get(field)
     return "<span class=muted>–</span>" if x is None else text(x)
@@ -470,6 +470,12 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
     # whether any entry has a solid to show: its STEP file, or else its triangles
     def solid(en):
         return bool(en["step"] or en["stl"])
+    # a reference shape is an entry of its own, first: its solid, to look at beside the
+    # kernels' (and over them, in the viewer), graded against nothing
+    ref_en = reference_entry(c, ref_path, mesh_path, up) if ref is not None else None
+    kernels_shown = entries
+    if ref_en:
+        entries = [ref_en] + entries
     has_view = any(solid(en) for en in entries)
 
     out.append("<h2 id=results>Results</h2>")
@@ -478,8 +484,12 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
     else:
         # the entry shown first: a pass with a solid to show, else any result with one, else
         # any result at all (the first such, in kernels.json's order); #k=NAME picks another
-        shown = max(entries, key=lambda en: (en["outcome"] == "pass" and solid(en), solid(en),
-                                             bool(en["row"])))
+        shown = max(kernels_shown, key=lambda en: (en["outcome"] == "pass" and solid(en),
+                                                   solid(en), bool(en["row"])),
+                    default=ref_en)
+        # where no kernel left a solid to show, the reference's is shown
+        if ref_en and not solid(shown):
+            shown = ref_en
 
         # every entry at a glance, a column each; a click on any of its cells picks it
         def value(en, i):
@@ -526,8 +536,11 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
         neat = " ✦ an elegant solution." if any(en["neat"] for en in entries) else ""
         facets = (" ▦ a faceted solid: a mesh stored as B-rep faces." if
                   any(en["facets"] is not None for en in entries) else "")
-        out.append(f"<p class=muted>† works around a missing feature.{neat}{facets} Pick an entry "
-                   "to see its solid, its measures and its code.</p>")
+        ref_note = (" <em>reference</em> is the original solid, not a kernel's result; "
+                    "<em>Overlay reference</em> under the viewer draws it over whichever entry "
+                    "is picked." if ref_en else "")
+        out.append(f"<p class=muted>† works around a missing feature.{neat}{facets}{ref_note} "
+                   "Pick an entry to see its solid, its measures and its code.</p>")
 
         # the entry picked (the page's script shows it): its solid in 3D, its time, its notes,
         # its data and its code
@@ -538,13 +551,19 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
             # what the viewer draws: the entry's B-rep, its STEP file's faces, each colored by its
             # surface, its edges drawn between them; only where it has no STEP file to show, or
             # the file cannot be read, its runner's triangles instead
-            out.append("<div id=view hidden><canvas id=viewer></canvas>"
+            out.append("<div id=view hidden" + (f" data-reference='{ref_en['stl']}'" if ref_en
+                                                else "") + "><canvas id=viewer></canvas>"
                        "<p class=legend id=kinds hidden></p>"
                        # a B-spline surface's control net, drawn over its faces at a click
                        "<p class=legend id=nets hidden><button type=button class=chip "
                        "title='Draw the control points of each B-spline "
                        "surface, joined in rows along u and along v, faint where the solid "
                        "hides them'>Control nets</button> <span></span></p>"
+                       # a reference shape's triangles, drawn over the entry picked
+                       "<p class=legend id=overlay hidden><button type=button class=chip "
+                       "title=\"Draw the reference's solid over the entry picked, tinted and "
+                       "see-through: where the tint shows, the reference stands out of the "
+                       "entry's solid\">Overlay reference</button> <span class=muted></span></p>"
                        "<p class=muted id=faces-note hidden>Drag to turn, scroll or pinch to zoom, "
                        "right-drag to move. The solid as its STEP file has it, meshed in the "
                        "browser by Open CASCADE (occt-import-js): each face colored by the kind "
@@ -553,7 +572,8 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
                        "Drag to turn, scroll or pinch to zoom, right-drag to move. Black lines "
                        "are where the surface turns sharply; red ones, seen through the solid, "
                        "are open edges, where the mesh is not closed.</p></div>")
-        out += [entry(en, exp) for en in entries]
+        out += [reference_section(en, exp) if en is ref_en else entry(en, exp)
+                for en in entries]
         out.append(PICK)
         # the table of entries sorted by a click on a row's head (the board's sort.js)
         out.append(f"<script type=module>import {{ sortable }} from '{up}sort.js{v}'; "
@@ -573,6 +593,74 @@ def case_page(c, registry, results, drawing, prev=None, after=None, v=""):
 
 
 KEYS = ("volume", "area")
+
+
+def reference_entry(c, ref_path, mesh_path, up):
+    """The entry of a case's reference shape (SPEC.md, "A reference shape"): its STEP file and its
+    triangles, copied into the site as they are (gzipped: the viewer unzips them), and what its
+    STEP file is made of."""
+    e = html.escape
+    cid = c["id"]
+    hrefs = {}
+    for kind, path in (("step", ref_path), ("stl", mesh_path)):
+        if path and os.path.exists(path):
+            name = os.path.basename(path)
+            keep_file(path, os.path.join(SITE, "reference", cid, name))
+            hrefs[kind] = f"{up}reference/{e(cid)}/{e(name)}"
+    made = None
+    if ref_path and not ref_path.endswith((".stl", ".stl.gz")) and os.path.exists(ref_path):
+        import gzip
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".step") as f:
+            opener = gzip.open if ref_path.endswith(".gz") else open
+            with opener(ref_path, "rb") as g:
+                shutil.copyfileobj(g, f)
+            f.flush()
+            try:
+                made = step.read(f.name)
+            except ValueError:
+                made = None
+    return {"name": "reference", "row": None, "outcome": "reference",
+            "stl": hrefs.get("stl"), "step": hrefs.get("step"), "mb": None,
+            "files": [(f"{k.upper()} file", os.path.basename(p), hrefs[k], os.path.getsize(p) / 1e6)
+                      for k, p in (("step", ref_path), ("stl", mesh_path)) if k in hrefs],
+            "origin": likeness.header(c).get("origin"), "made": made,
+            "path": os.path.relpath(ref_path, ROOT), "wa": None, "neat": None, "facets": None,
+            "src": None, "code": None, "loc": None, "label": "the answer", "measures": None,
+            "likeness": None, "friends": []}
+
+
+def reference_section(en, exp):
+    """The reference shape's entry, as HTML, hidden like a kernel's (`entry`): where its solid
+    comes from, its measures (the case's answer), its files and what its STEP file is made of."""
+    e = html.escape
+    out = [f"<section class=entry data-k='reference' data-src='{en['stl'] or ''}' "
+           f"data-step='{en['step'] or ''}' hidden aria-label='reference'>"]
+    out.append("<h3>Notes</h3>")
+    out.append("<p><span class='badge reference'>reference</span> The original solid this case "
+               "asks for, loaded from its STEP file. It is not a kernel's result and is not "
+               "graded: a kernel passes by matching it. To compare, pick a kernel's entry and "
+               "turn on <em>Overlay reference</em> under the viewer.</p>")
+    if en["origin"]:
+        out.append(f"<p class=muted>{e(en['origin'])}</p>")
+    out.append("<h3>Data</h3>")
+    if exp:
+        out.append("<div class=scroll><table data-nosort><tr><th></th><th>as the harness reads "
+                   "it</th></tr>" + "".join(
+                       f"<tr><td>{k}</td><td>{exp[k]['value']:.10g}</td></tr>"
+                       for k in KEYS if k in exp) + "</table></div>")
+    facts = [(kind, f"<a href='{href}' download>{e(name)}</a> "
+                    f"<span class=muted>{size_text(mb)}</span>")
+             for kind, name, href, mb in en["files"]]
+    if en["made"]:
+        facts += step_facts({"outcome": "pass", "step": en["made"]}, True, None)
+    out.append("<table class=facts>" + "".join(
+        f"<tr><th scope=row>{k}</th><td>{v}</td></tr>" for k, v in facts) + "</table>")
+    out.append("<h3>Implementation</h3>")
+    out.append(f"<p class=muted>None: a file, <a href='{REPO}/blob/main/{e(en['path'])}'>"
+               f"{e(en['path'])}</a>, not code.</p>")
+    out.append("</section>")
+    return "\n".join(out)
 
 # how a STEP file represents its solid (harness/step.py's `form`), in words
 FORMS = {"advanced": "advanced faces, each on a surface",
@@ -936,11 +1024,23 @@ function openEdges(geometry) {
   return both;
 }
 
+// A file's bytes, unzipped where it is gzipped (a reference shape's files are kept so, and a
+// server may or may not have unzipped them on the way)
+async function bytesOf(src) {
+  const r = await fetch(src);
+  if (!r.ok) throw new Error(`${src}: ${r.status}`);
+  const buffer = await r.arrayBuffer();
+  const head = new Uint8Array(buffer, 0, Math.min(2, buffer.byteLength));
+  if (head[0] !== 0x1f || head[1] !== 0x8b) return buffer;
+  const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Response(stream).arrayBuffer();
+}
+
 // each solid, built once: its surface, its creases and its open edges
 const built = new Map();
 function build(src) {
   if (!built.has(src)) {
-    built.set(src, new Promise((ok, no) => loader.load(src, ok, undefined, no)).then((geometry) => {
+    built.set(src, bytesOf(src).then((buffer) => loader.parse(buffer)).then((geometry) => {
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
       const solid = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
@@ -1192,10 +1292,7 @@ function openCascade() {
 function buildFaces(src) {
   const key = 'step:' + src;
   if (!built.has(key)) {
-    built.set(key, Promise.all([fetch(src).then((r) => {
-      if (!r.ok) throw new Error(`${src}: ${r.status}`);
-      return r.arrayBuffer();
-    }), openCascade()]).then(([buffer, oc]) => {
+    built.set(key, Promise.all([bytesOf(src), openCascade()]).then(([buffer, oc]) => {
       const bytes = new Uint8Array(buffer);
       const { kinds, nets } = readStep(new TextDecoder('latin1').decode(bytes));
       const read = oc.ReadStepFile(bytes, { linearUnit: 'millimeter',
@@ -1288,6 +1385,51 @@ function showNets(on) {
 try { showNets(localStorage.getItem('brep-bench.nets') === '1'); } catch (_) { showNets(false); }
 netsButton.addEventListener('click', () => showNets(!camera.layers.isEnabled(NETS)));
 
+// A reference shape's solid, its triangles drawn over the entry picked: tinted, see-through, and
+// a little toward the camera, so that where the two solids' surfaces meet the tint covers the
+// entry, where the reference stands out of the entry the tint shows in front of it, and where the
+// entry stands out of the reference the entry shows untinted. Hidden while the reference itself
+// is picked; whether it is drawn is kept like the control nets'.
+const overlayBar = document.getElementById('overlay');
+const overlayButton = overlayBar.querySelector('button');
+const overlayNote = overlayBar.querySelector('span');
+const referenceSrc = document.getElementById('view').dataset.reference || '';
+let ghost = null;
+function buildGhost() {
+  if (!ghost) {
+    ghost = bytesOf(referenceSrc).then((buffer) => {
+      const geometry = loader.parse(buffer);
+      geometry.computeVertexNormals();
+      return new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+        color: dark.matches ? 0xffa54d : 0xe5701a, roughness: 0.6, metalness: 0.0,
+        transparent: true, opacity: 0.4, depthWrite: false, side: THREE.DoubleSide,
+        polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+    });
+  }
+  return ghost;
+}
+let overlaid = false;
+function overlay() {
+  const on = overlaid && entry.src !== referenceSrc;
+  overlayButton.setAttribute('aria-pressed', String(overlaid));
+  overlayBar.hidden = !referenceSrc || entry.src === referenceSrc;
+  if (!referenceSrc) return;
+  if (!on && !ghost) return;  // not asked for yet: nothing to read
+  overlayNote.textContent = on ? 'Reading the reference…' : '';
+  buildGhost().then((mesh) => {
+    const now = overlaid && entry.src !== referenceSrc;
+    if (now) scene.add(mesh); else scene.remove(mesh);
+    overlayNote.textContent = now ? 'Orange: the reference, where it is at or outside the '
+      + "entry's solid; untinted: where the entry stands out of it." : '';
+  }, (error) => { overlayNote.textContent = `The reference could not be shown: ${error.message}.`; });
+}
+overlayButton.addEventListener('click', () => {
+  overlaid = !overlaid;
+  try { localStorage.setItem('brep-bench.overlay', overlaid ? '1' : '0'); } catch (_) {}
+  overlay();
+});
+try { overlaid = localStorage.getItem('brep-bench.overlay') === '1'; } catch (_) {}
+
 function marks(showing) {
   meshNote.hidden = showing !== 'mesh';
   facesNote.hidden = showing !== 'faces';
@@ -1371,6 +1513,7 @@ function picked(detail) {
   entry = detail || { src: '', step: '' };
   const any = entry.src || entry.step;
   renderer.setAnimationLoop(any ? frame : null);
+  overlay();
   if (!any) return;
   show(!fitted);
   fitted = true;
