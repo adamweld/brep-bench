@@ -6,5 +6,5 @@ let torus = m.profile(yz()).circle(3.0).at(5.0, 0.0).sketch("tube")
     .revolve(axis_at([0.0, 0.0, 0.0], [0.0, 0.0, 1.0]), full_circle());
 let below = m.tool(|m| m.profile(plane_at([0.0, 0.0, 0.0], [0.6, 0.0, -0.8])).rect(40.0, 40.0)
     .sketch("half_space").extrude(blind(20.0)));
-torus = torus.intersect(below, #{ label: "cut" });
+torus = torus.intersect(below, #{ label: "cut", non_manifold: "general" });
 m
