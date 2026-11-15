@@ -14,5 +14,5 @@ for sx in [1.0, -1.0] { for sy in [1.0, -1.0] { for sz in [1.0, -1.0] {
     solid = solid.intersect(slab, #{ label: "cut_" + i });
     i += 1;
 } } }
-solid = solid.chamfer(edges(), sqrt(6.0), #{ label: "bevels" });
+solid = solid.chamfer(edges(), sqrt(6.0), #{ label: "bevels", corner: "apex" });
 m
