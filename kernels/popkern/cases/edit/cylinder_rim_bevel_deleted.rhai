@@ -1,7 +1,6 @@
-// A cylinder of radius 6 on z from 0 to 10, its top rim beveled 2; then the bevel deleted.
-//
-// Refused: popkern has no direct edit that deletes a face and heals the gap. Its remove_faces
-// takes faces away and leaves the body open, a sheet, as thicken takes it; nothing runs the
-// neighbouring faces on along their surfaces until they meet.
-throw "popkern has no delete-face edit that heals the gap: remove_faces leaves the body open, \
-a sheet";
+// A cylinder's beveled rim deleted: the top and the side meet again.
+let m = model();
+let b = m.cylinder(6.0, 10.0);
+b = b.chamfer(edges().at_height(10.0), 2.0, #{ label: "bevel" });
+b = b.delete_faces(faces().kind("cone"), #{ label: "bevel_deleted" });
+m

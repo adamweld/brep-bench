@@ -1,8 +1,7 @@
-// A plate (radius 8, z = -4 to 0) with a boss (radius 3, z = 0 to 8), the boss's root rounded to
-// 1; then the round deleted.
-//
-// Refused: popkern has no direct edit that deletes a face and heals the gap. Its remove_faces
-// takes faces away and leaves the body open, a sheet, as thicken takes it; nothing runs the
-// neighbouring faces on along their surfaces until they meet.
-throw "popkern has no delete-face edit that heals the gap: remove_faces leaves the body open, \
-a sheet";
+// A boss's rounded root deleted: the boss stands on the plate with a sharp foot.
+let m = model();
+let b = m.cylinder(8.0, 4.0, #{ at: [0.0, 0.0, -4.0] });
+b = b.union(m.tool(|m| m.cylinder(3.0, 8.0)));
+b = b.fillet(edges().between("cylinder", "plane").at_height(0.0), 1.0, #{ label: "round" });
+b = b.delete_faces(faces().kind("torus"), #{ label: "round_deleted" });
+m

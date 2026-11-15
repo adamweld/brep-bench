@@ -1,8 +1,7 @@
-// An L-block (outline (0, 0), (20, 0), (20, 5), (5, 5), (5, 15), (0, 15), 8 tall), its inside
-// corner rounded to 2; then the round deleted.
-//
-// Refused: popkern has no direct edit that deletes a face and heals the gap. Its remove_faces
-// takes faces away and leaves the body open, a sheet, as thicken takes it; nothing runs the
-// neighbouring faces on along their surfaces until they meet.
-throw "popkern has no delete-face edit that heals the gap: remove_faces leaves the body open, \
-a sheet";
+// An L-block's rounded inside corner deleted: the corner is sharp again.
+let m = model();
+let b = m.profile(xy()).path(0.0, 0.0).line_to(20.0, 0.0).line_to(20.0, 5.0).line_to(5.0, 5.0)
+    .line_to(5.0, 15.0).line_to(0.0, 15.0).close().sketch("l").extrude(blind(8.0));
+b = b.fillet(edges().straight().direction("z").at_vertex([5.0, 5.0, 0.0]), 2.0, #{ label: "round" });
+b = b.delete_faces(faces().kind("cylinder"), #{ label: "round_deleted" });
+m

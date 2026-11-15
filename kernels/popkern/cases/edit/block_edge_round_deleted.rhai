@@ -1,8 +1,6 @@
-// A block from the origin to (20, 10, 10), the edge where its top meets x = 20 rounded to 2; then
-// the round deleted.
-//
-// Refused: popkern has no direct edit that deletes a face and heals the gap. Its remove_faces
-// takes faces away and leaves the body open, a sheet, as thicken takes it; nothing runs the
-// neighbouring faces on along their surfaces until they meet.
-throw "popkern has no delete-face edit that heals the gap: remove_faces leaves the body open, \
-a sheet";
+// A block's rounded edge deleted: the top and the side meet again.
+let m = model();
+let b = m.box(20.0, 10.0, 10.0);
+b = b.fillet(edges().straight().direction("y").at_vertex([20.0, 0.0, 10.0]), 2.0, #{ label: "round" });
+b = b.delete_faces(faces().kind("cylinder"), #{ label: "round_deleted" });
+m

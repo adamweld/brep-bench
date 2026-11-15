@@ -1,8 +1,6 @@
-// A box from the origin to (20, 16, 12) with every edge rounded to 2; then all twenty rounds
-// deleted.
-//
-// Refused: popkern has no direct edit that deletes a face and heals the gap. Its remove_faces
-// takes faces away and leaves the body open, a sheet, as thicken takes it; nothing runs the
-// neighbouring faces on along their surfaces until they meet.
-throw "popkern has no delete-face edit that heals the gap: remove_faces leaves the body open, \
-a sheet";
+// A box with every edge rounded, all twenty rounds deleted.
+let m = model();
+let b = m.box(20.0, 16.0, 12.0);
+b = b.fillet(edges(), 2.0, #{ label: "rounds" });
+b = b.delete_faces(faces().kind("cylinder").or(faces().kind("sphere")), #{ label: "rounds_deleted" });
+m
