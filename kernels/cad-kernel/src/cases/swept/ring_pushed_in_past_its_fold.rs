@@ -3,9 +3,10 @@
 //! without turning, stopping wholly inside the block. The ring leans 65° from upright,
 //! past tan² β = (R − r)/r, so its inner outline folds.
 //!
-//! Refused by the kernel, by name (`Unbuilt::Folded`): leaning past tan² β = (R − r)/r the
-//! apparent contour of the ring's inner contact cusps, and the sheet it sweeps would double back
-//! on itself where the kernel does not yet cut it.
+//! Leaning past tan² β = (R − r)/r the apparent contour of the ring's inner contact cusps, and the
+//! sheet it sweeps doubles back on itself. The kernel's closed sweep refused that by name
+//! (`Unbuilt::Folded`) until 0.14.0, which takes a folded sheet the contact's road, as it does a
+//! curved one: its trim keeps of each folded sheet what bounds the sweep.
 use crate::sketch::block;
 use cad_kernel::build::torus;
 use cad_kernel::geom::{tolerance, V};
