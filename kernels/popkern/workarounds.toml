@@ -1,8 +1,7 @@
 # The cases popkern builds by working around a feature it lacks, and what that is
 # (SPEC.md, "A workaround is flagged").
 
-"nurbs/groin-vault" = "no NURBS surface"
-"nurbs/vault-tangent-plane" = "no NURBS surface"
+"nurbs/groin-vault" = "the common part of two B-spline vaults declines, so each is built as the exact cylinder it is"
 "parts/star-handle" = "its outline extruded and drafted serves an invalid body, so it is lofted"
 "swept/ball-swung-groove" = "no sweep of a solid"
 "swept/ball-thread-groove" = "no sweep of a solid"
