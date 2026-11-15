@@ -3,5 +3,6 @@
 let m = model();
 let s = m.sheet_nurbs([[[-4.0, 0.0, 2.0], [-4.0, 10.0, 2.0]], [[0.0, 0.0, -2.0], [0.0, 10.0, -2.0]], [[4.0, 0.0, 2.0], [4.0, 10.0, 2.0]]],
     #{ degree: [2, 1], label: "trough" });
-s = s.thicken(1.0, #{ side: "inward", label: "thick" });
+// popkern thickens a sheet by its normal, Su x Sv: +z here, toward the concave side.
+s = s.thicken(1.0, #{ side: "outward", label: "thick" });
 m
