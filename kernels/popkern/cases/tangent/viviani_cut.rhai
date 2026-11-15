@@ -7,5 +7,5 @@ let ball = m.profile(xy()).path(0.0, -10.0).arc_to([-10.0, 0.0], [0.0, 10.0]).li
     .close().sketch("half_disc").revolve(axis_at([0.0, 0.0, 0.0], [0.0, 1.0, 0.0]), full_circle());
 let rod = m.tool(|m| m.profile(xy_at(-12.0)).circle(5.0).at(5.0, 0.0).sketch("rod")
     .extrude(blind(24.0)));
-ball = ball.subtract(rod);
+ball = ball.subtract(rod, #{ non_manifold: "general" });
 m
