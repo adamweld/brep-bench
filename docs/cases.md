@@ -214,6 +214,11 @@ more than first order. Faces that coincide over part of their extent: two half b
 their poles a quarter turn apart, and two half tori of one torus. A saddle cut level through its
 saddle point, where the plane meets it in two lines that cross. Every one has a closed form.
 
+Walls a hundredth of a small solid's size thick, left where a copy a hundredth wider has the solid
+taken out of it: a cylinder 0.0015 across and as tall, a cone and a square prism of that size, each
+on the copy's own axis and between its own end planes, so the tube, the shell and the square tube
+left over are 0.0000075 thick and end in the planes both solids share.
+
 ## Faces moved: direct edits (`edit/`)
 
 A finished solid changed by moving some of its faces rather than by redoing the steps that made it,
