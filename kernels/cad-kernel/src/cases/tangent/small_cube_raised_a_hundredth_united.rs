@@ -1,6 +1,6 @@
 //! A small cube, of side 0.0015, from the origin to (0.0015, 0.0015, 0.0015), united with a copy of
-//! itself raised by 0.000015 along z, a hundredth of its side: the box from the origin to
-//! (0.0015, 0.0015, 0.001515), the copy's sides lying in the cube's.
+//! itself raised by 0.000015 along z, a hundredth of its side: the box from the origin to (0.0015,
+//! 0.0015, 0.001515), the copy's sides lying in the cube's.
 use crate::sketch::block;
 use cad_kernel::boolean::{combined, Op};
 use cad_kernel::geom::Rigid;

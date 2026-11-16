@@ -1,6 +1,8 @@
 //! A small cylinder, of radius 0.00075 and height 0.0015 about the z axis from z = 0, and a copy of
 //! it slid 0.000015 along x, a fiftieth of its radius, the two sharing their end planes and their
-//! sides crossing in two vertical lines in the plane x = 0.0000075: the cylinder less the copy, a crescent prism 0.000015 thick at its widest, running to nothing at the lines where the sides cross.
+//! sides crossing in two vertical lines in the plane x = 0.0000075: the cylinder less the copy, a
+//! crescent prism 0.000015 thick at its widest, running to nothing at the lines where the sides
+//! cross.
 use cad_kernel::boolean::{combined, Op};
 use cad_kernel::build::{disc, prism};
 use cad_kernel::geom::Rigid;

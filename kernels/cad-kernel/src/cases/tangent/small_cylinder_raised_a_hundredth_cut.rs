@@ -1,6 +1,7 @@
 //! A small cylinder, of radius 0.00075 and height 0.0015 about the z axis from z = 0, and a copy of
 //! it raised by 0.000015 along z, a hundredth of its height, the copy's side lying in the
-//! cylinder's own: the cylinder less the copy, the disc under it from z = 0 to 0.000015, a hundredth as thick as it is wide.
+//! cylinder's own: the cylinder less the copy, the disc under it from z = 0 to 0.000015, a
+//! hundredth as thick as it is wide.
 use cad_kernel::boolean::{combined, Op};
 use cad_kernel::build::{disc, prism};
 use cad_kernel::geom::Rigid;
