@@ -219,6 +219,11 @@ taken out of it: a cylinder 0.0015 across and as tall, a cone and a square prism
 on the copy's own axis and between its own end planes, so the tube, the shell and the square tube
 left over are 0.0000075 thick and end in the planes both solids share.
 
+Thin walls at ordinary size: a cylinder of radius 5 and height 10 with a coaxial cylinder taken out
+between the same end planes, leaving a tube whose wall is 0.001, 0.0001 or 0.00003 thick, and a cone
+of base radius 5 hollowed by one of base radius 4.999 that shares its base plane and apex, leaving a
+shell 0.001 thick at the base that runs to nothing at the apex.
+
 ## Faces moved: direct edits (`edit/`)
 
 A finished solid changed by moving some of its faces rather than by redoing the steps that made it,
