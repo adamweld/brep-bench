@@ -170,7 +170,18 @@ fn inside(k: &mut DefaultKernel, hull: BodyId) -> Result<BodyId, Refusal> {
     Ok(k.offset(hull, &OffsetSpec { distance: 0., faces: curved, sharp: true })?.first()?)
 }
 
-pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
+/// Refused: a pass is the original itself, all 1385 of its faces, which a few solids from numbers
+/// read off the reference do not make, and a likeness short of it is a wrong answer. The likeness
+/// is kept below ([`likeness`]) for when the kernel can be given the whole boat.
+pub fn build(_k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
+    Err(Refusal::from(
+        "cadrs builds only a likeness of #3DBenchy (a hull, a deck well, a wheelhouse and its holes), not the original's 1385 faces",
+    ))
+}
+
+/// The boat as near as a few solids come to it.
+#[allow(dead_code)]
+pub fn likeness(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let [cx, cz, r] = SHEER;
     let sheer = |x: f64| [x, cz - (r * r - (x - cx) * (x - cx)).sqrt()];
     let side = across(
