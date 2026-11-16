@@ -15,6 +15,7 @@
 "draft/rounded-pocket-walls" = "no draft of a solid's faces"
 "edit/block-top-moved-up" = "no move of a face"
 "edit/hole-widened" = "no move of a face"
+"edit/holes-widened-until-merged" = "no move of a face"
 "edit/l-block-riser-moved" = "no move of a face"
 "edit/rounded-block-top-moved-up" = "no move of a face"
 "feature/hole-through-the-upper-arm" = "no hole through to the next face"
