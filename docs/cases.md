@@ -276,6 +276,13 @@ its spherical patches meeting three at each vertex. Two disjoint tori linked thr
 test separate bodies with linked placement, rather than nested cavities; volume, area and mesh
 closure alone do not verify that link. All three cases have closed-form measures.
 
+A small cylinder, 0.0015 across and as tall, with a copy of itself raised a hundredth of its height,
+and with another slid sideways a fiftieth of its radius: their common part, the cylinder less the
+copy, and their union, six in all. Raised, the copy's side lies in the cylinder's own side and the
+cut leaves a disc a hundredth as thick as it is wide; slid, the two sides cross in two lines and
+the cut leaves a crescent 0.000015 wide at its widest. A tolerance that does not shrink with the
+model takes the two sides, or the copy's end and the cylinder's, for one.
+
 ## Integration tests (`integration/`)
 
 Whole models that take many of a kernel's features at once, where a case elsewhere tests one. The
