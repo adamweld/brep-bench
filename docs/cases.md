@@ -253,6 +253,12 @@ riser and tread go together and leave two faces that have never met to run on an
 half-round notch through a block's side; and an open slot of two flats and a half cylinder. In the
 last two the side the cut came in through closes over it.
 
+Deletes where the faces round the gap lie on one surface, which runs on across it: ring grooves
+turned into a shaft, a cone frustum and a tube's bore, a V-groove and a round-bottomed groove in a
+shaft, each groove's faces deleted together; a flat milled along a shaft, two opposite flats, a flat
+on a cone frustum and one on a ball; an open keyway in a shaft and a keyway along a hub's bore.
+Each result is the solid as it was before the groove, flat or keyway was cut.
+
 ## Filled surfaces (`fill/`)
 
 A surface made to fill a loop of edges, the bilinearly blended Coons patch, capping a block: four
