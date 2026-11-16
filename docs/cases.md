@@ -229,8 +229,19 @@ extruded through the plate, so its measures also have closed forms.
 Faces deleted, and the gap they leave closed by the faces round them, each run on along its own
 surface until they meet: a round and a bevel on a block's edge and on a cylinder's rim, the round
 in an L-block's inside corner and the one at a boss's foot, a hole's countersink, three rounds and
-the ball where they meet at a cube's corner, and all twenty rounds of a box. Each result is the
-solid as it was before its round or bevel was made.
+the ball where they meet at a cube's corner, all twenty rounds of a box, the two rounds along a
+block's top deleted together, a cylinder's two rounded rims, and the round on a drilled hole's rim,
+where the top runs inward to meet the bore. Rounds whose neighbours are curved go the same way:
+a cone frustum's top rim, a hemisphere's rim, a blind bore's floor and the root of a ball standing in
+a plate, and bevels in three of those places; a half torus's rims, where the round meets a torus; a frustum with both rims rounded, both rounds deleted or only the top one; and rounds between two curved faces, a turned post's shoulder between its cylinder and its cone, the ridge between two cones, and a domed post's rim between its cylinder and its ball; the same three again with the upper part made turned about the axis first, so that each rim and its round come in two pieces. A closed tangent chain goes too, the eight rounds round a rounded box's top, and a hole's two
+rounded rims together. Each result is the
+solid as it was before its round or bevel was made. A hole's wall and a boss go the same way, more
+simply: their edges are whole circles in the faces left, which close over them.
+
+Three deletes whose gap no pair of neighboring faces closes by itself: an L-block's step, whose
+riser and tread go together and leave two faces that have never met to run on and meet; a
+half-round notch through a block's side; and an open slot of two flats and a half cylinder. In the
+last two the side the cut came in through closes over it.
 
 ## Filled surfaces (`fill/`)
 
