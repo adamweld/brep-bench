@@ -4,7 +4,8 @@ use super::*;
 use crate::Refusal;
 use brep_kernel::{
     boolean_operation, boolean_operation_nary, extrude_curves_to_sheet, extrude_profile_brep,
-    face_from_surface, make_arc, make_box_brep, make_line, make_plane, offset_shell, offset_solid, parameter_point_in_face, project_point_to_surface,
+    face_from_surface, make_arc, make_box_brep, make_cone_brep, make_line, make_plane, make_sphere_brep,
+    offset_shell, offset_solid, parameter_point_in_face, project_point_to_surface,
     thicken_face_sheet, thicken_trimmed_sheet, BooleanOperation,
     BooleanOptions, BrepSolid, KernelRefusal, NurbsCurve, NurbsSurface, OffsetCorners,
     PolygonClass, Vec2, Vec3,
@@ -136,4 +137,14 @@ pub fn flange() -> Result<Vec<BrepSolid>, Refusal> {
         make_line(p(2.0, 0.0, 2.0), p(2.0, 0.0, 12.0))?,
     ];
     Ok(extrude_curves_to_sheet(&profile, p(0.0, 1.0, 0.0), 8.0)?)
+}
+
+/// The cone on the z axis from its base of radius 6 at z = 0 to its apex at z = 12, its tip rounded
+/// by a ball of radius 1 tangent to its side: the frustum up to the circle of tangency (radius 2/√5
+/// at z = 12 − 4/√5) united with the ball about (0, 0, 12 − √5).
+pub fn ball_tipped_cone() -> Result<BrepSolid, Refusal> {
+    let (z, root) = (p(0.0, 0.0, 1.0), 5f64.sqrt());
+    let frustum = make_cone_brep(p(0.0, 0.0, 0.0), z, 6.0, 2.0 / root, 12.0 - 4.0 / root)?;
+    let ball = make_sphere_brep(p(0.0, 0.0, 12.0 - root), 1.0, z)?;
+    Ok(union(&frustum, &ball)?)
 }

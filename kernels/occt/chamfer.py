@@ -1,15 +1,19 @@
 """What the OCCT implementations of the two-distance chamfer cases on a ball's edges share: the
 circular edge through a point, the faces on either side of it, and BRepFilletAPI_MakeChamfer's
-two-distance chamfer, whose distances are chords from the edge in the plane square to it."""
+two-distance chamfer, whose distances are chords from the edge in the plane square to it; and,
+where that chamfer declines a setback that consumes a face, the solid cut by the chamfer's cone."""
 from OCP.BRepAdaptor import BRepAdaptor_Surface
-from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
+from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut, BRepAlgoAPI_Fuse
+from OCP.BRepBuilderAPI import (BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakePolygon,
+                                BRepBuilderAPI_MakeVertex)
 from OCP.BRepExtrema import BRepExtrema_DistShapeShape
 from OCP.BRepFilletAPI import BRepFilletAPI_MakeChamfer
+from OCP.BRepPrimAPI import BRepPrimAPI_MakeRevol
 from OCP.GeomAbs import GeomAbs_SurfaceType
 from OCP.TopAbs import TopAbs_EDGE, TopAbs_FACE
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopoDS import TopoDS
-from OCP.gp import gp_Pnt
+from OCP.gp import gp, gp_Pnt
 
 from bench import Refused
 
@@ -68,3 +72,53 @@ def chamfered(solid, point, first, d_first, d_other, what):
     if not chamfer.IsDone():
         raise Refused(f"BRepFilletAPI_MakeChamfer could not chamfer {what}")
     return chamfer.Shape()
+
+
+def cut_beyond_line(solid, point, direction, what, reach=12):
+    """`solid` less everything beyond a cone about the z axis: in the half-plane (ρ, z), the points
+    to the right of the line through `point` along `direction`, out to `reach`, turned about the
+    axis. Refused, naming `what`, if the cut declines."""
+    (px, pz), (dx, dz) = point, direction
+    beyond = lambda q: (q[0] - px) * dz - (q[1] - pz) * dx  # positive to the right of the line
+    # The square 0 ≤ ρ ≤ reach, |z| ≤ reach, clipped to that side of the line.
+    corners = [(0, -reach), (reach, -reach), (reach, reach), (0, reach)]
+    section = []
+    for a, b in zip(corners, corners[1:] + corners[:1]):
+        (sa, sb) = (beyond(a), beyond(b))
+        if sa >= 0:
+            section.append(a)
+        if (sa < 0) != (sb < 0):
+            t = sa / (sa - sb)
+            section.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
+    return cut_by_revolved(solid, section, what)
+
+
+def cut_by_revolved(solid, section, what):
+    """`solid` less the solid of revolution about the z axis whose half-section is the polygon
+    `section`, corners (ρ, z) in order, its first and last on the axis; Refused, naming `what`, if
+    the cut declines."""
+    polygon = BRepBuilderAPI_MakePolygon()
+    for rho, z in section:
+        polygon.Add(gp_Pnt(rho, 0, z))
+    polygon.Close()
+    face = BRepBuilderAPI_MakeFace(polygon.Wire(), True).Face()
+    tool = BRepPrimAPI_MakeRevol(face, gp.OZ_s()).Shape()
+    cut = BRepAlgoAPI_Cut(solid, tool)
+    if not cut.IsDone():
+        raise Refused(f"BRepAlgoAPI_Cut declined to cut {what}")
+    return cut.Shape()
+
+
+def filled_by_revolved(solid, section, what):
+    """`solid` joined to the solid of revolution about the z axis whose half-section is the
+    polygon `section`, corners (ρ, z) in order; Refused, naming `what`, if the join declines."""
+    polygon = BRepBuilderAPI_MakePolygon()
+    for rho, z in section:
+        polygon.Add(gp_Pnt(rho, 0, z))
+    polygon.Close()
+    face = BRepBuilderAPI_MakeFace(polygon.Wire(), True).Face()
+    fill = BRepPrimAPI_MakeRevol(face, gp.OZ_s()).Shape()
+    joined = BRepAlgoAPI_Fuse(solid, fill)
+    if not joined.IsDone():
+        raise Refused(f"BRepAlgoAPI_Fuse declined to fill {what}")
+    return joined.Shape()

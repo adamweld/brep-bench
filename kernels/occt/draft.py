@@ -11,9 +11,12 @@ are extended or trimmed to meet them.
 import math
 
 from OCP.BRepAdaptor import BRepAdaptor_Curve
+from OCP.BRepAlgoAPI import BRepAlgoAPI_Common, BRepAlgoAPI_Fuse
+from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 from OCP.BRepFilletAPI import BRepFilletAPI_MakeFillet
 from OCP.BRepOffsetAPI import BRepOffsetAPI_DraftAngle
-from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
+from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeHalfSpace
+from OCP.ShapeUpgrade import ShapeUpgrade_UnifySameDomain
 from OCP.TopAbs import TopAbs_EDGE
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopoDS import TopoDS
@@ -77,3 +80,39 @@ def box_sides(solid, lo, hi, radius=0):
         points += [(x0 + k, y0 + k, z), (x1 - k, y0 + k, z),
                    (x1 - k, y1 - k, z), (x0 + k, y1 - k, z)]
     return [face_through(solid, p) for p in points]
+
+
+def leaning_boxes_fused(rectangles, height, degrees):
+    """The boxes over `rectangles` (each ((x0, y0), (x1, y1)) in the plane z = 0, `height` tall),
+    each cut by the four planes through its floor's edges that lean `degrees` from z over it (the
+    planes its sides would be drafted to; DraftAngle itself declines once they close), fused into
+    one solid with the faces that lie in one plane made one. A block whose outline is the
+    rectangles' union, its sides drafted until they close, is that solid where each concave corner
+    of the outline is a corner of two of the rectangles: under the sides' planes its section at
+    every height is the union of the rectangles' sections."""
+    lean = math.tan(math.radians(degrees))
+    whole = None
+    for (x0, y0), (x1, y1) in rectangles:
+        roof = BRepPrimAPI_MakeBox(gp_Pnt(x0, y0, 0), gp_Pnt(x1, y1, height)).Shape()
+        inside = gp_Pnt((x0 + x1) / 2, (y0 + y1) / 2, 0)
+        # each side's plane: through its floor edge, its normal out of the box and up by the lean
+        for point, out in [((x0, y0, 0), (-1, 0)), ((x1, y0, 0), (1, 0)),
+                           ((x0, y0, 0), (0, -1)), ((x0, y1, 0), (0, 1))]:
+            plane = gp_Pln(gp_Pnt(*point), gp_Dir(out[0], out[1], lean))
+            under = BRepPrimAPI_MakeHalfSpace(BRepBuilderAPI_MakeFace(plane).Face(), inside).Solid()
+            cut = BRepAlgoAPI_Common(roof, under)
+            cut.Build()
+            if not cut.IsDone():
+                raise Refused("BRepAlgoAPI_Common declined a leaning side")
+            roof = cut.Shape()
+        if whole is None:
+            whole = roof
+            continue
+        fuse = BRepAlgoAPI_Fuse(whole, roof)
+        fuse.Build()
+        if not fuse.IsDone():
+            raise Refused("BRepAlgoAPI_Fuse declined the roofs")
+        whole = fuse.Shape()
+    unify = ShapeUpgrade_UnifySameDomain(whole, True, True, False)
+    unify.Build()
+    return unify.Shape()
