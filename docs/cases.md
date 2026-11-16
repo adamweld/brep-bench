@@ -115,6 +115,9 @@ its hole into an apple. A ball bounded by one NURBS face is grown too, its offse
 poles where the face's parameters pinch, and an elliptic cylinder is grown and shrunk, its side
 offset to a curve that is no conic: shrunk within its least radius of curvature it has a closed
 form, and shrunk past it the offset turns back on itself in swallowtails that must be trimmed.
+A cylinder cut by a plane at 45° is grown by 1.5, 2, 2.5 and 4, the last two past its elliptic
+edge's least radius of curvature, where the whole tube about the ellipse would cross itself; the
+solid is convex, so Steiner's formula gives each exactly.
 
 A dumbbell shrunk beyond half its neck width splits into two separate bodies, each keeping the
 curved bulge at the lost neck's mouth. Both bodies must survive; unlike the dumbbell shell, it is
@@ -145,6 +148,8 @@ ring against a bore, or is never made at all, a capsule open at a dome tangent t
 hollowed and one halved into a pipe, a bore opened into a hollow block, a cylinder open at its side
 that falls into two disks, and a ball cut by a plane whose cavity reaches it aslant, through a
 pinhole, or not at all.
+A half ball shelled outward and open at its dome has only its flat face to move: it runs on
+until it meets the sphere, leaving a slice of the ball 0.5, 1 or 2 thick under the opening.
 
 ## Geometry (`geometry/`)
 
