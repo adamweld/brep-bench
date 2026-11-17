@@ -115,6 +115,9 @@ its hole into an apple. A ball bounded by one NURBS face is grown too, its offse
 poles where the face's parameters pinch, and an elliptic cylinder is grown and shrunk, its side
 offset to a curve that is no conic: shrunk within its least radius of curvature it has a closed
 form, and shrunk past it the offset turns back on itself in swallowtails that must be trimmed.
+A cylinder cut by a plane at 45° is grown by 1.5, 2, 2.5 and 4, the last two past its elliptic
+edge's least radius of curvature, where the whole tube about the ellipse would cross itself; the
+solid is convex, so Steiner's formula gives each exactly.
 
 A dumbbell shrunk beyond half its neck width splits into two separate bodies, each keeping the
 curved bulge at the lost neck's mouth. Both bodies must survive; unlike the dumbbell shell, it is
@@ -145,6 +148,8 @@ ring against a bore, or is never made at all, a capsule open at a dome tangent t
 hollowed and one halved into a pipe, a bore opened into a hollow block, a cylinder open at its side
 that falls into two disks, and a ball cut by a plane whose cavity reaches it aslant, through a
 pinhole, or not at all.
+A half ball shelled outward and open at its dome has only its flat face to move: it runs on
+until it meets the sphere, leaving a slice of the ball 0.5, 1 or 2 thick under the opening.
 
 ## Geometry (`geometry/`)
 
@@ -252,6 +257,12 @@ Three deletes whose gap no pair of neighboring faces closes by itself: an L-bloc
 riser and tread go together and leave two faces that have never met to run on and meet; a
 half-round notch through a block's side; and an open slot of two flats and a half cylinder. In the
 last two the side the cut came in through closes over it.
+
+Deletes where the faces round the gap lie on one surface, which runs on across it: ring grooves
+turned into a shaft, a cone frustum and a tube's bore, a V-groove and a round-bottomed groove in a
+shaft, each groove's faces deleted together; a flat milled along a shaft, two opposite flats, a flat
+on a cone frustum and one on a ball; an open keyway in a shaft and a keyway along a hub's bore.
+Each result is the solid as it was before the groove, flat or keyway was cut.
 
 ## Filled surfaces (`fill/`)
 
