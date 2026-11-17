@@ -344,7 +344,8 @@ beside **refused** and **failed** where there is no file to judge. A file that i
 solid (open, triangles or empty) is a wrong answer; the verdict itself is shown, and a faceted file
 is graded like any other, on its measures.
 
-The harness then measures the file's solid itself (`harness/mass.py`), untimed: its volume and
+The harness then measures the file's solid itself (`harness/mass.py`, or the same measurer in
+Rust, `harness/mass/`, where it is built), untimed: its volume and
 area, which are graded as a runner's measures are, and its centre of gravity and its moments of
 inertia (of unit density, about the centre), which are shown. It reads the exact geometry the file
 holds, surface by surface and edge by edge, and integrates over each face by the divergence and

@@ -263,15 +263,46 @@ def argv(command, cid, out_stl, out_step):
 # the harness's own measurer of a STEP file's solid, run in a process of its own (it is given a
 # time limit, as a run is)
 MASS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mass.py")
+# its fast twin (harness/mass/, Rust: the same method, the same answer, some hundred times
+# sooner), which measures in its place where it has been built:
+# cargo build --release --manifest-path harness/mass/Cargo.toml
+MASS_RS = os.path.join(os.path.dirname(MASS), "mass")
+MASS_BIN = os.path.join(MASS_RS, "target", "release", "mass.exe" if os.name == "nt" else "mass")
+
+
+def mass_sources():
+    """The fast measurer's source files (harness/mass/), in order."""
+    src = os.path.join(MASS_RS, "src")
+    try:
+        names = sorted(n for n in os.listdir(src) if n.endswith(".rs"))
+    except OSError:
+        names = []
+    return [os.path.join(MASS_RS, "Cargo.toml")] + [os.path.join(src, n) for n in names]
+
+
+@functools.lru_cache(maxsize=None)
+def mass_command():
+    """The measurer's command line, less the file: the fast one where it is built and no older
+    than its sources (a stale one would measure by a method the sources no longer say), else
+    harness/mass.py."""
+    try:
+        built = os.path.getmtime(MASS_BIN)
+        if os.access(MASS_BIN, os.X_OK) and all(os.path.getmtime(p) <= built
+                                                for p in mass_sources()):
+            return [MASS_BIN]
+    except OSError:
+        pass
+    return [sys.executable, MASS]
 
 
 def mass_of(out_step, timeout):
-    """The mass properties of the solid in the STEP file at `out_step` (harness/mass.py):
+    """The mass properties of the solid in the STEP file at `out_step` (harness/mass.py, or its
+    fast twin where that is built, `mass_command`):
     {"volume", "area", "centroid", "inertia", ...} (and `by_surface`, the solid with its loops
     taken by their surfaces' normals, where that differs), or {"invalid": why} where the file
     holds no solid, or {"error": why} where it cannot measure the file. Untimed."""
     try:
-        p = subprocess.run([sys.executable, MASS, out_step], capture_output=True, text=True,
+        p = subprocess.run(mass_command() + [out_step], capture_output=True, text=True,
                            timeout=timeout, cwd=ROOT)
     except subprocess.TimeoutExpired:
         return {"error": f"not measured in {timeout:g} s"}
@@ -304,7 +335,8 @@ class MassCache:
     results/mass/<kernel>.json, kept from run to run (CI keeps it in a cache of its own), so that
     a file a kernel writes again byte for byte is not measured again. It holds only what this
     measurer, with this time limit, made of the files: a change to harness/mass.py or
-    harness/step.py, or to the limit, starts it afresh."""
+    harness/step.py, to the limit, or to which of the two measurers measures (and the fast one's
+    sources, where it does), starts it afresh."""
 
     def __init__(self, kernel, limit=MASS_TIMEOUT, jobs=JOBS):
         self.limit, self.jobs = limit, jobs
@@ -313,6 +345,10 @@ class MassCache:
         for name in ("mass.py", "step.py", "stl.py"):
             with open(os.path.join(os.path.dirname(MASS), name), "rb") as f:
                 digest.update(f.read())
+        if mass_command() == [MASS_BIN]:
+            for path in mass_sources():
+                with open(path, "rb") as f:
+                    digest.update(b"\0" + os.path.basename(path).encode() + b"\0" + f.read())
         self.version = digest.hexdigest()
         self.files = {}
         try:

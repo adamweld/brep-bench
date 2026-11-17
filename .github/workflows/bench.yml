@@ -186,6 +186,11 @@ jobs:
           needs.plan.outputs.full == 'true' ||
           contains(format(' {0} ', steps.plan.outputs.build), format(' {0} ', matrix.kernel))
         run: python harness/build.py "$KERNEL"
+      # the harness's measurer in Rust (harness/mass/, harness/mass.py's fast twin), which run.py
+      # uses where it is built: by the runner's own toolchain, and without it mass.py still measures
+      - name: Build the measurer
+        continue-on-error: true
+        run: cargo build --release --manifest-path harness/mass/Cargo.toml
       # what harness/mass.py made of each STEP file this kernel wrote, by the file's hash: restored
       # on every run, a full one too, so that a file written again byte for byte is not measured
       # again (it holds only what this measurer made of them: run.py starts it afresh otherwise)

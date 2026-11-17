@@ -35,6 +35,12 @@ Supported: planes, cylinders, cones, spheres, tori (degenerate too), B-spline su
 too), surfaces of revolution and of linear extrusion; lines, circles, ellipses, B-spline curves
 (rational too), polylines and trimmed curves; MANIFOLD_SOLID_BREP, BREP_WITH_VOIDS and
 FACETED_BREP; lengths in any unit, given in millimetres. Anything else is said, as an error.
+
+harness/mass/ is this measurer's fast twin, in Rust: the same method step for step, summed in the
+same order, printing the same answer some hundred times sooner, which the harness runs in this
+one's place where it has been built (harness/run.py's `mass_command`). This file is the
+reference: a change here must be made there too, and `python3 harness/mass/compare.py FOLDER`
+checks that the two still agree over a folder's STEP files.
 """
 import bisect
 import heapq
