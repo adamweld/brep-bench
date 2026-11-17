@@ -18,14 +18,5 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let b = ball(k, p3(0.0, 0.0, 0.0), 5.0)?;
     let c = cone(k, p3(0.0, 0.0, 0.0), v3(0.0, 0.0, 1.0), 0.0, 6.0, 8.0)?;
     let sector = common(k, b, c)?;
-    // The rim through (0, −3, 4); the ball is about the origin, through its top.
-    distance_angle_off_ball(
-        k,
-        sector,
-        p3(0.0, -3.0, 4.0),
-        p3(0.0, 0.0, 0.0),
-        p3(0.0, 0.0, 5.0),
-        DOWN_CONE,
-        ANGLE_DEGREES.to_radians(),
-    )
+    distance_angle_off_ball(k, sector, DOWN_CONE, ANGLE_DEGREES.to_radians())
 }

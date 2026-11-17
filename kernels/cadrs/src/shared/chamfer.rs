@@ -4,7 +4,7 @@ use crate::bench::{cut, extrude, p3, union, P3, V3};
 use crate::Refusal;
 use cadrs_kernel::{
     BodyId, BodyKind, ChamferMeasure, ChamferOpts, ChamferSpec, DefaultKernel, EdgeId, Kernel, LoftEnd,
-    LoftSection, LoftSpec, Loop, Pick, Plane, Profile,
+    LoftSection, LoftSpec, Loop, Pick, Plane, Profile, SurfaceKind,
 };
 
 /// `body` with `edges` chamfered by `spec` in one Chamfer feature.
@@ -91,47 +91,20 @@ pub fn chord_two_distances_on_ball(
     chamfer_with(k, body, &edges, &opts)
 }
 
-/// `body` with the circular edge through `edge_point` chamfered by a distance and an angle in one
-/// Chamfer feature: `distance` on its face that is NOT on the ball about `centre` (through
-/// `ball_point`), the chamfer at `angle` (radians) to that face. cadrs measures both from the face
-/// whose loop runs along the edge (see [`chord_two_distances_on_ball`]); where that is the ball,
-/// the feature is flipped.
+/// `body` with its rim on a ball (the edges between a spherical face and one that is not)
+/// chamfered in one Chamfer feature: `distance` on the rim's face that is not on the ball, the
+/// chamfer at `angle` (radians) to that face.
 pub fn distance_angle_off_ball(
     k: &mut DefaultKernel,
     body: BodyId,
-    edge_point: P3,
-    centre: P3,
-    ball_point: P3,
     distance: f64,
     angle: f64,
 ) -> Result<BodyId, Refusal> {
-    let edge = k.edge_at(body, edge_point)?;
-    let all = k.edges(body)?;
-    let info = all.iter().find(|i| i.id == edge).ok_or("the edge is gone")?;
-    let circle = info.circle.ok_or("the edge is not a circle")?;
-    let axis = circle.normal.into_inner();
-    let outward = edge_point - centre;
-    let ball_first = |i: &cadrs_kernel::EdgeInfo| {
-        let sense = axis.cross(&(i.start - circle.center)).dot(&i.start_tangent).signum();
-        let along = axis.cross(&(edge_point - circle.center)) * sense;
-        outward.cross(&along).dot(&(ball_point - edge_point)) > 0.0
-    };
-    let first = ball_first(info);
-    // The whole circle: where the ball's seam and the other face's cross it apart, it is two
-    // edges, each chamfered, one that runs the other way round flipped the other way.
-    let on_circle = |i: &&cadrs_kernel::EdgeInfo| {
-        i.circle.is_some_and(|c| {
-            (c.center - circle.center).norm() < 1e-9
-                && (c.radius - circle.radius).abs() < 1e-9
-                && c.normal.into_inner().cross(&axis).norm() < 1e-9
-        })
-    };
-    let rim: Vec<&cadrs_kernel::EdgeInfo> = all.iter().filter(on_circle).collect();
+    let balls = k.faces_of(body, SurfaceKind::Sphere)?;
+    let rim = k.edges_where(body, &|e| e.faces.iter().flatten().filter(|f| balls.contains(f)).count() == 1)?;
     let mut opts = ChamferOpts::new(ChamferSpec::DistanceAngle { distance, angle });
-    opts.flip = first;
-    opts.flipped = rim.iter().filter(|i| ball_first(i) != first).map(|i| i.id).collect();
-    let edges: Vec<EdgeId> = rim.iter().map(|i| i.id).collect();
-    chamfer_with(k, body, &edges, &opts)
+    opts.first_on = k.faces_where(body, &|f| f.kind != SurfaceKind::Sphere)?;
+    chamfer_with(k, body, &rim, &opts)
 }
 
 /// The octahedron |x| + |y| + |z| ≤ `a`: the square through its four corners in the plane z = 0

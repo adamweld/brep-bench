@@ -18,13 +18,5 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let b = ball(k, p3(0.0, 0.0, 0.0), 5.0)?;
     let body = union(k, seat, b)?;
     // The edge through (0, −4, 3); the ball is about the origin, through its top.
-    distance_angle_off_ball(
-        k,
-        body,
-        p3(0.0, -4.0, 3.0),
-        p3(0.0, 0.0, 0.0),
-        p3(0.0, 0.0, 5.0),
-        UP_CONE,
-        ANGLE_DEGREES.to_radians(),
-    )
+    distance_angle_off_ball(k, body, UP_CONE, ANGLE_DEGREES.to_radians())
 }
