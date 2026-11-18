@@ -2,7 +2,14 @@
 title = "A bull-nose mill pushed straight down into a block at a lean"
 tags = ["swept", "solid-sweep", "slide", "torus", "cylinder", "leaning", "stopped", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/leaning_bullnose.sv"
-settled = false
+
+[volume]
+value = 1986.59022325
+exact = "no closed form: next.BREP and cadrs give the same volume to the twelve figures the board publishes"
+
+[area]
+value = 1075.28822555
+exact = "no closed form: next.BREP and cadrs agree to 2e-11; the mean of their values"
 +++
 
 A block, the box from (−8, −8, −8) to (8, 8, 0), with a hole bored into its top by a bull-nose mill

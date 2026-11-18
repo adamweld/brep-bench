@@ -1,7 +1,14 @@
 +++
 title = "A block capped by the Coons patch of four parabolas"
 tags = ["fill", "coons", "bezier", "saddle", "planar"]
-settled = false
+
+[volume]
+value = 1000.0
+exact = "10³: the patch's rise and fall over the square cancel"
+
+[area]
+value = 614.1210047563
+exact = "no closed form: OCCT, next.BREP and cadrs agree to 3e-12; the mean of their values"
 +++
 
 Four parabolic arcs that close a loop over the square from (0, 0) to (10, 10), each a quadratic
@@ -25,4 +32,4 @@ Make the solid the patch caps: under it, the four vertical faces from z = 0 up t
 planes x = 0, x = 10, y = 0 and y = 10, and the bottom, the square from (0, 0, 0) to (10, 10, 0).
 
 Its volume is 1000, since the patch's rise and fall over the square cancel, but its area, the
-saddle's, has no closed form here, so the case is unsettled until two kernels agree.
+saddle's, has no closed form here, so it is the mean of kernels that agree on it.

@@ -2,7 +2,14 @@
 title = "A rod threaded by a cone's point"
 tags = ["swept", "solid-sweep", "screw", "helix", "cone", "apex", "boolean", "cut"]
 origin = "geomsolver #721, box G5 (an apex on the tool's axis)"
-settled = false
+
+[volume]
+value = 1513.245602523
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 6e-10; the mean of their values"
+
+[area]
+value = 878.8830388467
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 2e-9; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, threaded by a pointed cone

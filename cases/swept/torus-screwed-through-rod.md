@@ -2,7 +2,14 @@
 title = "A rod grooved by a wheel screwed along it"
 tags = ["swept", "solid-sweep", "screw", "helix", "torus", "envelope", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/screw.sv"
-settled = false
+
+[volume]
+value = 1460.630002527
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 7e-10; the mean of their values"
+
+[area]
+value = 791.5632225563
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-9; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, with a helical groove ground
