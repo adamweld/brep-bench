@@ -1,13 +1,15 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp.
-//! Grown by every point within 1, the plate's outer edges and corners round and the hole's rims
-//! become saddles of tori, and the kernel has no offset that rounds its joins.
+//! The plate from (−10, −10, 0) to (10, 10, 4) with a hole of radius 3 drilled through it along
+//! the z axis, grown by 1: every point within 1 of it. The plate grows as a box does, and the hole
+//! narrows to radius 2, flaring at its rims into the inner quarters of tori.
+use crate::bench::cut;
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_box, make_cylinder, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins: its offset of a solid, \
-         `offset_faces`, moves the faces and joins them sharp where they meet, so the grown \
-         plate's edges, corners and hole rims would not be rounded"
-        .into())
+    let plate = make_box([-10.0, -10.0, 0.0], [20.0, 20.0, 4.0])?;
+    // the drill runs past both faces
+    let drill = make_cylinder([0.0, 0.0, -1.0], 3.0, 6.0)?;
+    let drilled = cut(plate, drill)?;
+    offset_rounded(&drilled, 1.0)
 }

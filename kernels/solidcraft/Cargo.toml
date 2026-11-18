@@ -14,6 +14,14 @@ publish = false
 solidcraft-kernel = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
 solidcraft-geom = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
 solidcore-record = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
+# solidcore's own crates, for the cases built on solidcore-ops, the modelling layer under
+# solidcraft-kernel (src/ops.rs): ops itself, the kernel beneath it, its record conversions, its
+# mesher and the STEP writer SolidCraft's export goes through
+solidcore = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
+solidcore-ops = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
+solidcore-convert = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
+solidcore-tess = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
+solidcore-step = { git = "https://github.com/tangency-labs/solidcraft", tag = "v0.44.1" }
 serde_json = "1"
 
 [profile.release]

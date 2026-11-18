@@ -1,5 +1,5 @@
 //! The brep-bench runner for SolidCraft (https://solidcraft.io), on its B-rep kernel boundary,
-//! the `solidcraft-kernel` crate.
+//! the `solidcraft-kernel` crate, and on the modelling layer under it, solidcore-ops (`ops`).
 //!
 //!     brep-bench-solidcraft CASE OUT.stl [OUT.step]
 //!     brep-bench-solidcraft --version
@@ -23,6 +23,11 @@
 //! own, `KernelError::Internal`). A case may also refuse in its own words, where the kernel has no
 //! operation for what it describes. A boolean the kernel answers is empty is not a refusal but an
 //! answer: the runner reports an empty solid.
+//!
+//! A case's `build` returns either kernel's body: a `solidcraft_kernel::Body`, or, for a case
+//! built on solidcore-ops, a `solidcore_ops::Body` (`ops`), which is written as STEP by the same
+//! writer and, where it declines, measured and meshed by solidcore's own tools. Which one is a
+//! case's own choice, made in its file; the runner learns it from the type ([`Layer`]).
 use serde_json::{Value, json};
 use solidcraft_geom::prelude::*;
 use solidcraft_kernel::{
@@ -31,10 +36,53 @@ use solidcraft_kernel::{
 use std::collections::BTreeMap;
 use std::process::ExitCode;
 
+#[allow(dead_code)]
+mod bench;
+mod ops;
+#[allow(dead_code, unused_imports)]
+mod shared;
 mod solids;
 
+/// The solid a case built, on either layer.
+pub enum Solid {
+    /// Built through SolidCraft's kernel crate.
+    Craft(Body),
+    /// Built through solidcore-ops, beneath it.
+    Core(solidcore_ops::Body),
+}
+
+/// A body type a case's `build` may return: what the runner sets up before building on its
+/// layer, and the body as a [`Solid`].
+pub trait Layer: Sized {
+    fn prepare() -> Result<(), Refusal> {
+        Ok(())
+    }
+    fn solid(self) -> Solid;
+}
+
+impl Layer for Body {
+    fn solid(self) -> Solid {
+        Solid::Craft(self)
+    }
+}
+
+impl Layer for solidcore_ops::Body {
+    fn prepare() -> Result<(), Refusal> {
+        ops::set_fixes()
+    }
+    fn solid(self) -> Solid {
+        Solid::Core(self)
+    }
+}
+
+/// A case's `build` run on its layer: the layer set up, then the solid built.
+pub fn run<B: Layer, E: Into<Refusal>>(build: fn() -> Result<B, E>) -> Result<Solid, Refusal> {
+    B::prepare()?;
+    build().map(B::solid).map_err(Into::into)
+}
+
 /// A case's implementation: the solid it builds, or why it was not built.
-type Build = fn() -> Result<Body, Refusal>;
+type Build = fn() -> Result<Solid, Refusal>;
 
 /// Why a case was not built: a kernel error, in the kernel's own words, or a case that refuses
 /// in its own because the kernel has no operation for what it describes.
@@ -67,7 +115,7 @@ impl std::fmt::Display for Refusal {
 
 /// One module per case file, and `CASES`, written by `build.rs`.
 mod cases {
-    use super::{Build, Refusal};
+    use super::{Build, run};
     include!(concat!(env!("OUT_DIR"), "/cases.rs"));
 }
 
@@ -195,7 +243,24 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
     pause();
-    let reply = match build().and_then(|body| {
+    let reply = match build().and_then(|solid| {
+        let body = match solid {
+            Solid::Craft(body) => body,
+            Solid::Core(body) => {
+                let declined = match out_step {
+                    Some(path) => match ops::step(&body, path) {
+                        None => return Ok(json!({"status": "ok"})),
+                        why => why,
+                    },
+                    None => None,
+                };
+                let mut reply = ops::report(&body, out)?;
+                if let Some(why) = declined {
+                    reply["step_error"] = json!(why);
+                }
+                return Ok(reply);
+            }
+        };
         // given OUT.step, the solid written there is the whole answer (SPEC.md, "A runner"):
         // nothing meshed; only where the writer declines does the runner go on to its triangles
         let declined = match out_step {

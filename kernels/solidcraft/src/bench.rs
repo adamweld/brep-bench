@@ -20,19 +20,25 @@ use std::f64::consts::TAU;
 /// How near a point must be to an edge to pick it.
 pub const PICK_TOLERANCE: f64 = 1e-6;
 
+/// The kernel's answer that `what` leaves nothing: an answer, not a refusal, which the runner
+/// reports as an empty solid ([`crate::solids::EMPTY`]), as it does for SolidCraft's booleans.
+pub fn empty(what: &str) -> Refusal {
+    format!("{}{what} left nothing", crate::solids::EMPTY).into()
+}
+
 /// `a` and `b` united.
 pub fn fuse(a: Body, b: Body) -> Result<Body, Refusal> {
-    boolean(a, b, BooleanOp::Union)?.ok_or_else(|| "the union is empty".into())
+    boolean(a, b, BooleanOp::Union)?.ok_or_else(|| empty("the union"))
 }
 
 /// `a` less `b`.
 pub fn cut(a: Body, b: Body) -> Result<Body, Refusal> {
-    boolean(a, b, BooleanOp::Subtract)?.ok_or_else(|| "the difference is empty".into())
+    boolean(a, b, BooleanOp::Subtract)?.ok_or_else(|| empty("the difference"))
 }
 
 /// What is in both `a` and `b`.
 pub fn common(a: Body, b: Body) -> Result<Body, Refusal> {
-    boolean(a, b, BooleanOp::Intersect)?.ok_or_else(|| "the intersection is empty".into())
+    boolean(a, b, BooleanOp::Intersect)?.ok_or_else(|| empty("the intersection"))
 }
 
 /// `body` less each of `tools`, one after another.

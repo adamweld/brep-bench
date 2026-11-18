@@ -38,7 +38,7 @@ pub fn in_kernel(
     let solid = is_outward_solid(&mut k, &mut brep)?;
     let mut made = op(&mut k, &mut brep, &order)?;
     if made.face_list().is_empty() {
-        return Err("the result is empty".into());
+        return Err(crate::bench::empty("the offset"));
     }
     if solid && !is_outward_solid(&mut k, &mut made)? {
         return Err("the result is not a closed solid".into());

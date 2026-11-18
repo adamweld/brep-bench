@@ -98,7 +98,7 @@ fn kernel_curve(k: &Kernel, c: &Curve) -> Result<KCurve, Refusal> {
             None,
         )?),
         Curve::Spline { .. } | Curve::RationalSpline { .. } => {
-            curve_from_parameters(k, &solidcore_convert::curve(c), [0.0, 0.0])?.curve
+            curve_from_parameters(k, &solidcore_convert::curve(c).map_err(|e| e.to_string())?, [0.0, 0.0])?.curve
         }
         _ => return Err("a flat face's curve is a line or a spline here".into()),
     })
@@ -119,7 +119,7 @@ pub fn sheet(faces: &[Face]) -> Result<Body, Refusal> {
                 let ends = |k: &[f64]| [k[0], k[k.len() - 1]];
                 let (surface, domain) = surface_from_parameters(
                     &k,
-                    &solidcore_convert::surface(s),
+                    &solidcore_convert::surface(s).map_err(|e| e.to_string())?,
                     [ends(u_knots), ends(v_knots)],
                 )?;
                 face_on(&mut k, &mut b, surface, &domain)?;
@@ -191,8 +191,9 @@ pub fn periodic(degree: usize, polygon: &[[f64; 3]]) -> Result<OpsCurve, Refusal
     let knots: Vec<f64> = (0..points.len() + degree + 1).map(|i| i as f64).collect();
     let domain = [knots[degree], knots[points.len()]];
     let k = Kernel::default();
-    let made = curve_from_parameters(&k, &solidcore_convert::curve(&spline_curve(&knots, &points)), domain)?;
-    let clamped = solidcore_convert::record_curve(record_of(&k, &made.curve, &made.interval)?.curve);
+    let made = curve_from_parameters(&k, &solidcore_convert::curve(&spline_curve(&knots, &points)).map_err(|e| e.to_string())?, domain)?;
+    let clamped = solidcore_convert::record_curve(record_of(&k, &made.curve, &made.interval)?.curve)
+        .map_err(|e| e.to_string())?;
     match clamped {
         Curve::Spline { knots, points } => Ok(OpsCurve::Nurbs {
             degree,
