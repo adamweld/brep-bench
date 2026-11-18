@@ -3,13 +3,11 @@
 //! and runs anticlockwise round the outline of a cross (a bar 80 by 30 across a bar 30 by 70,
 //! every corner rounded to 6) at z = −3, −6 and −9, then rises.
 //!
-//! Each lap's groove is the mill's section through its axis (6 wide, from the lap's depth to
-//! above the plate) carried upright round the outline, cadrs's Sweep along a path; the plunges
-//! and the rise at (60, 10), a point of the outline, are within the laps' grooves. The plate
-//! less the three, each cut in turn as the program cuts them.
-use crate::bench::{block, cut, p3};
-use crate::shared::cnc::{across, round_the_path, rounded_loop};
-use crate::shared::geometry::Section;
+//! The program goes to cadrs whole, as one path the mill is carried along upright (its cut by
+//! a moving solid): the kernel reads each lap's groove as the ground within the mill's radius
+//! of the outline, flat, and cuts the deepest; the shallower laps lie within it.
+use crate::bench::{block, cylinder, p3, v3};
+use crate::shared::cnc::Program;
 use crate::Refusal;
 use cadrs_kernel::{BodyId, DefaultKernel};
 
@@ -19,16 +17,18 @@ const CROSS: [(f64, f64); 12] = [
 ];
 
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
-    let mut plate = block(k, p3(0.0, 0.0, -15.0), p3(120.0, 90.0, 0.0))?;
+    let (min, max) = (p3(0.0, 0.0, -15.0), p3(120.0, 90.0, 0.0));
+    let plate = block(k, min, max)?;
+    // The mill: radius 3, 30 long, upright with its tip at the origin; the lap starts at
+    // (60, 10), the middle of the cross's first side, and the whole program goes to the
+    // kernel as one path.
+    let mill = cylinder(k, p3(0.0, 0.0, 0.0), v3(0.0, 0.0, 1.0), 3.0, 30.0)?;
+    let mut p = Program::new(plate, (min, max), mill, 3.0, p3(60.0, 10.0, 5.0)).whole();
     for depth in [-3.0, -6.0, -9.0] {
-        // The mill's section where the lap starts, at (60, 10) heading along +x.
-        let section = Section::on(across(60.0, 10.0, (1.0, 0.0)))
-            .line((-3.0, depth), (3.0, depth))
-            .line((3.0, depth), (3.0, 5.0))
-            .line((3.0, 5.0), (-3.0, 5.0))
-            .line((-3.0, 5.0), (-3.0, depth));
-        let groove = round_the_path(k, &section.sketch(), rounded_loop(&CROSS, 6.0))?;
-        plate = cut(k, plate, groove)?;
+        p.line(k, (60.0, 10.0, depth))?;
+        p.rounded_loop(k, &CROSS, 6.0)?;
+        p.line(k, (60.0, 10.0, 5.0))?;
     }
-    Ok(plate)
+    p.run(k)?;
+    Ok(p.body)
 }

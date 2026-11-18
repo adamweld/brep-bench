@@ -41,7 +41,7 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let plate = block(k, min, max)?;
     let up = v3(0.0, 0.0, 1.0);
     let mill = cylinder(k, p3(0.0, 0.0, 0.0), up, 5.0, 30.0)?;
-    let mut p = Program::new(plate, (min, max), mill, 5.0, p3(0.0, 0.0, 5.0));
+    let mut p = Program::new(plate, (min, max), mill, 5.0, p3(0.0, 0.0, 5.0)).whole();
     // The pocket.
     for depth in [-4.0, -8.0, -12.0] {
         for j in 0..15 {
@@ -64,6 +64,7 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     }
     // The bore.
     let bore = cylinder(k, p3(0.0, 0.0, 0.0), up, 3.0, 30.0)?;
+    p.run(k)?;
     p.change(bore, 3.0, p3(60.0, 55.0, 5.0));
     for depth in [-3.0, -6.0] {
         p.line(k, (60.0, 55.0, depth))?;
@@ -79,6 +80,7 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
         .line((4.0, 30.0), (0.0, 30.0))
         .line((0.0, 30.0), (0.0, 0.0));
     let drill = revolve(k, &half.sketch(), Axis::new(p3(0.0, 0.0, 0.0), up), None)?;
+    p.run(k)?;
     p.change(drill, 4.0, p3(60.0, 55.0, 5.0));
     for (x, y) in [(8.0, 8.0), (152.0, 8.0), (152.0, 102.0), (8.0, 102.0)] {
         p.line(k, (x, y, 5.0))?;
@@ -87,5 +89,6 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
             p.line(k, (x, y, back))?;
         }
     }
+    p.run(k)?;
     Ok(p.body)
 }
