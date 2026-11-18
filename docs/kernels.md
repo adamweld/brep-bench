@@ -19,6 +19,7 @@ live; [SPEC.md](../SPEC.md#kernelsjson) describes the fields. The `name` there (
 | [geop](https://github.com/geop-cad/geop) | `kernels/geop` (Rust programs of geop's operations, on its crates from its repository at a release tag pinned in its `Cargo.toml`) |
 | [cadrs](https://github.com/rvdende/cadrs) | `kernels/cadrs` (Rust, through the `Kernel` trait of cadrs's kernel crate, `cadrs_kernel`, from its repository at a commit pinned in its `Cargo.toml`) |
 | [SMLib](https://github.com/NVIDIA-Omniverse/usd-brep) | `kernels/smlib` (Python, through NVIDIA's `usd-brep` package from PyPI, pinned in its `build`); no STEP, which the package cannot write |
+| [geomsolver](https://github.com/bmander/geomsolver) | `kernels/geomsolver` (Solvent, geomsolver's declarative constraint language: each case a `.sv` document naming its solid `part`, compiled by geomsolver's own `solventc`, built from its source at the release tag `build.py` pins; its solids are built and written as STEP by the core's B-rep kernel, a newer cad-kernel than the one listed above) |
 | [monstertruck](https://github.com/virtualritz/monstertruck) | listed, with no runner yet: wanted |
 
 A kernel **measured from its mesh** has no exact measures of its own: the harness takes its volume

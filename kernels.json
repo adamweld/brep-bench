@@ -318,6 +318,29 @@
       "source": "kernels/smlib/cases/{category}/{name_snake}.py",
       "step": "the usd-brep package writes USD and SMLib's own format, and has no STEP writer",
       "binary": [{"python": "python3", "distribution": "usd-brep"}]
+    },
+    {
+      "name": "geomsolver",
+      "kernel": "https://github.com/bmander/geomsolver",
+      "license": "MIT",
+      "backend": "Rust",
+      "frontend": "Solvent (geomsolver's constraint language, compiled by solventc)",
+      "build": [
+        "python3",
+        "kernels/geomsolver/build.py"
+      ],
+      "command": [
+        "python3",
+        "kernels/geomsolver/run.py"
+      ],
+      "version": [
+        "python3",
+        "kernels/geomsolver/run.py",
+        "--version"
+      ],
+      "source": "kernels/geomsolver/cases/{category}/{name_snake}.sv",
+      "step": true,
+      "binary": ["kernels/geomsolver/bin/solventc"]
     }
   ]
 }
