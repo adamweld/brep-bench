@@ -15,14 +15,5 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let above = block(k, p3(-6.0, -6.0, 3.0), p3(6.0, 6.0, 6.0))?;
     let cap = common(k, b, above)?;
     let body = union(k, frustum, cap)?;
-    // The rim through (0, −4, 3); the ball is about the origin, through its top.
-    distance_angle_off_ball(
-        k,
-        body,
-        p3(0.0, -4.0, 3.0),
-        p3(0.0, 0.0, 0.0),
-        p3(0.0, 0.0, 5.0),
-        DOWN_CONE,
-        ANGLE_DEGREES.to_radians(),
-    )
+    distance_angle_off_ball(k, body, DOWN_CONE, ANGLE_DEGREES.to_radians())
 }

@@ -6,14 +6,30 @@
 //! of radius 5 faces twelve seats at latitude 40°, and a drill of radius 2.5 drills each, both
 //! square to the dome.
 //!
-//! The program is run as written. Each roughing circle's groove is the mill's section through
-//! its axis carried upright round the circle (cadrs's Sweep along a path). A leaning cutter is the
-//! upright one moved up the z axis, turned down to its latitude and round to its longitude; what
-//! each of its moves sweeps is cadrs's sweep of a solid (a slide along its axis, a turn about
-//! the level line through the origin square to its meridian, or about the z axis), and a few
-//! passes' sweeps are cut from the dome together. The moves between passes, clear of the blank,
-//! cut nothing and are left out.
-use crate::bench::{arc, boolean, cut, cylinder, moved, p2, p3, revolve, turned, v3, V3};
+//! The program repeats itself round the z axis, and the dome is built as it does: one sector
+//! of it machined, and the sector patterned round.
+//!
+//! - The roughing circles, the circles round the pole and the touch at the pole are whole turns
+//!   about the z axis: what they leave is the same at every longitude.
+//! - The meridian passes are one pass turned on by 2° each time, and each is its own mirror
+//!   image in its meridian plane. Within the blank a pass's cutter is a ball of radius 4 rolled
+//!   along its axis, the axis always in the pass's meridian half plane; a ball centred in that
+//!   half plane covers, of any circle about the z axis, an arc with its middle on the meridian.
+//!   So of that circle the passes together cover what the nearest pass covers alone: within 1°
+//!   of a pass's meridian the dome is the blank less that pass, whatever its neighbours do.
+//! - The seats and holes repeat every 30°, each within the 30° from 1° before one meridian pass
+//!   to 1° before the fifteenth after it.
+//!
+//! So: the 1° of the blank from a pass's meridian plane to the plane halfway to the next pass is
+//! machined by the roughing, that pass, the circles and the touch; its mirror image in the
+//! meridian plane makes the pass's own 2°; fifteen of those, each turned 2° on, make 30°, in
+//! which one seat is faced and one hole drilled; and twelve of those make the dome. Every sweep
+//! is cadrs's own: a roughing circle's groove is the mill's section through its axis carried
+//! upright round the circle (Sweep along a path), and what a leaning cutter's slide or turn
+//! sweeps is the sweep of a solid, the cutter put square to the dome by moving it up the z axis,
+//! turning it down to its latitude and round to its longitude. The moves between passes, clear
+//! of the blank, cut nothing and are left out.
+use crate::bench::{arc, boolean, cut, cylinder, mirrored, moved, p2, p3, revolve, turned, union, v3, V3};
 use crate::shared::cnc::{across, round_the_path};
 use crate::shared::geometry::Section;
 use crate::shared::swept::{slid, swung, z_axis};
@@ -42,14 +58,29 @@ fn turned_section(k: &mut DefaultKernel, half: Section) -> Result<BodyId, Refusa
     revolve(k, &half.sketch(), z_axis(), None)
 }
 
+/// `count` copies of `part` round the z axis, `step` degrees apart, as one body.
+fn round_the_axis(k: &mut DefaultKernel, part: BodyId, count: usize, step: f64) -> Result<BodyId, Refusal> {
+    let mut copies = Vec::new();
+    for i in 1..count {
+        copies.push(turned(k, part, z_axis(), step * i as f64)?);
+    }
+    boolean(k, BoolOp::Union, part, &copies)
+}
+
 pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let up = v3(0.0, 0.0, 1.0);
-    let blank = cylinder(k, p3(0.0, 0.0, 0.0), up, 50.0, 45.0)?;
     let w = 2f64.sqrt() / 2.0;
+    // The blank from the first meridian pass's plane (y = 0) to the plane halfway to the next
+    // pass, 1° on: its half section turned 1° about the z axis.
+    let half_section = Section::on(Plane::xz(0.0))
+        .line((0.0, 0.0), (50.0, 0.0))
+        .line((50.0, 0.0), (50.0, 45.0))
+        .line((50.0, 45.0), (0.0, 45.0))
+        .line((0.0, 45.0), (0.0, 0.0));
+    let mut part = revolve(k, &half_section.sketch(), z_axis(), Some(1.0))?;
     // 1. Roughing: the bull-nose mill, upright, in level circles. Each circle's groove is the
     // mill's section through its axis carried upright round the circle (the plunge and the rise
     // at (R, 0), a point of the circle, are within it).
-    let mut dome = blank;
     for z in [41.0f64, 36.0, 31.0, 26.0, 21.0, 16.0, 11.0, 6.0] {
         let rho = (DOME * DOME - z * z).max(0.0).sqrt();
         let mut radii = Vec::new();
@@ -71,35 +102,9 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
                 &section.sketch(),
                 vec![arc(p2(0.0, 0.0), r, 0.0, 180.0), arc(p2(0.0, 0.0), r, 180.0, 180.0)],
             )?;
-            dome = cut(k, dome, ring)?;
+            part = cut(k, part, ring)?;
         }
     }
-    // What some passes sweep, cut from the dome together.
-    let mut swept: Vec<BodyId> = Vec::new();
-    // (Each meridian's turn: the cutter where the turn starts and the line it turns about, to
-    // make the turn's sweep again in parts.)
-    let mut turns: Vec<(BodyId, BodyId, Axis)> = Vec::new();
-    // (All at once; or, where that boolean fails, one by one, a sweep whose own cut fails kept
-    // for later: what the cutters pass through is the same in any order, and the cut that fails
-    // against the dome as it is may not against the dome as the rest leave it.)
-    let mut later: Vec<BodyId> = Vec::new();
-    let mut together = |k: &mut DefaultKernel, swept: &mut Vec<BodyId>, dome: &mut BodyId, at_least: usize| -> Result<(), Refusal> {
-        if swept.len() >= at_least.max(1) {
-            match boolean(k, BoolOp::Subtract, *dome, swept) {
-                Ok(cut) => *dome = cut,
-                Err(_) => {
-                    for tool in swept.iter() {
-                        match boolean(k, BoolOp::Subtract, *dome, &[*tool]) {
-                            Ok(cut) => *dome = cut,
-                            Err(_) => later.push(*tool),
-                        }
-                    }
-                }
-            }
-            swept.clear();
-        }
-        Ok(())
-    };
     // 2. Finishing: the ball-end mill square to the dome.
     let ball = turned_section(
         k,
@@ -110,31 +115,34 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
             .line((0.0, 40.0), (0.0, 0.0)),
     )?;
     let reach = 90.0 - DOME;
-    for pass in 0..180 {
-        let lon = 2.0 * pass as f64;
-        // In along its axis at latitude 3°, up the meridian to 75°, out along its axis.
-        let low = square_to(k, ball, 3.0, lon, DOME)?;
-        swept.push(slid(k, low, normal(3.0, lon) * reach)?);
-        let level = v3(lon.to_radians().sin(), -lon.to_radians().cos(), 0.0);
-        let about = Axis::new(p3(0.0, 0.0, 0.0), level);
-        let turn = swung(k, low, about, 0.0, 72.0)?;
-        turns.push((turn, low, about));
-        swept.push(turn);
-        let high = square_to(k, ball, 75.0, lon, DOME)?;
-        swept.push(slid(k, high, normal(75.0, lon) * reach)?);
-        together(k, &mut swept, &mut dome, 18)?;
-    }
+    // The meridian pass at longitude 0: in along its axis at latitude 3°, up the meridian to
+    // 75° (a turn about the level line square to it), out along its axis.
+    let low = square_to(k, ball, 3.0, 0.0, DOME)?;
+    let slide_in = slid(k, low, normal(3.0, 0.0) * reach)?;
+    part = cut(k, part, slide_in)?;
+    let level = Axis::new(p3(0.0, 0.0, 0.0), v3(0.0, -1.0, 0.0));
+    let climb = swung(k, low, level, 0.0, 72.0)?;
+    part = cut(k, part, climb)?;
+    let high = square_to(k, ball, 75.0, 0.0, DOME)?;
+    let slide_out = slid(k, high, normal(75.0, 0.0) * reach)?;
+    part = cut(k, part, slide_out)?;
+    // Round the pole: in along its axis, once round the z axis, out again the way it came.
     for lat in 75..90 {
-        // In along its axis, once round the z axis, out again the way it came.
         let at = square_to(k, ball, lat as f64, 0.0, DOME)?;
-        swept.push(slid(k, at, normal(lat as f64, 0.0) * reach)?);
-        swept.push(swung(k, at, z_axis(), 0.0, 360.0)?);
-        together(k, &mut swept, &mut dome, 18)?;
+        let slide = slid(k, at, normal(lat as f64, 0.0) * reach)?;
+        part = cut(k, part, slide)?;
+        let circle = swung(k, at, z_axis(), 0.0, 360.0)?;
+        part = cut(k, part, circle)?;
     }
     let pole = square_to(k, ball, 90.0, 0.0, DOME)?;
-    swept.push(slid(k, pole, up * reach)?);
-    together(k, &mut swept, &mut dome, 1)?;
-    // 3. The seats and 4. the holes, each cutter slid in along the normal and back.
+    let touch = slid(k, pole, up * reach)?;
+    part = cut(k, part, touch)?;
+    // The pass's own 2° of the dome, and fifteen passes' 30°, from −1° to 29°.
+    let other = mirrored(k, part, p3(0.0, 0.0, 0.0), v3(0.0, 1.0, 0.0))?;
+    let slice = union(k, part, other)?;
+    let mut sector = round_the_axis(k, slice, 15, 2.0)?;
+    // 3. The seat and 4. the hole at longitude 15°, each cutter slid in along the normal and
+    // back.
     let flat = cylinder(k, p3(0.0, 0.0, 0.0), up, 5.0, 40.0)?;
     let drill = turned_section(
         k,
@@ -145,45 +153,9 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
             .line((0.0, 40.0), (0.0, 0.0)),
     )?;
     for (cutter, depth) in [(flat, 38.5), (drill, 30.0)] {
-        for seat in 0..12 {
-            let lon = 15.0 + 30.0 * seat as f64;
-            let at = square_to(k, cutter, 40.0, lon, depth)?;
-            swept.push(slid(k, at, normal(40.0, lon) * (70.0 - depth))?);
-        }
-        together(k, &mut swept, &mut dome, 1)?;
+        let at = square_to(k, cutter, 40.0, 15.0, depth)?;
+        let plunge = slid(k, at, normal(40.0, 15.0) * (70.0 - depth))?;
+        sector = cut(k, sector, plunge)?;
     }
-    // The sweeps kept for later, while any of them cuts; then a meridian's turn that still won't
-    // cut whole is cut in parts (the same sweep, its pieces' ends elsewhere).
-    while !later.is_empty() {
-        let before = later.len();
-        let mut still = Vec::new();
-        for tool in later.drain(..) {
-            match boolean(k, BoolOp::Subtract, dome, &[tool]) {
-                Ok(cut) => dome = cut,
-                Err(_) => still.push(tool),
-            }
-        }
-        if still.len() == before {
-            break;
-        }
-        later = still;
-    }
-    for tool in later {
-        let Some(&(_, low, about)) = turns.iter().find(|t| t.0 == tool) else {
-            return Err(Refusal::from("cadrs's boolean fails to cut a finishing slide's sweep from the dome"));
-        };
-        let in_parts = [2, 3, 5, 7].into_iter().find_map(|parts| {
-            let mut cut = dome;
-            for i in 0..parts {
-                let (from, to) = (72.0 * i as f64 / parts as f64, 72.0 * (i + 1) as f64 / parts as f64);
-                let piece = swung(k, low, about, from, to).ok()?;
-                cut = boolean(k, BoolOp::Subtract, cut, &[piece]).ok()?;
-            }
-            Some(cut)
-        });
-        dome = in_parts.ok_or_else(|| {
-            Refusal::from("cadrs's boolean fails to cut a finishing pass's sweep from the dome, whole or in parts (it leaves an open shell)")
-        })?;
-    }
-    Ok(dome)
+    round_the_axis(k, sector, 12, 30.0)
 }

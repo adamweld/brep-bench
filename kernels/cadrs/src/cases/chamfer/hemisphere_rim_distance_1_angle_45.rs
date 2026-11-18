@@ -16,14 +16,5 @@ pub fn build(k: &mut DefaultKernel) -> Result<BodyId, Refusal> {
     let b = ball(k, p3(0.0, 0.0, 0.0), 5.0)?;
     let upper = block(k, p3(-20.0, -20.0, 0.0), p3(20.0, 20.0, 20.0))?;
     let hemisphere = common(k, b, upper)?;
-    // The rim through (0, −5, 0); the ball is about the origin, through its top.
-    distance_angle_off_ball(
-        k,
-        hemisphere,
-        p3(0.0, -5.0, 0.0),
-        p3(0.0, 0.0, 0.0),
-        p3(0.0, 0.0, 5.0),
-        ON_FLAT,
-        ANGLE_DEGREES.to_radians(),
-    )
+    distance_angle_off_ball(k, hemisphere, ON_FLAT, ANGLE_DEGREES.to_radians())
 }
