@@ -78,13 +78,23 @@ pub struct Program {
     /// reached the workpiece, where they are gathered to be cut together
     /// ([`Program::gathering`]).
     run: Option<Vec<crate::bench::P3>>,
+    /// Every move since the cutter was taken up (where the tip stood then, and each move),
+    /// where the whole program is handed to the kernel at once ([`Program::whole`]).
+    program: Option<(crate::bench::P3, Vec<Step>)>,
+}
+
+/// A move of a program kept to be run later: straight to a point, or round an upright line.
+#[derive(Clone, Copy)]
+enum Step {
+    Line(crate::bench::P3),
+    Arc { centre: (f64, f64), degrees: f64 },
 }
 
 impl Program {
     /// `cutter` (of `radius`, upright, its tip at the origin) standing with its tip at `tip`
     /// over the workpiece `body`, which fills the box from `min` to `max`.
     pub fn new(body: BodyId, block: (crate::bench::P3, crate::bench::P3), cutter: BodyId, radius: f64, tip: crate::bench::P3) -> Self {
-        Program { body, cutter, radius, block, tip, run: None }
+        Program { body, cutter, radius, block, tip, run: None, program: None }
     }
 
     /// From here on the straight moves are kept until [`Program::cut`] takes what they sweep
@@ -124,9 +134,72 @@ impl Program {
         Ok(())
     }
 
-    /// The same workpiece under another cutter, its tip at `tip`.
+    /// From here on a cutter's moves are kept, every one, until [`Program::run`] hands them to
+    /// the kernel as one path: cadrs's cut by a solid carried upright along a path, which
+    /// reads a flat end mill's program (level moves, plunges, moves clear above the work) and
+    /// cuts what the mill fills at each depth at once.
+    pub fn whole(mut self) -> Self {
+        self.program = Some((self.tip, Vec::new()));
+        self
+    }
+
+    /// The kept moves ([`Program::whole`]) cut from the workpiece: as one path where the
+    /// kernel cuts that exactly; else each move as it comes, a slide or a turn. Before the
+    /// cutter is changed, and at the end.
+    pub fn run(&mut self, k: &mut DefaultKernel) -> Result<(), Refusal> {
+        let Some((start, steps)) = self.program.take() else {
+            return Ok(());
+        };
+        if !steps.is_empty() {
+            let mut path = Vec::with_capacity(steps.len());
+            let mut at = start;
+            for s in &steps {
+                match *s {
+                    Step::Line(to) => {
+                        path.push(cadrs_kernel::PathCurve::Bezier3 { poles: vec![at, to], weights: Vec::new() });
+                        at = to;
+                    }
+                    Step::Arc { centre, degrees } => {
+                        let (dx, dy) = (at.x - centre.0, at.y - centre.1);
+                        let a = degrees.to_radians();
+                        path.push(cadrs_kernel::PathCurve::Sketch {
+                            plane: cadrs_kernel::Plane::xy(at.z),
+                            curve: cadrs_kernel::Curve2::arc([centre.0, centre.1], dx.hypot(dy), dy.atan2(dx), a),
+                        });
+                        at = p3(centre.0 + dx * a.cos() - dy * a.sin(), centre.1 + dx * a.sin() + dy * a.cos(), at.z);
+                    }
+                }
+            }
+            let placed = crate::bench::moved(k, self.cutter, start.coords)?;
+            let along = cadrs_kernel::SolidMotion::Path {
+                path,
+                up: nalgebra::Unit::new_normalize(crate::bench::v3(0.0, 0.0, 1.0)),
+            };
+            match crate::shared::swept::cut_swept_exactly(k, self.body, placed, &along) {
+                Ok(cut) => self.body = cut,
+                Err(_) => {
+                    // Each move as it comes.
+                    self.tip = start;
+                    for s in &steps {
+                        match *s {
+                            Step::Line(to) => self.line(k, (to.x, to.y, to.z))?,
+                            Step::Arc { centre, degrees } => self.arc(k, centre, degrees)?,
+                        }
+                    }
+                }
+            }
+        }
+        self.program = Some((self.tip, Vec::new()));
+        Ok(())
+    }
+
+    /// The same workpiece under another cutter, its tip at `tip`. (A program kept whole is run
+    /// first: [`Program::run`].)
     pub fn change(&mut self, cutter: BodyId, radius: f64, tip: crate::bench::P3) {
         (self.cutter, self.radius, self.tip) = (cutter, radius, tip);
+        if let Some(p) = self.program.as_mut() {
+            p.0 = tip;
+        }
     }
 
     /// Whether the cutter, its tip anywhere in the box from `a` to `b`, may touch the workpiece:
@@ -145,6 +218,13 @@ impl Program {
     pub fn line(&mut self, k: &mut DefaultKernel, to: (f64, f64, f64)) -> Result<(), Refusal> {
         let to = p3(to.0, to.1, to.2);
         let v = to - self.tip;
+        if let Some((_, steps)) = self.program.as_mut() {
+            if v.norm() > 1e-12 {
+                steps.push(Step::Line(to));
+            }
+            self.tip = to;
+            return Ok(());
+        }
         if v.norm() > 1e-12 && self.reaches(self.tip, to) {
             match self.run.as_mut() {
                 Some(run) => {
@@ -176,6 +256,11 @@ impl Program {
         let r = dx.hypot(dy);
         let a = degrees.to_radians();
         let to = p3(centre.0 + dx * a.cos() - dy * a.sin(), centre.1 + dx * a.sin() + dy * a.cos(), self.tip.z);
+        if let Some((_, steps)) = self.program.as_mut() {
+            steps.push(Step::Arc { centre, degrees });
+            self.tip = to;
+            return Ok(());
+        }
         // (The arc's own box, generously: the circle's.)
         let (lo, hi) = (p3(centre.0 - r, centre.1 - r, self.tip.z), p3(centre.0 + r, centre.1 + r, self.tip.z));
         if self.reaches(lo, hi) {
