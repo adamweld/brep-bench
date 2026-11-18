@@ -1,10 +1,11 @@
 //! Finds the case implementations and the SolidCraft version for the runner.
 //!
 //! Every `src/cases/<category>/<name_snake>.rs` is one case, `<category>/<name>` with the name's
-//! underscores as hyphens, and must define `pub fn build() -> Result<Body, E>`, where `E` is the
-//! kernel's `KernelError` or, for a case that refuses in its own words, the runner's `Refusal`.
+//! underscores as hyphens, and must define `pub fn build() -> Result<B, E>`, where `B` is either
+//! kernel's body (`solidcraft_kernel::Body`, or `solidcore_ops::Body` for a case built on
+//! solidcore-ops) and `E` an error the runner's `Refusal` is made from.
 //! This writes `$OUT_DIR/cases.rs`: a module per file (a raw identifier, so `box.rs` is one) and
-//! `CASES`, the table from case id to its `build`, its error made a `Refusal`. Adding a case is
+//! `CASES`, the table from case id to its `build`, run on its layer (`run`). Adding a case is
 //! adding its file.
 //!
 //! It also sets `SOLIDCRAFT_VERSION` to the version and commit of `solidcraft-kernel` in
@@ -42,7 +43,7 @@ fn main() {
                 .unwrap();
             writeln!(
                 table,
-                "    ({:?}, || {category}::r#{name}::build().map_err(Refusal::from)),",
+                "    ({:?}, || run({category}::r#{name}::build)),",
                 format!("{category}/{}", name.replace('_', "-"))
             )
             .unwrap();

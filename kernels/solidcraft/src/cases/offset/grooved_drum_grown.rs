@@ -1,14 +1,16 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp.
-//! Grown by 1, the drum's rims become quarter tori, the groove's walls cross each other and must
-//! be taken away, and its outer rims become pieces of tori meeting in a crease: the kernel's
-//! offset neither rounds a join nor removes faces moved through each other.
+//! A drum, the cylinder of radius 10 on the z axis from z = 0 to z = 10, with a groove round its
+//! side from z = 4.2 to z = 5.8 cut to radius 7, grown by 1: every point within 1 of it. The
+//! groove, narrower than 2, fills but for a shallow notch, the kernel's offset with its convex
+//! edges rounded.
+use crate::bench::cut;
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_cylinder, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins, nor one that removes faces moved \
-         through each other: its offset of a solid, `offset_faces`, keeps the body's topology and \
-         joins the moved faces sharp, so the drum's rims would not round nor the groove close"
-        .into())
+    let drum = make_cylinder([0.0, 0.0, 0.0], 10.0, 10.0)?;
+    // the groove: a ring from radius 7 out past the side
+    let ring = cut(make_cylinder([0.0, 0.0, 4.2], 11.0, 1.6)?, make_cylinder([0.0, 0.0, 4.0], 7.0, 2.0)?)?;
+    let grooved = cut(drum, ring)?;
+    offset_rounded(&grooved, 1.0)
 }

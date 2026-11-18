@@ -1,13 +1,11 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet. Grown
-//! by every point within 1, the cone's rim becomes a piece of a torus and its apex a cap of a ball,
-//! and the kernel has no offset that rounds its joins or caps a point.
+//! A cone on the z axis, its base the disc of radius 3 at z = 0 and its apex at (0, 0, 4), grown
+//! by 1: every point within 1 of it, its rim a piece of a torus's tube and its apex a cap of a
+//! ball, the kernel's offset with its convex edges rounded.
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_cone, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins: its offset of a solid, \
-         `offset_faces`, moves the faces and joins them sharp where they meet, so the grown \
-         cone's rim would not become a torus nor its apex a ball's cap"
-        .into())
+    let cone = make_cone([0.0, 0.0, 0.0], 3.0, 0.0, 4.0)?;
+    offset_rounded(&cone, 1.0)
 }

@@ -1,13 +1,14 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp.
-//! Grown by every point within 1, the ring's rims become pieces of tori from the bore to the
-//! sphere, and the kernel has no offset that rounds its joins.
+//! A napkin ring, the ball of radius 5 centred on the origin with a hole of radius 3 bored through
+//! it along z, grown by 1: every point within 1 of it, its sphere moved out to radius 6, its bore
+//! in to radius 2, its rims pieces of tori, the kernel's offset with its convex edges rounded.
+use crate::bench::cut;
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_cylinder, make_sphere, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins: its offset of a solid, \
-         `offset_faces`, moves the faces and joins them sharp where they meet, so the grown \
-         ring's rims would not become tori"
-        .into())
+    let ball = make_sphere([0.0, 0.0, 0.0], 5.0)?;
+    let bore = make_cylinder([0.0, 0.0, -6.0], 3.0, 12.0)?;
+    let ring = cut(ball, bore)?;
+    offset_rounded(&ring, 1.0)
 }
