@@ -2,7 +2,7 @@
 //! picked by points on them.
 use crate::solids::*;
 
-/// The kernel has no cone: SolidCraft's own cone feature revolves the half section, here a right
+/// solidcraft-kernel has no cone: SolidCraft's own cone feature revolves the half section, here a right
 /// triangle with an edge on the axis, and so does this.
 pub fn build() -> R<Body> {
     let cone = revolve_z(polygon(&[(0.0, 0.0), (6.0, 0.0), (0.0, 8.0)]), 360.0)?;
