@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 
 /// The half section in x and z, the dome's curve one cubic Bézier segment of the profile, turned
 /// a full turn about the z axis.

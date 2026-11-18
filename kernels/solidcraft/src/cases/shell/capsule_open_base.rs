@@ -1,7 +1,7 @@
 //! SolidCraft's Shell (`shell`) hollows a body inward to a wall of the thickness, opening the faces
 //! picked by points on them.
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use std::f64::consts::PI;
 
 pub fn build() -> R<Body> {

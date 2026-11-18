@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use std::f64::consts::{FRAC_1_SQRT_2, FRAC_PI_2, TAU};
 
 const TIP_DISTANCE: f64 = 33.1;
@@ -62,6 +62,14 @@ fn outline() -> Loop2 {
 
 pub fn build() -> R<Body> {
     let star = Region2 { outer: outline(), holes: vec![] };
-    // 12 along +y (the plane's normal is −y), every side drafted 2° inward
-    solidcraft_kernel::extrude_tapered(&xz(), &star, 12.0, -1.0, -2f64.to_radians())
+    // 12 along +y (the plane's normal is −y), every side drafted 2° inward; the outline's corners
+    // are all rounded, so how a sharp corner's gap would be closed does not arise (the default)
+    solidcraft_kernel::extrude_tapered(
+        &xz(),
+        &star,
+        12.0,
+        -1.0,
+        -2f64.to_radians(),
+        solidcraft_kernel::DraftCorner::default(),
+    )
 }

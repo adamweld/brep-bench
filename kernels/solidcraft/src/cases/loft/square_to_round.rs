@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use solidcraft_kernel::{patch_edges, patch_region, revolve_sheet, stitch, transform_matrix};
 use std::f64::consts::FRAC_PI_2;
 
