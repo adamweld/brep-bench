@@ -2,13 +2,10 @@ use crate::solids::*;
 use solidcore_record::Seg2;
 use solidcraft_kernel::PathSeg;
 
-/// A sweep path is lines and arcs: a free-form path curve is followed as its polyline, the cubic
-/// sampled to 0.01 of its chords, which is how SolidCraft's own sweep feature follows a sketch's
-/// Bézier (`path_segments` in its document crate). The kernel then sweeps the profile along the
-/// polyline with smooth B-spline walls through stations square to it.
+/// The cubic as a path: the kernel's sweep follows a sketch's free-form curve exactly
+/// (`PathSeg::Curve`), as SolidCraft's own Sweep hands it a sketch's Bézier.
 pub fn bezier_path(plane: &Plane, curve: Seg2) -> Vec<PathSeg> {
-    let w = |p: Vec2| plane.to_world(p);
-    curve.polyline(1e-2).windows(2).map(|q| PathSeg::Line { a: w(q[0]), b: w(q[1]) }).collect()
+    vec![PathSeg::Curve { plane: *plane, seg: curve }]
 }
 
 /// The disc of radius 20 in the plane square to the curve where it leaves the origin, along

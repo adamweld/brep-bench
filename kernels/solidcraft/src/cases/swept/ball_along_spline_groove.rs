@@ -8,10 +8,7 @@
 //! end ball lies inside the tube; the other half is the half ball on the tube's end disc, as in
 //! `ball-swung-groove`. The tube and the half balls are cut from the block in turn.
 //!
-//! Nor does the kernel's `sweep` take a curve for its path, only lines and arcs: SolidCraft's own
-//! Sweep follows a free-form path curve as the polyline its geometry crate draws through it
-//! (`Seg2::polyline`, within 1e-2 of the curve), and so does this. A path of many short lines is
-//! swept smoothly, with B-spline walls through stations along it.
+//! The tube is the disc swept along the curve itself (`PathSeg::Curve`, the sketch's Bézier).
 //!
 //! Where a half ball meets the B-spline tube's groove along its end disc's rim, the kernel's
 //! boolean works for minutes and then finds no result (joined to the tube first, as in
@@ -23,13 +20,10 @@ use solidcraft_kernel::{PathSeg, sweep};
 
 pub fn build() -> R<Body> {
     let block = block((-6.0, -6.0, -8.0), (36.0, 26.0, 0.0))?;
-    // the curve, drawn in the top face (the xy plane at z = 0), followed as SolidCraft's Sweep
-    // follows a free-form path
+    // the curve, drawn in the top face (the xy plane at z = 0)
     let curve =
         Seg2::Cubic { p0: v2(0.0, 0.0), p1: v2(10.0, 0.0), p2: v2(20.0, 20.0), p3: v2(30.0, 20.0) };
-    let points: Vec<Vec3> = curve.polyline(1e-2).iter().map(|p| Plane::XY.to_world(*p)).collect();
-    let path: Vec<PathSeg> =
-        points.windows(2).map(|w| PathSeg::Line { a: w[0], b: w[1] }).collect();
+    let path = [PathSeg::Curve { plane: Plane::XY, seg: curve }];
     // the disc where the curve starts, square to it: the curve leaves (0, 0, 0) along +x
     let start = Plane { origin: Vec3::ZERO, x: Vec3::Y, y: Vec3::Z };
     let mut grooved = cut(&block, &sweep(&start, &disc((0.0, 0.0), 3.0), &path)?)?;

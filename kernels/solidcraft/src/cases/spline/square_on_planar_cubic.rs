@@ -3,7 +3,7 @@ use crate::solids::*;
 use solidcore_record::Seg2;
 
 /// The square of side 20 in the plane square to the curve where it leaves the origin, along
-/// (4, 3, 0), its sketch x horizontal and its sketch y up, swept along the cubic's polyline (as
+/// (4, 3, 0), its sketch x horizontal and its sketch y up, swept along the cubic (as
 /// `spline/pipe-on-planar-cubic` is). The stations' frames turn least about a planar path, so
 /// the square's top and bottom stay level all the way.
 pub fn build() -> R<Body> {

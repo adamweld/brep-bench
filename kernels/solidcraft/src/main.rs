@@ -16,7 +16,8 @@
 //!
 //! The kernel under SolidCraft is solidcore, its Rust port of NVIDIA's SMLib, and
 //! `solidcraft_kernel::measure` integrates a solid's volume and area on its exact surfaces
-//! (SMLib's, at a relative accuracy of 1e-8), so those are the measures the runner answers; its
+//! (SMLib's, at a relative accuracy of 1e-8; a mesh body's from its triangles, which the reply
+//! then says, `"measured": "mesh"`), so those are the measures the runner answers; its
 //! triangles are SolidCraft's own mesh of the solid (`Body::mesh`). A kernel error is a refusal:
 //! the kernel declined, saying why (it turns a panic in the kernel under it into an error of its
 //! own, `KernelError::Internal`). A case may also refuse in its own words, where the kernel has no
@@ -122,6 +123,10 @@ fn report(body: &Body, out: &str) -> Result<Value, KernelError> {
     std::fs::write(out, stl(&mesh)).expect("the STL file writes");
     let mut reply = json!({"status": "ok", "volume": m.volume, "area": m.area, "faces": faces,
                            "valid": problems.is_empty()});
+    // a mesh body is measured from its own triangles, so its measures are the mesh's
+    if m.measured_by == "mesh" {
+        reply["measured"] = json!("mesh");
+    }
     if !problems.is_empty() {
         reply["problems"] = json!(problems);
     }
@@ -212,7 +217,8 @@ fn main() -> ExitCode {
             std::fs::write(out, stl(&solidcraft_geom::Mesh::default())).expect("the STL file writes");
             let mut reply = json!({"status": "ok", "volume": 0.0, "area": 0.0, "faces": {},
                                    "valid": false, "problems": [why]});
-            // and no solid to write as STEP: no file, and the reply says so
+            // and no solid to write as STEP: no file, and the reply says so, in the runner's
+            // words (the writer is not asked to write nothing)
             if out_step.is_some() {
                 reply["step_error"] = json!("no solid to write: the kernel's answer is empty");
             }
