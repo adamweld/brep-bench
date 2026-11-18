@@ -1,5 +1,4 @@
-//! A STEP file's entities (as harness/step.py's `parse` reads them) and an entity's arguments (as
-//! harness/mass.py's `arguments` does).
+//! A STEP file's entities (as harness/step.py's `parse` reads them) and an entity's arguments.
 use crate::py::*;
 use std::collections::HashMap;
 

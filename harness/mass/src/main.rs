@@ -3,27 +3,47 @@
 //!
 //!     mass FILE.step     # prints them as JSON
 //!
-//! This is harness/mass.py's fast twin: the same method, step for step, in the same order, so
-//! that it prints the same answer (to the last bits of the sums) some hundred times sooner. The
-//! harness runs it in place of `python3 harness/mass.py` where it has been built
-//! (`cargo build --release --manifest-path harness/mass/Cargo.toml`; harness/run.py's `mass_of`).
-//! harness/mass.py remains the reference, and what is said there of the method is not said again
-//! here: a change to either is a change to both, and harness/mass/compare.py checks that the two
-//! still agree over a folder of STEP files.
+//! The harness grades a kernel on the STEP file it writes (SPEC.md, "STEP is the answer"), so the
+//! file's own solid is measured here, by the harness, the same way for every kernel, and not by
+//! any one kernel's reader. harness/run.py's `mass_of` runs it, and builds it first where it is not
+//! built or is older than its sources
+//! (`cargo build --release --manifest-path harness/mass/Cargo.toml`).
 //!
-//! How, in short. By the divergence theorem each measure of the solid is an integral over its
-//! boundary of a polynomial in the position times the outward normal. Each face is a surface
-//! S(u, v) trimmed by loops of edges, and its integral over the trimmed region of the (u, v)
-//! plane is, by Green's theorem, -∮ H du round the loops, where H(u, v) = ∫ F(u, s) ds from a
-//! fixed v_ref to v. Both integrals are taken by Gauss quadrature, the one round the loops
-//! adaptively (Gauss-Kronrod), to about 1e-12 of the solid's size. The loops are put on the
-//! (u, v) plane by inverting the points of each edge's curve in space onto the face's surface.
+//! How. By the divergence theorem each measure of the solid is an integral over its boundary of a
+//! polynomial in the position times the outward normal: the volume is ∮ (x·n)/3 dA, its first
+//! moment ∫ x dV is ∮ (x²/2) n_x dA, its second moment ∫ x² dV is ∮ (x³/3) n_x dA, and so on. Each
+//! face is a surface S(u, v) trimmed by loops of edges, and its integral ∬ F(S, S_u × S_v) du dv
+//! over the trimmed region of the (u, v) plane is, by Green's theorem, -∮ H du round the loops,
+//! where H(u, v) = ∫ F(u, s) ds from a fixed v_ref to v. Both integrals are taken by Gauss
+//! quadrature, the one round the loops adaptively (Gauss-Kronrod), to about 1e-12 of the solid's
+//! size.
 //!
-//! Supported, as there: planes, cylinders, cones, spheres, tori (degenerate too), B-spline
-//! surfaces (rational too), surfaces of revolution and of linear extrusion; lines, circles,
-//! ellipses, B-spline curves (rational too), polylines and trimmed curves; MANIFOLD_SOLID_BREP,
+//! The loops are put on the (u, v) plane by inverting the points of each edge's curve in space
+//! onto the face's surface (closed forms for the analytic surfaces, Newton's method on a
+//! B-spline), never by the file's own curves in (u, v), which many writers leave out and some
+//! write loosely. A periodic parameter (an angle) is unwrapped along each loop, so that a loop
+//! round a cylinder or a torus is followed as it winds. Where an edge passes through a singular
+//! point of its surface (the pole of a sphere, the apex of a cone) the loop runs along the
+//! singular line in (u, v) from the direction it arrives in to the one it leaves in. What a
+//! periodic face's loops leave open (whether a face round a sphere holds the pole) is settled by
+//! the face's area in (u, v), which must be positive and no more than the whole surface's.
+//!
+//! A face's loops are taken as ISO 10303-42 directs them: anticlockwise seen from where the face's
+//! normal points, the face's normal its surface's turned by `same_sense`. Where a face's normal is
+//! against its surface's, the answer also has `by_surface`: the solid as it would be with the
+//! loops directed by the surfaces' normals, as some writers direct them; the harness reads it only
+//! to say why a file fails.
+//!
+//! Supported: planes, cylinders, cones, spheres, tori (degenerate too), B-spline surfaces
+//! (rational too), surfaces of revolution and of linear extrusion; lines, circles, ellipses,
+//! B-spline curves (rational too), polylines and trimmed curves; MANIFOLD_SOLID_BREP,
 //! BREP_WITH_VOIDS and FACETED_BREP; lengths in any unit, given in millimetres. Anything else is
 //! said, as an error.
+//!
+//! It was first written in Python (harness/mass.py, since removed) and then in Rust step for step,
+//! and still gives the Python measurer's answers digit for digit: it keeps Python's floored
+//! remainder, rounding, hypot and printing (py.rs), and sums in the same order. A change that
+//! alters an answer's last digits is a change to how every kernel is measured.
 //!
 //! The faces are measured several at once (`MASS_THREADS`, by default as many as the machine has
 //! cores, eight at most) and summed in the file's order, so the answer does not depend on how

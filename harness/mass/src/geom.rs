@@ -151,7 +151,7 @@ const WG: [f64; 4] = [
     0.417959183673469387755102040816327,
 ];
 
-/// (node, Kronrod weight, Gauss weight) on [-1, 1], in harness/mass.py's order.
+/// (node, Kronrod weight, Gauss weight) on [-1, 1], in the order the sums are taken (which the answer's last bits rest on).
 pub fn kronrod() -> &'static [(f64, f64, f64); 15] {
     static K: OnceLock<[(f64, f64, f64); 15]> = OnceLock::new();
     K.get_or_init(|| {

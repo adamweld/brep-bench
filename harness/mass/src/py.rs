@@ -1,7 +1,8 @@
-//! Python's own arithmetic and printing, where harness/mass.py's answer rests on them: its floored
+//! Python's own arithmetic and printing, as the measurer had them when it was written in Python
+//! (harness/mass.py, since removed), so that its answers stay the same digit for digit: its floored
 //! `%`, its `round`, `min` and `max`, a float's `repr`, a string's, and `json.dumps`.
 
-/// Why a file is not measured, as harness/mass.py's exceptions tell them apart.
+/// Why a file is not measured, as the Python measurer's exceptions told them apart.
 #[derive(Debug, Clone)]
 pub enum Err {
     /// `Unsupported`: what the file holds that the measurer cannot measure.

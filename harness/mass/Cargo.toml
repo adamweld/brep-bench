@@ -3,14 +3,14 @@ name = "brep-bench-mass"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-description = "The mass properties of the solid in a STEP file, from its exact geometry: harness/mass.py's fast twin."
+description = "The mass properties of the solid in a STEP file, from its exact geometry."
 publish = false
 
 [[bin]]
 name = "mass"
 path = "src/main.rs"
 
-# No crates: the harness stays free of dependencies, as harness/mass.py is.
+# No crates: the harness stays free of dependencies.
 [dependencies]
 
 [profile.release]
