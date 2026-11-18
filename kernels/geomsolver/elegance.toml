@@ -1,0 +1,21 @@
+# The cases geomsolver builds with a solution that stands out across the kernels, and what makes it
+# so (SPEC.md, "An elegant implementation may be flagged").
+
+"boolean/reuleaux-tetrahedron" = "the four centres stated as six equal distances, then three `common`s"
+"boolean/ring-of-balls" = "one ball drawn in a `ring 12`, joined copy by copy into an empty body"
+"chamfer/cube-all-edges-mitered" = "every edge chamfered by one `chamfer(d: 2mm) part`, the flats mitring by themselves"
+"draft/cylinder-parted-both-ways" = "the parting circle drawn where it parts, and one drafted prism leans both ways from it"
+"feature/post-up-to-dome" = "the post up to the dome said as a set: within 3 of the axis, above the floor, inside the cavity's ball"
+"fillet/notched-cube-inside-corner" = "one statement, `round(r: 3mm) part.notch`: every edge the notch made, its ball corner too"
+"loft/square-to-octagon" = "the hull in one line: the join of the two drawn faces, every segment from one to the other"
+"offset/l-block-grown" = "one Grown word over an L: convex edges rounded, the concave edge left sharp, exact"
+"offset/tetrahedron-grown" = "the hull written as the join of two opposite edges, grown by one set statement, built exactly"
+"parts/star-handle" = "one arm in a ring, every corner a round in the chain, drafted in one word"
+"shell/box-open-top-and-front" = "two openings by stating the shell as a set over the faces kept, recognised and built exactly"
+"shell/drilled-block-open-top" = "one `part.near shell(t: 1mm) part`: the bore's tube falls out of the shell's own definition, built exactly"
+"singular/sectors-sharing-an-apex" = "one set, three memberships: in the ball and in both cones"
+"sweep/helical-pipe-round-ends" = "the ball itself carried by a screw: the swept solid is its own rounded ends"
+"swept/ball-along-spline-groove" = "the ball as a set carried by a frame riding the spline: the groove is one line of set notation"
+"swept/drafted-slot-screwed-through-rod" = "a stadium drawn as a tangent chain, drafted, and screwed through the rod in one line of set notation"
+"swept/ring-pushed-in-past-its-fold" = "the same document as the shallower lean with one number changed; the fold is built without being stated"
+"tangent/midsphere-common" = "the ball's radius is never written: its sphere is held through a corner of the cube's middle section, and the solve finds it"

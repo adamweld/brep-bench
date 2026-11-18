@@ -41,6 +41,14 @@ if len(sys.argv) > 1 and sys.argv[1] == "--version":
     sys.exit(0)
 
 
+def with_parent():
+    """Ends solventc with the runner (Linux: PR_SET_PDEATHSIG), so that a runner the harness kills
+    at its time limit leaves no compiler running on, to slow the cases after it."""
+    if sys.platform.startswith("linux"):
+        import ctypes
+        ctypes.CDLL(None, use_errno=True).prctl(1, signal.SIGKILL)  # PR_SET_PDEATHSIG
+
+
 class Fault(Exception):
     """The document itself is wrong: it did not parse, elaborate or solve."""
 
@@ -85,24 +93,37 @@ def refusal(source):
     return " ".join(paragraph)[len("Refused:"):].strip()
 
 
+def solved(stdout):
+    """Whether solventc's report says the document solved: `DOC: solved` in its text, or, under
+    `--json`, its document's solve a success."""
+    if re.search(r": solved\b", stdout):
+        return True
+    try:
+        return bool(json.loads(stdout)["documents"][0]["solve"]["success"])
+    except (ValueError, KeyError, IndexError, TypeError):
+        return False
+
+
 def compile_(document, *outputs):
     """Run solventc over the document with these outputs. Returns its standard output where it
     succeeded; raises Refused, in the compiler's words, where the document solved but an output was
     declined, and Fault where the document itself failed."""
-    run = subprocess.run([SOLVENTC, document, *outputs], capture_output=True, text=True)
+    run = subprocess.run([SOLVENTC, document, *outputs], capture_output=True, text=True,
+                         preexec_fn=with_parent)
     if run.returncode == 0:
         return run.stdout
-    solved = re.search(r": solved\b", run.stdout) and run.returncode == 1
-    if not solved:
+    if run.returncode != 1 or not solved(run.stdout):
         raise Fault(f"solventc exited {run.returncode}\n{run.stdout}{run.stderr}")
     errors = [PLACE.sub("", line) for line in run.stderr.splitlines() if "error[" in line]
     raise Refused("; ".join(errors) or run.stderr.strip() or "solventc declined the output")
 
 
 def measured(document, out_stl):
-    """The core's own measures of the part, and its triangles in out_stl."""
-    report = json.loads(compile_(document, "--json", "--where", PART, "--solid", PART,
-                                 "--stl", out_stl))
+    """The core's own measures of the part, and its triangles in out_stl. The triangles first:
+    where solventc declines them too, it says so at once, before measuring a solid it reads only
+    point by point, which can take minutes."""
+    compile_(document, "--solid", PART, "--stl", out_stl)
+    report = json.loads(compile_(document, "--json", "--where", PART))
     positions = report["documents"][0]["positions"]
     return {"status": "ok", "volume": positions[f"{PART}.volume"],
             "area": positions[f"{PART}.area"]}
