@@ -74,32 +74,53 @@ pub struct Program {
     radius: f64,
     block: (crate::bench::P3, crate::bench::P3),
     tip: crate::bench::P3,
-    /// What the moves since the last [`Program::cut`] swept, where they are gathered to be cut
-    /// together ([`Program::gathering`]).
-    swept: Option<Vec<BodyId>>,
+    /// Where the tip went in the moves since the last [`Program::cut`], from the first that
+    /// reached the workpiece, where they are gathered to be cut together
+    /// ([`Program::gathering`]).
+    run: Option<Vec<crate::bench::P3>>,
 }
 
 impl Program {
     /// `cutter` (of `radius`, upright, its tip at the origin) standing with its tip at `tip`
     /// over the workpiece `body`, which fills the box from `min` to `max`.
     pub fn new(body: BodyId, block: (crate::bench::P3, crate::bench::P3), cutter: BodyId, radius: f64, tip: crate::bench::P3) -> Self {
-        Program { body, cutter, radius, block, tip, swept: None }
+        Program { body, cutter, radius, block, tip, run: None }
     }
 
-    /// From here on each straight move's sweep is kept (cadrs's sweep of a solid, one slide)
-    /// until [`Program::cut`] takes them all from the workpiece in one boolean: a pass of many
-    /// short moves, each overlapping the next.
+    /// From here on the straight moves are kept until [`Program::cut`] takes what they sweep
+    /// from the workpiece together: a pass of many short moves, each overlapping the next.
     pub fn gathering(mut self) -> Self {
-        self.swept = Some(Vec::new());
+        self.run = Some(Vec::new());
         self
     }
 
-    /// The gathered sweeps cut from the workpiece, all at once.
+    /// The gathered moves cut from the workpiece: as one pass (cadrs's cut by a solid carried
+    /// upright along a path, which makes a ball-end mill's pass of straight moves whole, face
+    /// by face); else a move at a time, each move's sweep (cadrs's sweep of a solid, one
+    /// slide) and all of them in one boolean.
     pub fn cut(&mut self, k: &mut DefaultKernel) -> Result<(), Refusal> {
-        if let Some(tools) = self.swept.as_mut().filter(|t| !t.is_empty()) {
-            self.body = crate::bench::boolean(k, cadrs_kernel::BoolOp::Subtract, self.body, tools)?;
-            tools.clear();
+        let Some(run) = self.run.as_mut().filter(|r| r.len() >= 2).map(std::mem::take) else {
+            return Ok(());
+        };
+        let placed = crate::bench::moved(k, self.cutter, run[0].coords)?;
+        let path: Vec<cadrs_kernel::PathCurve> = run
+            .windows(2)
+            .map(|m| cadrs_kernel::PathCurve::Bezier3 { poles: vec![m[0], m[1]], weights: Vec::new() })
+            .collect();
+        let along = cadrs_kernel::SolidMotion::Path {
+            path,
+            up: nalgebra::Unit::new_normalize(crate::bench::v3(0.0, 0.0, 1.0)),
+        };
+        if let Ok(cut) = crate::shared::swept::cut_swept_exactly(k, self.body, placed, &along) {
+            self.body = cut;
+            return Ok(());
         }
+        let mut tools = Vec::with_capacity(run.len() - 1);
+        for m in run.windows(2) {
+            let placed = crate::bench::moved(k, self.cutter, m[0].coords)?;
+            tools.push(crate::shared::swept::slid(k, placed, m[1] - m[0])?);
+        }
+        self.body = crate::bench::boolean(k, cadrs_kernel::BoolOp::Subtract, self.body, &tools)?;
         Ok(())
     }
 
@@ -125,10 +146,20 @@ impl Program {
         let to = p3(to.0, to.1, to.2);
         let v = to - self.tip;
         if v.norm() > 1e-12 && self.reaches(self.tip, to) {
-            let placed = crate::bench::moved(k, self.cutter, self.tip.coords)?;
-            match self.swept.as_mut() {
-                Some(tools) => tools.push(crate::shared::swept::slid(k, placed, v)?),
+            match self.run.as_mut() {
+                Some(run) => {
+                    // (A move that doesn't go on from the last is the start of another run.)
+                    if run.last().is_some_and(|l| (l - self.tip).norm() > 1e-12) {
+                        self.cut(k)?;
+                    }
+                    let run = self.run.as_mut().expect("gathering");
+                    if run.is_empty() {
+                        run.push(self.tip);
+                    }
+                    run.push(to);
+                }
                 None => {
+                    let placed = crate::bench::moved(k, self.cutter, self.tip.coords)?;
                     self.body =
                         crate::shared::swept::cut_swept(k, self.body, placed, &crate::shared::swept::slide(v))?
                 }
