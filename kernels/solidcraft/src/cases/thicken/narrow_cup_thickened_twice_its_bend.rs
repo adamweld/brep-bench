@@ -16,6 +16,6 @@ pub fn build() -> R<Body> {
         line((5.0, 2.0), (5.0, 10.0)),
     ];
     let cup = solidcraft_kernel::revolve_sheet(&xz(), &[profile], Vec2::ZERO, Vec2::Y, 0.0, TAU)?;
-    // the turned faces' normals point out of the cup, away from the axis: against them
+    // the turned faces' normals point out of the cup: against them
     solidcraft_kernel::thicken(&cup, -4.0, false)
 }

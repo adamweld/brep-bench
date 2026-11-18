@@ -16,6 +16,6 @@ pub fn build() -> R<Body> {
         line((6.0, 1.0), (6.0, 8.0)),
     ];
     let pan = solidcraft_kernel::revolve_sheet(&xz(), &[profile], Vec2::ZERO, Vec2::Y, 0.0, TAU)?;
-    // the turned faces' normals point out of the pan, away from the axis: against them
+    // the turned faces' normals point out of the pan: against them
     solidcraft_kernel::thicken(&pan, -3.0, false)
 }

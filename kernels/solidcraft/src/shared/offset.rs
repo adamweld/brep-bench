@@ -19,9 +19,10 @@ use solidcore_ops::Body;
 
 /// `op` run by the kernel on `body`'s record made its own again (with the record's [`Order`]),
 /// and what it makes taken back as a body. The kernel runs with the fixes ops's session runs
-/// with, and the result is held to ops's contract for its offsets: it has faces, and a solid
-/// made of a solid is one (closed, manifold, valid and facing out: the kernel's
-/// `is_outward_solid`), where the kernel can tell.
+/// with, and the result is held to ops's contract for its offsets, a little looser: it has faces,
+/// and a solid made of a solid is one (closed, manifold, valid and facing out: the kernel's
+/// `is_outward_solid`), unless that test cannot read the result's surfaces, where ops would refuse
+/// and this leaves the solid to the harness's own check.
 pub fn in_kernel(
     body: &Body,
     op: impl FnOnce(&mut Kernel, &mut Brep, &Order) -> solidcore::Result<Brep>,
@@ -40,10 +41,15 @@ pub fn in_kernel(
     if made.face_list().is_empty() {
         return Err(crate::bench::empty("the offset"));
     }
-    // where the kernel cannot tell (a surface its enclosure test cannot read, such as the offset
-    // of an elliptic cylinder), the result goes on unchecked: the harness checks the solid itself
-    if solid && matches!(is_outward_solid(&mut k, &mut made), Ok(false)) {
-        return Err("the result is not a closed solid".into());
+    // where the kernel's test cannot read a surface of the result (it answers `Unsupported`), the
+    // result goes on unchecked, and the harness checks the solid itself; any other error of the
+    // test is the kernel's answer
+    if solid {
+        match is_outward_solid(&mut k, &mut made) {
+            Ok(true) | Err(solidcore::SolidError::Unsupported { .. }) => {}
+            Ok(false) => return Err("the result is not a closed solid".into()),
+            Err(e) => return Err(e.into()),
+        }
     }
     let (record, _) =
         to_record(&mut k, &mut made).map_err(|e| format!("the result makes no record: {e:?}"))?;

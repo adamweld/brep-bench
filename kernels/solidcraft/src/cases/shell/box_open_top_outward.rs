@@ -2,10 +2,8 @@
 //! z = 6, the wall every point outside the box within 1 of its other faces: the box grown by 1 and
 //! cut off at z = 6, less the box. Its outside is rounded at the box's convex edges and corners.
 //!
-//! The kernel's shell refuses to round an outward wall (`SmApiShellBrepFull` with convex edges
-//! rounded, `bDoExtendedOffset` off, rejects the box as invalid input), and ops's shell keeps the
-//! edges sharp. So the cup is made as the description composes it: the kernel's offset of the
-//! box, its convex edges rounded, cut off at the plane of the top and hollowed by the box.
+//! The cup is made as the description composes it: the kernel's offset of the box, its convex
+//! edges rounded, cut off at the plane of the top and hollowed by the box.
 use crate::bench::cut_all;
 use crate::shared::offset::offset_rounded;
 use crate::Refusal;

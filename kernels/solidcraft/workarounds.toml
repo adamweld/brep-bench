@@ -1,10 +1,7 @@
 # The cases SolidCraft's kernel builds by working around a feature it lacks, and what that is
 # (SPEC.md, "A workaround is flagged").
 
-"nurbs/bezier-dome" = "no solid from a NURBS surface"
 "nurbs/bspline-dome" = "no solid from a NURBS surface, no B-spline curve in a profile"
-"nurbs/drilled-dome" = "no solid from a NURBS surface"
-"nurbs/sliced-dome" = "no solid from a NURBS surface"
 "nurbs/vault-tangent-plane" = "no NURBS surface of even degree"
 "spline/peanut-prism" = "no B-spline curve in a profile"
 "spline/rational-spheroid" = "no NURBS curve in a profile"
@@ -19,9 +16,7 @@
 "swept/two-beads-slid-through-rod" = "no sweep of a solid"
 "swept/ball-along-spline-groove" = "no sweep of a solid"
 "swept/ball-thread-groove" = "no sweep of a solid"
-"shell/box-open-top-outward" = "no outward shell with rounded walls"
 "shell/l-block-open-top" = "no shell joined by arcs"
-"draft/t-block-sides-drafted-until-its-bar-and-stem-close" = "no draft of sides whose top it consumes"
 "chamfer/cube-all-edges" = "no chamfer corner cut flat"
 "feature/hole-through-the-upper-arm" = "no hole through to the next face"
 "feature/pad-down-to-cylinder" = "no extrusion up to a face"
@@ -33,4 +28,3 @@
 "thicken/open-box-outward-rounded" = "no thickening with rounded edges"
 "thicken/sphere-skin" = "no thickening of a closed sheet"
 "fillet/conic-edge" = "no conic blend"
-"fillet/bezier-dome-one-edge" = "no solid from a NURBS surface"
