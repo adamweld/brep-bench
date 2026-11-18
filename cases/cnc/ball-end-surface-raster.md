@@ -1,7 +1,14 @@
 +++
 title = "A free-form surface finished by a ball-end mill in 41 three-axis raster passes"
 tags = ["cnc", "toolpath", "swept", "solid-sweep", "slide", "pieces", "sphere", "cylinder", "scallop", "boolean", "cut"]
-settled = false
+
+[volume]
+value = 119999.9438165
+exact = "no closed form: cad-kernel and cadrs agree to 8e-11; the mean of their values"
+
+[area]
+value = 21722.69118005
+exact = "no closed form: cad-kernel and cadrs agree to 2e-10; the mean of their values"
 +++
 
 A plate whose top is finished into a free-form surface by a ball-end mill in raster passes, as a

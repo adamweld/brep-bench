@@ -2,7 +2,14 @@
 title = "A rod threaded by a drafted bar of slotted section"
 tags = ["swept", "solid-sweep", "screw", "helix", "draft", "cone", "prism", "boolean", "cut"]
 origin = "geomsolver #721, box X9 (a drafted prism under a screw)"
-settled = false
+
+[volume]
+value = 1401.31396323
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-9; the mean of their values"
+
+[area]
+value = 896.7608937903
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 2e-9; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, threaded by a drafted bar

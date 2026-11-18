@@ -2,7 +2,14 @@
 title = "A rod threaded by a V wheel"
 tags = ["swept", "solid-sweep", "screw", "helix", "envelope", "sharp-edge", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/vthread.sv"
-settled = false
+
+[volume]
+value = 1554.38096569
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 7e-10; the mean of their values"
+
+[area]
+value = 812.521505271
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 6e-10; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, with a helical V groove ground

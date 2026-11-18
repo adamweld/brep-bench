@@ -2,7 +2,14 @@
 title = "A rod threaded by a wheel whose section is an ellipse"
 tags = ["swept", "solid-sweep", "screw", "helix", "ellipsoid", "quadric", "boolean", "cut"]
 origin = "geomsolver #721, box G8 (meridians that are no line or circle)"
-settled = false
+
+[volume]
+value = 1559.464104565
+exact = "no closed form: cad-kernel and cadrs agree to 3e-10; the mean of their values"
+
+[area]
+value = 794.460009403
+exact = "no closed form: cad-kernel and cadrs agree to 9e-10; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, with a helical groove ground

@@ -2,7 +2,14 @@
 title = "A rod threaded by an end mill's flat end"
 tags = ["swept", "solid-sweep", "screw", "helix", "cylinder", "cap", "rim", "boolean", "cut"]
 origin = "geomsolver #721, box G3 (a cap's round rim under a twist)"
-settled = false
+
+[volume]
+value = 1339.548902297
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-10; the mean of their values"
+
+[area]
+value = 904.7974927203
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-9; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, threaded by the flat end of

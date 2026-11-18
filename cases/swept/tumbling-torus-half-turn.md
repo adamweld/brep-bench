@@ -2,7 +2,14 @@
 title = "An oblique torus tumble through half a turn"
 tags = ["swept", "solid-sweep", "tumble", "torus", "regression"]
 origin = "geomsolver 55e64186 tumbling-torus failure isolation; docs/tumbling-torus-regressions.md"
-settled = false
+
+[volume]
+value = 12.2377154547
+exact = "no closed form: next.BREP and cadrs agree to 5e-9; the mean of their values"
+
+[area]
+value = 79.6439922584
+exact = "no closed form: next.BREP and cadrs agree to 2e-9; the mean of their values"
 +++
 
 The initial torus is centered at (3, 0, 2), with axis parallel to z, major radius 1 and tube radius
@@ -22,8 +29,8 @@ interior envelope sheets are not part of the boundary.
 A shorter-interval control for `swept/tumbling-torus-full-turn`. The roll spans 180 degrees instead
 of 360 degrees; no other parameter changes.
 
-No closed-form volume or area is asserted. The case remains unsettled until independently
-implemented kernels agree under the benchmark's rules.
+No closed-form volume or area is asserted. Its answer is the mean of independently implemented
+kernels that agree under the benchmark's rules.
 
 **As a set:**
 

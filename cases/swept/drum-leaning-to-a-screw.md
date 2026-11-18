@@ -2,7 +2,14 @@
 title = "A helical groove milled by a drum leaning to the screw's axis"
 tags = ["swept", "solid-sweep", "screw", "helix", "cylinder", "leaning", "boolean", "cut"]
 origin = "geomsolver #721, box X9 (a cylinder about an axis leaning to the screw's)"
-settled = false
+
+[volume]
+value = 50.2500186946
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-9; the mean of their values"
+
+[area]
+value = 143.6145448977
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 7e-10; the mean of their values"
 +++
 
 A curved block with a helical groove milled through it by a drum leaning to the screw that carries

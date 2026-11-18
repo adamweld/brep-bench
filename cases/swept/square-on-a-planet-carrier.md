@@ -2,7 +2,14 @@
 title = "A square bar carried round on a planet gear"
 tags = ["swept", "solid-sweep", "planar", "general-motion", "prism", "trochoid", "envelope"]
 origin = "geomsolver #721, box K3 (nested relative motions)"
-settled = false
+
+[volume]
+value = 155.3366775343
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 5e-9; the mean of their values"
+
+[area]
+value = 282.1927120073
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 4e-10; the mean of their values"
 +++
 
 The solid a square bar fills as it is carried round on a planet, turning about its own center

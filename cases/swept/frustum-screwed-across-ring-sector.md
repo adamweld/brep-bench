@@ -2,7 +2,14 @@
 title = "A helical groove milled by a tapered cutter"
 tags = ["swept", "solid-sweep", "screw", "helix", "cone", "boolean", "cut"]
 origin = "geomsolver #721, box X9 (a screwed cone cut from a blank)"
-settled = false
+
+[volume]
+value = 65.20000349
+exact = "no closed form: OCCT and next.BREP agree to 9e-10; the mean of their values"
+
+[area]
+value = 160.46377052
+exact = "no closed form: OCCT and next.BREP agree to 3e-9; the mean of their values; cadrs, which agrees with next.BREP but not OCCT, is 1e-8 from it"
 +++
 
 A curved block with a helical groove milled through it by a tapered cutter screwed across it.

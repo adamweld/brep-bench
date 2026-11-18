@@ -2,7 +2,14 @@
 title = "A rod grooved by a leaning V wheel turned once round it"
 tags = ["swept", "solid-sweep", "turn", "whole-turn", "revolution", "sharp-edge", "leaning", "boolean", "cut"]
 origin = "geomsolver rust/examples/solid_sweeps/whole_turn.sv"
-settled = false
+
+[volume]
+value = 1536.481051645
+exact = "no closed form: cad-kernel and cadrs agree to 6e-9; the mean of their values"
+
+[area]
+value = 805.6742355625
+exact = "no closed form: cad-kernel and cadrs agree to 3e-10; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, grooved all round by a wheel

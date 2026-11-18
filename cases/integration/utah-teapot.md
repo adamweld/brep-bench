@@ -1,8 +1,15 @@
 +++
 title = "The Utah teapot"
 tags = ["integration", "part", "bezier", "nurbs", "surface", "sheet", "closed", "boolean", "union", "pole", "coincident", "coplanar", "point-contact"]
-settled = false
 origin = "Martin Newell's teapot (1975), the 32 patches with Frank Crow's bottom, in Newell's coordinates"
+
+[volume]
+value = 25.9956738117
+exact = "no closed form: cad-kernel, OCCT and cadrs agree to 1e-9; the mean of their values"
+
+[area]
+value = 52.2260167859
+exact = "no closed form: cad-kernel, OCCT and cadrs agree to 4e-9; the mean of their values"
 +++
 
 Martin Newell's teapot made a solid: the 32 bicubic Bézier patches of the usual data set (Newell's
@@ -108,4 +115,4 @@ The four solids' volumes are exact (by the divergence theorem, the integrand on 
 polynomial): the body 42702346587/1750000000 ≈ 24.4013409069, the lid 743579407/875000000 ≈
 0.8498050366, the spout 2623953/4000000 = 0.65598825, and the handle 13149/50000 = 0.26298. The
 union's volume is their sum less the parts of the spout and the handle inside the body, and those,
-like every area here, have no closed form, so the case is unsettled until two kernels agree.
+like every area here, have no closed form, so its answer is the mean of kernels that agree on it.

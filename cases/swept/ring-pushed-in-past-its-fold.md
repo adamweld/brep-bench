@@ -2,7 +2,14 @@
 title = "A ring pushed into a block at so steep a lean its inner outline folds"
 tags = ["swept", "solid-sweep", "slide", "torus", "leaning", "fold", "cusp", "stopped", "boolean", "cut"]
 origin = "geomsolver #721, box X8 (folds cut where they lie)"
-settled = false
+
+[volume]
+value = 1907.002117765
+exact = "no closed form: cad-kernel and cadrs agree to 2e-9; the mean of their values"
+
+[area]
+value = 1164.56866667
+exact = "no closed form: cad-kernel and cadrs agree to 8e-10; the mean of their values"
 +++
 
 A block, the box from (−8, −8, −8) to (8, 8, 0), with a hole bored into its top by a ring pushed
