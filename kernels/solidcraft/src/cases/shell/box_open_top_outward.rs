@@ -1,34 +1,19 @@
-//! SolidCraft's Shell (`shell`) hollows inward only. Outward, the wall is the box with the five faces
-//! other than the top moved 1 outward by Offset Face (`offset_faces`), which keeps every edge
-//! where its two faces, moved, meet: the box from (−1, −1, −1) to (11, 9, 6). Its eight
-//! edges below the rim, rounded to radius 1, are the quarter cylinders of radius 1 about the box's
-//! own edges, each 1 from the faces either side, and where three meet at a bottom corner their
-//! corner is the ball of radius 1 about the box's corner: the box grown by 1 and cut off at z = 6, less the box.
-use crate::solids::*;
+//! The box from the origin to (10, 8, 6) shelled outward to a wall 1 thick, open at its top face,
+//! z = 6, the wall every point outside the box within 1 of its other faces: the box grown by 1 and
+//! cut off at z = 6, less the box. Its outside is rounded at the box's convex edges and corners.
+//!
+//! The kernel's shell refuses to round an outward wall (`SmApiShellBrepFull` with convex edges
+//! rounded, `bDoExtendedOffset` off, rejects the box as invalid input), and ops's shell keeps the
+//! edges sharp. So the cup is made as the description composes it: the kernel's offset of the
+//! box, its convex edges rounded, cut off at the plane of the top and hollowed by the box.
+use crate::bench::cut_all;
+use crate::shared::offset::offset_rounded;
+use crate::Refusal;
+use solidcore_ops::{make_box, Body};
 
-pub fn build() -> R<Body> {
-    let b = block((0.0, 0.0, 0.0), (10.0, 8.0, 6.0))?;
-    // the middle of each face but the top, picking it
-    let faces = [
-        v3(0.0, 4.0, 3.0),
-        v3(10.0, 4.0, 3.0),
-        v3(5.0, 0.0, 3.0),
-        v3(5.0, 8.0, 3.0),
-        v3(5.0, 4.0, 0.0),
-    ];
-    let grown = solidcraft_kernel::offset_faces(&b, &faces, 1.0)?;
-    // a point on each edge of the grown box below the rim: four round its bottom, four up its
-    // sides
-    let edges = [
-        v3(5.0, -1.0, -1.0),
-        v3(5.0, 9.0, -1.0),
-        v3(-1.0, 4.0, -1.0),
-        v3(11.0, 4.0, -1.0),
-        v3(-1.0, -1.0, 3.0),
-        v3(11.0, -1.0, 3.0),
-        v3(11.0, 9.0, 3.0),
-        v3(-1.0, 9.0, 3.0),
-    ];
-    let rounded = solidcraft_kernel::fillet(&grown, &edges, 1.0)?;
-    cut(&rounded, &b)
+pub fn build() -> Result<Body, Refusal> {
+    let block = make_box([0.0, 0.0, 0.0], [10.0, 8.0, 6.0])?;
+    let grown = offset_rounded(&block, 1.0)?;
+    let above = make_box([-2.0, -2.0, 6.0], [14.0, 12.0, 2.0])?;
+    cut_all(grown, [above, block])
 }

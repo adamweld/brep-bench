@@ -4,7 +4,7 @@ use crate::solids::*;
 use solidcore_record::Seg2;
 use std::f64::consts::FRAC_PI_2;
 
-/// The kernel has no cone, and no round of an apex: the solid is its half section turned about
+/// solidcraft-kernel has no cone, and no round of an apex: the solid is its half section turned about
 /// z, as SolidCraft's own cone feature revolves its section: the cone's side up to the circle
 /// where the ball of radius 1 about (0, 0, 12 − √5) touches it, then that ball's arc over to the
 /// axis.

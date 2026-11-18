@@ -2,7 +2,7 @@
 //! picked by points on them.
 use crate::solids::*;
 
-/// The kernel has no cone: SolidCraft's own cone feature revolves the half section, and so does
+/// solidcraft-kernel has no cone: SolidCraft's own cone feature revolves the half section, and so does
 /// this, the section a trapezoid kept off the axis by the bore's radius.
 pub fn build() -> R<Body> {
     let bored = revolve_z(polygon(&[(1.0, 0.0), (6.0, 0.0), (3.0, 4.0), (1.0, 4.0)]), 360.0)?;

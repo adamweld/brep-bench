@@ -3,7 +3,7 @@ use solidcraft_kernel::ChamferSide;
 
 pub fn build() -> R<Body> {
     let ball = solidcraft_kernel::sphere(Vec3::ZERO, 5.0)?;
-    // the kernel has no cone: its half section, apex at the origin, turned about the z axis
+    // solidcraft-kernel has no cone: its half section, apex at the origin, turned about the z axis
     let cone = revolve_z(polygon(&[(0.0, 0.0), (8.0, 6.0), (0.0, 6.0)]), 360.0)?;
     let sector = common(&ball, &cone)?;
     // 1, at 45° to it, down the cone: the first face flipped, the ball facing up more at the rim
