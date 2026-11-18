@@ -36,3 +36,5 @@
 "thicken/angle-bracket-rounded" = "no thickening with rounded edges"
 "thicken/open-box-outward-rounded" = "no thickening with rounded edges"
 "thicken/sphere-skin" = "no thickening of a closed sheet"
+"fillet/conic-edge" = "no conic blend"
+"fillet/bezier-dome-one-edge" = "no solid from a NURBS surface"
