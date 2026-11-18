@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use solidcraft_kernel::PathSeg;
 
 /// A sweep path is lines and arcs: a free-form path curve is followed as its polyline, the cubic

@@ -18,7 +18,7 @@
 //! `ball-swung-groove`, or whole balls, it fares no better).
 use super::ball_swung_groove::half_ball;
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use solidcraft_kernel::{PathSeg, sweep};
 
 pub fn build() -> R<Body> {

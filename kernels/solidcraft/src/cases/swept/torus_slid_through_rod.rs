@@ -16,7 +16,7 @@ use crate::solids::*;
 /// radius `tube` about a circle of radius `ring`. The slot within `tube` of the segment from
 /// `x − ring` to `x + ring` at height `y`, on the plane at height `z`.
 pub fn shadow(x: f64, y: f64, z: f64, ring: f64, tube: f64) -> (Plane, Region2) {
-    use solidcraft_geom::Seg2;
+    use solidcore_record::Seg2;
     use std::f64::consts::{FRAC_PI_2, PI};
     let (near, far) = (x - ring, x + ring);
     let segs = vec![

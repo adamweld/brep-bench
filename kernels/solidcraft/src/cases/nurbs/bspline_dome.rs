@@ -1,6 +1,6 @@
 use super::bezier_dome::{block_under, sheet};
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 use solidcraft_geom::bspline::{BezierPatch, HPoint, NurbsSurface};
 use solidcraft_geom::tspline::TSpline;
 

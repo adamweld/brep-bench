@@ -2,7 +2,10 @@
 //! and returns bodies in lists; these keep a case to the solid it describes.
 #![allow(dead_code)]
 
-pub use solidcraft_geom::{Loop2, Plane, Region2, Vec2, Vec3};
+pub use solidcore_record::{Loop2, Plane, Region2, Vec2, Vec3};
+// the geometry of the record's plain types (`Vec3::cross`, `Plane::from_normal`, `Seg2::end`):
+// traits of SolidCraft's geometry crate
+pub use solidcraft_geom::prelude::*;
 pub use solidcraft_kernel::{Body, BoolOp, KernelError};
 use solidcraft_kernel as k;
 

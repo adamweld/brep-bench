@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 
 /// The half section in x and z, its curve the profile's conic: a rational quadratic Bézier
 /// segment whose apex has the weight ½ (the ends weigh 1), turned a full turn about the z axis.

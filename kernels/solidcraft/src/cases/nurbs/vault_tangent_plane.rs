@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 
 /// The block on the square −12 ≤ x, y ≤ 12 under the weighted barrel vault arching along y.
 ///
