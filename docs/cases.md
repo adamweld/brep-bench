@@ -327,6 +327,21 @@ drawn at random, and its answer is a closed form derived here, not taken from th
   it, and each end leaves a dimple in the grown face, part of a horn torus coming down to a cusp on
   the axis, or of a spindle torus that crosses itself there.
 
+## Contacts prompted by OCCT's tests (`tangent/`, `boolean/`, `nurbs/`)
+
+Booleans whose operands touch or coincide where an edge, a seam or a pole already is, each written
+from a one-line note on one of Open CASCADE's own tests (named in its `origin`) with dimensions and
+closed forms of its own. A torus lies on a drum's rim and is tangent to its wall along it; another
+seats in a tube's end, tangent to both walls along their rims; a ball's poles and seam lie on the
+circle where it caps a drum; a cube turned about an edge tangent to a ball cuts a cap whose rim runs
+through the point of contact; a frustum's base circle touches a cube's faces at its corners; a pin
+touches a drum's wall from inside along a line, and a square post lies with its edges on one; a
+collar's bore lies on a post's wall, open where the post's seam is; a block turned about the
+upright has one edge in a cube's face; and a ring whose middle circle lies on a post's wall cuts a
+half-round groove. Two are on freeform faces: a
+NURBS ball cut by the octant through its pole and along its seam, and a cube of flat B-spline faces
+halved by a prism through two of its corners.
+
 ## Integration tests (`integration/`)
 
 Whole models that take many of a kernel's features at once, where a case elsewhere tests one. The
