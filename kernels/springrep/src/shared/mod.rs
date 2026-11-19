@@ -18,3 +18,25 @@ pub fn frame(origin: [f64; 3], z: [f64; 3], x: [f64; 3]) -> Result<Frame, String
 pub fn at(origin: [f64; 3]) -> Frame {
     Frame::new(Vec3::from_array(origin), Vec3::Z, Vec3::X).expect("the world's axes")
 }
+pub mod boolean;
+pub mod chamfer;
+pub mod cnc;
+pub mod draft;
+pub mod edit;
+pub mod feature;
+pub mod fill;
+pub mod fillet;
+pub mod geometry;
+pub mod integration;
+pub mod loft;
+pub mod nurbs;
+pub mod offset;
+pub mod parts;
+pub mod primitives;
+pub mod shell;
+pub mod singular;
+pub mod spline;
+pub mod sweep;
+pub mod swept;
+pub mod tangent;
+pub mod thicken;
