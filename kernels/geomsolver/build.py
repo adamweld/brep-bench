@@ -4,7 +4,7 @@
     python3 kernels/geomsolver/build.py
 
 geomsolver's command-line compiler, `solventc`, is built from its source at the commit COMMIT
-names (its release tag TAG), checked out into kernels/geomsolver/upstream/: it is what a Solvent
+names (TAG says where it is: a release tag, or the branch it was pushed to), checked out into kernels/geomsolver/upstream/: it is what a Solvent
 user runs to turn a `.sv` document into a solid and write it as STEP. It is the pure-Rust build,
 the one the project releases: its own B-rep kernel (cad-kernel), with no Open CASCADE. Needs Rust
 (`cargo`) and git. Standard library only.
@@ -17,8 +17,10 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 UPSTREAM = os.path.join(HERE, "upstream")
 REPOSITORY = "https://github.com/bmander/geomsolver"
-TAG = "v0.1.24"
-COMMIT = "c7e5bf1b7c64d849342d00523740f93152d8a228"
+# v0.1.24 with faces deleted as sets built exactly and traced curves written as cubics; to be
+# pinned to the release that carries them
+TAG = "ccr-c93277d3-pzcw5v"
+COMMIT = "a2596c13b741e7b80dcb55606e123648bf2afbdd"
 # where the runner finds the compiler, and the tag it names in --version
 BINARY = os.path.join(HERE, "bin", "solventc")
 
