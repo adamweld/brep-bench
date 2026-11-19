@@ -28,3 +28,13 @@ pub fn rod(
     let frame = Frame::from_axis(Vec3::from_array(base), Vec3::from_array(axis)).map_err(e)?;
     cylinder(&frame, r, length, name).map_err(e)
 }
+
+/// The chain of `boolean/chain-of-three-balls`: balls of radius 5, 4 and 3 about the origin,
+/// (7, 0, 0) and (10, 4, 0), the first two joined and then the third joined to them.
+pub fn chain_of_three_balls() -> Result<Brep, String> {
+    let first = ball([0., 0., 0.], 5., "first")?;
+    let second = ball([7., 0., 0.], 4., "second")?;
+    let third = ball([10., 4., 0.], 3., "third")?;
+    let pair = springrep::boolean::union(&first, &second).map_err(e)?;
+    springrep::boolean::union(&pair, &third).map_err(e)
+}
