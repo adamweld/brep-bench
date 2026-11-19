@@ -17,8 +17,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 UPSTREAM = os.path.join(HERE, "upstream")
 REPOSITORY = "https://github.com/bmander/geomsolver"
-TAG = "v0.1.25"
-COMMIT = "160b1ef28ecfaeab3a7ed4e9507e2650077924cb"
+TAG = "v0.1.26"
+COMMIT = "6067594b4c47ed26b946f856c529a99b58f18a4a"
 # where the runner finds the compiler, and the tag it names in --version
 BINARY = os.path.join(HERE, "bin", "solventc")
 
