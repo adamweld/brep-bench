@@ -123,6 +123,10 @@ A dumbbell shrunk beyond half its neck width splits into two separate bodies, ea
 curved bulge at the lost neck's mouth. Both bodies must survive; unlike the dumbbell shell, it is
 the material itself that separates. Its volume and area have closed forms.
 
+A notched plate is grown by 1 with its edges kept sharp while its slanted inner wall is moved 16,
+so far that it overtakes one jaw of the notch: that jaw's face is gone, and the wall runs on to
+meet the plate's end directly.
+
 ## Thickened sheets (`thicken/`)
 
 A sheet (a face or faces with no solid behind them) thickened into the solid between it and its
@@ -150,6 +154,8 @@ that falls into two disks, and a ball cut by a plane whose cavity reaches it asl
 pinhole, or not at all.
 A half ball shelled outward and open at its dome has only its flat face to move: it runs on
 until it meets the sphere, leaving a slice of the ball 0.5, 1 or 2 thick under the opening.
+A funnel, a cone frustum lofted between circles of radius 40 and 4, is shelled to a wall 1 thick
+open at both ends.
 
 ## Geometry (`geometry/`)
 
@@ -177,6 +183,10 @@ rounded corners drafted with the sides they are tangent to, the rounds becoming 
 cylinder parted at its middle and drafted away from the parting line both ways, faces drafted
 through the ellipses where a hole comes out of them, and a box drafted until its top is consumed,
 which leaves a hip roof. Every one has a closed form.
+
+Two drafts on united solids leave the drafted face meeting a curved one: a post standing on a dome
+and a drum standing in a torus, each drafted about the plane of its foot, so that the cone the
+side becomes runs down into the sphere or the tube.
 
 ## Form features (`feature/`)
 
@@ -240,6 +250,13 @@ form.
 Two holes widened until they overlap add a change of topology: their cylindrical walls must trim
 against each other and the two openings become one. The result is given by the union of two disks
 extruded through the plate, so its measures also have closed forms.
+
+Flats moved past an axis or a pinch, the curved face running on round it: a quarter of a ball with
+both flats moved out 4, so that its poles lie inside the sphere's face; three quarters of a cone
+with one flat moved out past its axis, leaving the apex inside the cone's face; the upper half of
+a horn torus with its flat moved down below the point where the tube touches the axis; and,
+simpler, a quarter of a slice of a ball with both side flats moved in and three quarters of a
+cone frustum with both ends moved out.
 
 Faces deleted, and the gap they leave closed by the faces round them, each run on along its own
 surface until they meet: a round and a bevel on a block's edge and on a cylinder's rim, the round
