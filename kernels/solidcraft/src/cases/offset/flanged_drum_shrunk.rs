@@ -1,15 +1,15 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp.
-//! Shrunk by 1, the flange's faces cross each other and must be taken away, and where the flange
-//! met the drum its concave edges become pieces of tori meeting in a ridge: the kernel's offset
-//! neither removes faces moved through each other nor rounds a join.
+//! A drum, the cylinder of radius 8 on the z axis from z = 0 to z = 6, with a flange round its
+//! side out to radius 11 from z = 2.2 to z = 3.8, shrunk by 1: every point at least 1 from its
+//! outside. The flange's faces, moved 1 in from each side, cross and are trimmed away by the
+//! kernel's offset inward (its self-intersections merged), and the flange's inside edges, where
+//! the moved faces part, become concave tori.
+use crate::bench::fuse;
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_cylinder, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset that removes faces moved through each other, nor one \
-         with rounded joins: its offset of a solid, `offset_faces`, keeps the body's topology and \
-         joins the moved faces sharp, so the flange could not vanish nor its inside edges become \
-         tori"
-        .into())
+    let drum = make_cylinder([0.0, 0.0, 0.0], 8.0, 6.0)?;
+    let flange = make_cylinder([0.0, 0.0, 2.2], 11.0, 1.6)?;
+    offset_rounded(&fuse(drum, flange)?, -1.0)
 }

@@ -1,6 +1,7 @@
 //! What the solidcore implementations of one category share, a module per category.
 pub mod boolean;
 pub mod chamfer;
+pub mod defeature;
 pub mod draft;
 pub mod edit;
 pub mod feature;
