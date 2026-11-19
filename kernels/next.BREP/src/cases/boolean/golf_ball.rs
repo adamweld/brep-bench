@@ -2,10 +2,9 @@
 //! centered 10.6 from the origin toward one of the 12 vertices, 30 edge midpoints and 20 face
 //! centers of the icosahedron with vertices (0, ±1, ±φ), (±1, ±φ, 0), (±φ, 0, ±1). Every ball has
 //! its poles on the vertical through its center.
-use crate::solids::boolean::cut;
 use crate::solids::p;
 use crate::Refusal;
-use brep_kernel::{make_sphere_brep, BrepSolid, Vec3};
+use brep_kernel::{boolean_operation_nary, make_sphere_brep, BooleanOperation, BrepSolid, Vec3};
 
 /// The 62 unit directions: the icosahedron's vertices, the middles of its edges (pairs of vertices
 /// at its edge length, 2) and the centers of its faces (triples of mutually adjacent vertices).
@@ -37,14 +36,16 @@ fn directions() -> Vec<Vec3> {
 
 pub fn build() -> Result<BrepSolid, Refusal> {
     let up = p(0.0, 0.0, 1.0);
-    let mut ball = make_sphere_brep(p(0.0, 0.0, 0.0), 10.0, up)?;
+    let ball = make_sphere_brep(p(0.0, 0.0, 0.0), 10.0, up)?;
     let dirs = directions();
     if dirs.len() != 62 {
         return Err(Refusal::from(format!("{} directions, not 62", dirs.len())));
     }
+    // The dimples' balls lie apart (neighbouring centres 5.8 apart, each ball 2.4 across): one cut by
+    // all 62 at once.
+    let mut operands = vec![ball];
     for d in dirs {
-        let dimple = make_sphere_brep(d.scale(10.6), 1.2, up)?;
-        ball = cut(&ball, &dimple)?;
+        operands.push(make_sphere_brep(d.scale(10.6), 1.2, up)?);
     }
-    Ok(ball)
+    Ok(boolean_operation_nary(&operands, BooleanOperation::Subtract)?)
 }
