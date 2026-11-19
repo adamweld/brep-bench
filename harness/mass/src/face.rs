@@ -24,6 +24,8 @@ pub struct Face<'a> {
     s: View,
     vref: f64,
     top: Option<f64>,
+    /// Whether a loop runs along a seam (one edge both ways), which lies inside its face.
+    seam: bool,
     /// The inner integral's breaks.
     cuts: Vec<f64>,
     /// Gauss's nodes and weights over each whole panel between two breaks, once made.
@@ -127,6 +129,20 @@ impl<'a> Face<'a> {
             transposed,
         };
         let paths: Vec<Vec<Path>> = loops.into_iter().map(|(ps, _)| ps).collect();
+        // a seam: an edge run both ways in one loop, its two runs apart (a turn apart) in (u, v)
+        let seam = paths.iter().any(|ps| {
+            ps.iter().enumerate().any(|(i, p)| {
+                ps[i + 1..].iter().any(|q| match (&p.c, &q.c) {
+                    (Some(a), Some(b)) => {
+                        let (x, y) = (p.start(), q.end());
+                        Arc::ptr_eq(a, b)
+                            && (p.t0, p.t1) == (q.t1, q.t0)
+                            && (x.0 - y.0).abs() + (x.1 - y.1).abs() > 1e-7
+                    }
+                    _ => false,
+                })
+            })
+        });
         let bounded = !paths.is_empty();
         let periods = s.periods();
         let domain = s.domain();
@@ -218,6 +234,7 @@ impl<'a> Face<'a> {
             s,
             vref,
             top,
+            seam,
             cuts: Vec::new(),
             whole: Vec::new(),
             column: None,
@@ -287,7 +304,11 @@ impl<'a> Face<'a> {
                     let a = full.abs();
                     let turns = div(total[0], a)? - 1e-12;
                     let k = -integer(turns, turns.floor())? * (if full > 0.0 { 1.0 } else { -1.0 });
-                    if k != 0.0 {
+                    if k > 0.0 && self.seam {
+                        // a loop along a seam bounds the region it unwraps to, never the rest of
+                        // the surface (which the seam is not in): it runs against the standard
+                        total = total.map(|x| -x);
+                    } else if k != 0.0 {
                         let column = match self.column {
                             Some(c) => c,
                             None => {
