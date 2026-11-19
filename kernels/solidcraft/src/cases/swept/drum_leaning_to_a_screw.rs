@@ -8,8 +8,8 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the leaning drum's side \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the leaning drum's side \
          meets the screw square-on along a space curve, in no plane, so no planar section \
-         screwed by `sweep_helix` makes the groove's walls"
+         screwed by either layer's screw sweep (`sweep_helix`, `screw_sweep`) makes the groove's walls"
         .into())
 }

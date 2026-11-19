@@ -9,7 +9,8 @@
 //! apart. That gap is far narrower than the turn, so the rod passes over all the rod filled out
 //! to the spheres about the origin through its end rims does: K′, the rod with its ends
 //! capped by the spheres of radii √(5² + 0.5²) and √(3² + 0.5²) instead of flat, which meets every
-//! circle in one arc about its point at 0° or at 180°, or holds it whole. Turned by 120°, an arc
+//! circle in an arc about its point at 0°, one about 180°, or both, or holds it whole. Turned by
+//! 120°, an arc
 //! about 0° is passed over where K′ starts, the 120° on from 0°, and where it stops; one about
 //! 180°, likewise from 180°. So the sweep is K′'s section by the half-plane at 0° revolved from 0°
 //! to 120°, its section by the half-plane at 180° revolved from 180° to 300°, and K′ where it

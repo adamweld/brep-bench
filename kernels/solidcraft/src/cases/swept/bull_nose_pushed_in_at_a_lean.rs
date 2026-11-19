@@ -7,7 +7,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the hole's wall is the leaning \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the hole's wall is the leaning \
          mill's outline along the push, which on its quarter-torus corner is the curve where the \
          torus's normal is level, none of its circles"
         .into())

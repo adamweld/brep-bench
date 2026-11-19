@@ -8,7 +8,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the stem, a cylinder about a \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the stem, a cylinder about a \
          line skew to the turn's axis, touches its sweep along curves that are none of its lines \
          or circles, so what it cuts is bounded by an envelope"
         .into())

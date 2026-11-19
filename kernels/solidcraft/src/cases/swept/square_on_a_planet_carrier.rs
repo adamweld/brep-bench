@@ -6,7 +6,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the bar turns about its own \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the bar turns about its own \
          centre as that is carried round the z axis, so its sweep is bounded by the envelopes of \
          its sides and the trochoids of its corners"
         .into())

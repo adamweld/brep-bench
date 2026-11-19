@@ -7,7 +7,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the wheel's flanks are the \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the wheel's flanks are the \
          envelope of the worm's thread as it slides along its axis while the wheel turns, which \
          no sweep of a profile along a line, a screw, a revolve or a path makes"
         .into())

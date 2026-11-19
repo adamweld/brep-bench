@@ -8,7 +8,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: `sweep_helix` screws a planar \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: no layer's screw sweep (`sweep_helix`, `screw_sweep`) does more than screw a planar \
          profile, but the V groove's flanks are the envelope of the leaning wheel's cones over \
          the screw, which is no plane section of it"
         .into())

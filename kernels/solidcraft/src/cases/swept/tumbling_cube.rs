@@ -8,7 +8,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the tumbling cube's sweep \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the tumbling cube's sweep \
          is bounded by the envelope of its places, and no sweep of a profile along a line, a \
          screw, a revolve or a path carries even a face of it through two turns about skew axes"
         .into())

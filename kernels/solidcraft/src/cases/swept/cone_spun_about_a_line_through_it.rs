@@ -9,7 +9,7 @@
 //! sphere about the origin; beyond the base it meets the cone in two arcs mirrored in the xz
 //! plane, and the cap fills the gap between them, which is narrower than the turn, so K′ sweeps
 //! what the cone does. K′ is symmetric in the xz plane and meets every circle about the z axis in
-//! arcs about its point at 0° or at 180°, or holds it whole; turned by 150°, an arc about 0° is
+//! arcs about its point at 0° and/or at 180°, or holds it whole; turned by 150°, an arc about 0° is
 //! passed over where K′ starts, the 150° on from 0° and where it stops, and one about 180°
 //! likewise from 180°. So the sweep is K′ where it starts and where it stops, with K′'s section by
 //! the xz plane on the side x ≥ 0 revolved from 0° to 150° and on the side x ≤ 0 from 180° to

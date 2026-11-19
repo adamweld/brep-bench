@@ -7,7 +7,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the tooth space's flanks \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the tooth space's flanks \
          are the envelope of the pinion tooth's flanks under turns about two skew axes at once, \
          which no sweep of a profile along a line, a screw, a revolve or a path makes"
         .into())

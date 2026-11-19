@@ -9,7 +9,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the leaning mill turns with the \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the leaning mill turns with the \
          curve, so the groove's walls are the envelope of its side and round over the motion, \
          which no plane section of it swept along the curve makes"
         .into())

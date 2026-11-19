@@ -9,7 +9,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the hole is the spring's shadow \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the hole is the spring's shadow \
          along the push, bounded by the silhouettes of its helical coils, which no sweep of a \
          profile makes"
         .into())

@@ -9,8 +9,8 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no sweep along a path of growing lead: \
-         its helical sweeps rise a constant pitch (`sweep_helix_radial` only moves the section \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or a sweep along a path of growing lead: \
+         every layer's helical sweep rises a constant pitch (`sweep_helix_radial` only moves the section \
          off the axis), and its path sweeps take lines, arcs and splines, none of which is the \
          path that has risen 6s + 0.3s² after s turns"
         .into())

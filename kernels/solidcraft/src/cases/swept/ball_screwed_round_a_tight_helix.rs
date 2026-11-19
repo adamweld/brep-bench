@@ -11,7 +11,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the helix turns tighter than \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the helix turns tighter than \
          the ball, so the screw sweep of the ball's forward-moving great disc runs through itself, \
          and the solid's boundary is that sweep's envelope trimmed where it meets itself"
         .into())

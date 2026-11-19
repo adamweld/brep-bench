@@ -8,7 +8,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the key turns with the curve and \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the key turns with the curve and \
          its corners dig past its sides where it bends, so the groove's walls are its corners' \
          paths and its faces' envelopes, which no plane section swept along the curve makes"
         .into())

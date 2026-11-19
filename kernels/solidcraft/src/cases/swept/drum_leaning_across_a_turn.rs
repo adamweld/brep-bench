@@ -7,7 +7,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: the drum, its axis skew to the \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: the drum, its axis skew to the \
          turn's, touches its sweep along curves that are none of its lines or circles, so the \
          channel is bounded by an envelope"
         .into())
