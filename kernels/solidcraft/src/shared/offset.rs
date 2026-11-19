@@ -39,7 +39,7 @@ pub fn in_kernel(
     let solid = is_outward_solid(&mut k, &mut brep)?;
     let mut made = op(&mut k, &mut brep, &order)?;
     if made.face_list().is_empty() {
-        return Err(crate::bench::empty("the offset"));
+        return Err(crate::bench::empty("the kernel's operation"));
     }
     // where the kernel's test cannot read a surface of the result (it answers `Unsupported`), the
     // result goes on unchecked, and the harness checks the solid itself; any other error of the
