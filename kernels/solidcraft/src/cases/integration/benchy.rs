@@ -7,8 +7,8 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("SolidCraft builds only a likeness of #3DBenchy from numbers read off the reference (a \
-         hull, a deck well, a wheelhouse and its openings), not the original's 1385 faces, whose \
-         construction the case does not give"
+    Err("the case's solid is #3DBenchy's original CAD model, 1385 faces, and the case gives no \
+         construction of it: what any layer can build from numbers read off the reference is a \
+         likeness, not that solid"
         .into())
 }
