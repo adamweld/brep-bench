@@ -304,6 +304,29 @@ cut leaves a disc a hundredth as thick as it is wide; slid, the two sides cross 
 the cut leaves a crescent 0.000015 wide at its widest. A tolerance that does not shrink with the
 model takes the two sides, or the copy's end and the cylinder's, for one.
 
+## From brep-conformance (`scale/`, and some in `boolean/`, `fillet/` and `offset/`)
+
+Single instances of the generated families of
+[brep-conformance](https://github.com/springcraft-ai/brep-conformance) (MIT), springrep's suite,
+chosen where its published runs show kernels failing and brep-bench had no case like them. Each
+names its family in its `origin`; its parameters are picked to be stated plainly rather than
+drawn at random, and its answer is a closed form derived here, not taken from that suite.
+
+- **Scale** (`scale/`): a lens of two balls united and a Steinmetz bicylinder, a million from the
+  origin along directions no axis lines up with; the same lens and bicylinder a few microns across;
+  and the lens tens of metres across. The solids are ordinary; the coordinates are not, against a
+  kernel's fixed absolute tolerance.
+- **A chain of three balls** united one after another, the middle one overlapping both ends, and
+  the chain halved by the plane through all three centers, which meets every circle where two
+  spheres cross at its diameter's ends.
+- **Fillets at the limits**: a ridge where two faces meet at 179°, rounded by a radius twenty times
+  the solid's size; a knife edge of 5° rounded by 0.1, its contacts far back along the blade; and
+  a block's edge broken by a flat 0.00014 wide and rounded over by a ball too big to touch the
+  flat, so that the round takes it away.
+- **A drilled plate grown to and past its hole's radius**: the hole closes, onto its axis or past
+  it, and each end leaves a dimple in the grown face, part of a horn torus coming down to a cusp on
+  the axis, or of a spindle torus that crosses itself there.
+
 ## Integration tests (`integration/`)
 
 Whole models that take many of a kernel's features at once, where a case elsewhere tests one. The
