@@ -23,7 +23,7 @@ use solidcore_ops::Body;
 /// `body` with the faces through `points` deleted together, the gap they leave closed by the
 /// faces round them run on along their surfaces.
 pub fn delete_faces(body: &Body, points: &[[f64; 3]]) -> Result<Body, Refusal> {
-    let picked = faces_through_each(body, points)?;
+    let picked = whole_faces(body, &faces_through_each(body, points)?)?;
     let mut kept = None;
     let healed = in_kernel(body, |k, b, order| {
         let faces: Vec<FaceId> = picked.iter().filter_map(|&i| order.faces.get(i).copied()).collect();
@@ -33,7 +33,12 @@ pub fn delete_faces(body: &Body, points: &[[f64; 3]]) -> Result<Body, Refusal> {
             for group in &groups {
                 // the base's patch is the extended surfaces; the feature taken off (discarded) is
                 // closed from the base's patch, as solidcore's own face offset calls it
-                ex.add_feature(k, group, RebuildBrepType::ExtendSurface, RebuildBrepType::FromOtherBrep)?;
+                // `None`: the set's boundary does not part the body, and no feature is made
+                ex.add_feature(k, group, RebuildBrepType::ExtendSurface, RebuildBrepType::FromOtherBrep)?
+                    .ok_or(solidcore::SolidError::Unsupported {
+                        operation: "defeature",
+                        reason: "the faces' boundary does not part the body: no feature is made of them",
+                    })?;
             }
             // a feature whose patch could not be built is put back, the others taken off
             let back = ex.do_defeature(k)?;
@@ -53,6 +58,25 @@ pub fn delete_faces(body: &Body, points: &[[f64; 3]]) -> Result<Body, Refusal> {
         Some(why) => Err(why.into()),
         None => Ok(healed),
     }
+}
+
+/// The faces picked, each with every other face of the body on the same curved surface: a
+/// primitive splits a cylinder, cone, sphere or torus into pieces along its seams, and the
+/// deletion is of the whole face, every piece. Planes are taken as picked. No face twice.
+fn whole_faces(body: &Body, picked: &[usize]) -> Result<Vec<usize>, Refusal> {
+    use solidcore_record::brep::Surface;
+    let (record, _) = body.to_record()?;
+    let mut out: Vec<usize> = Vec::new();
+    for &i in picked {
+        let s = &record.faces[i].surface;
+        let planar = matches!(s, Surface::Plane { .. } | Surface::PlaneThrough { .. });
+        for (j, f) in record.faces.iter().enumerate() {
+            if (j == i || (!planar && &f.surface == s)) && !out.contains(&j) {
+                out.push(j);
+            }
+        }
+    }
+    Ok(out)
 }
 
 /// `faces` of `b` in sets that share edges: each set one feature.

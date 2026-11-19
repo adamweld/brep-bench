@@ -38,7 +38,9 @@ pub fn rounded(body: &Body, points: &[[f64; 3]], radius: f64) -> Result<Body, Re
 
 /// The faces of SolidCraft's `body` nearest each of `points`, a face named twice taken once, by
 /// their index in its face order: what the kernel's `delete_faces` takes. A face is named by a
-/// point on it, a round or a bevel by a point of the sharp edge it replaced.
+/// point on it, a round or a bevel by a point of the sharp edge it replaced. Each with every
+/// face on the same surface joined to it (`with_same_surface`: the halves of a hole's wall),
+/// so the whole face is named however the kernel stored it.
 pub fn faces_nearest(body: &solidcraft_kernel::Body, points: &[Vec3]) -> R<Vec<usize>> {
     let mut faces = Vec::new();
     for p in points {
@@ -49,7 +51,7 @@ pub fn faces_nearest(body: &solidcraft_kernel::Body, points: &[Vec3]) -> R<Vec<u
             faces.push(f);
         }
     }
-    Ok(faces)
+    Ok(solidcraft_kernel::with_same_surface(body, &faces))
 }
 
 /// The record faces of `body` nearest each of `points`, a face named twice taken once: a round
@@ -94,27 +96,17 @@ pub fn round_the_rim(radius: f64, z: f64) -> Vec<[f64; 3]> {
 /// as the removal requires, and the result is held to be a closed solid facing out.
 pub fn delete_rounds(body: &Body, points: &[[f64; 3]]) -> Result<Body, Refusal> {
     let rounds = rounds_nearest(body, points)?;
-    let (record, _) = body.to_record()?;
-    let mut k = Kernel::default();
-    for name in solidcore_ops::session::fixes() {
-        if let Some(on) = k.fixes.flag_mut(name) {
-            *on = true;
+    // the kernel's own body, run as `in_kernel` runs every raw operation (its fixes on, the
+    // result checked as a closed solid where the kernel can tell)
+    crate::shared::offset::in_kernel(body, |k, brep, order| {
+        // the kernel's faces, named before the first removal changes anything
+        let faces: Vec<FaceId> = rounds.iter().map(|&i| order.faces[i]).collect();
+        let editing = brep.editing_enabled();
+        brep.set_editing_enabled(true);
+        for f in faces {
+            delete_fillet_face(k, brep, f, None)?;
         }
-    }
-    let (mut brep, order) =
-        to_kernel(&mut k, &record, true).map_err(|e| format!("the record does not convert: {e:?}"))?;
-    // the kernel's faces, named before the first removal changes anything
-    let faces: Vec<FaceId> = rounds.iter().map(|&i| order.faces[i]).collect();
-    let editing = brep.editing_enabled();
-    brep.set_editing_enabled(true);
-    for f in faces {
-        delete_fillet_face(&mut k, &mut brep, f, None)?;
-    }
-    brep.set_editing_enabled(editing);
-    if !is_outward_solid(&mut k, &mut brep)? {
-        return Err("the result is not a closed solid".into());
-    }
-    let (record, _) =
-        to_record(&mut k, &mut brep).map_err(|e| format!("the result makes no record: {e:?}"))?;
-    Ok(Body::from_record(&record, true)?.0)
+        brep.set_editing_enabled(editing);
+        Ok(std::mem::take(brep))
+    })
 }

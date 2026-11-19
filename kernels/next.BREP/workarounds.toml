@@ -2,3 +2,5 @@
 # (SPEC.md, "A workaround is flagged").
 "swept/straight-bevel-gear-cut-by-its-pinion" = "no sweep of a solid under two turns that meet"
 "swept/cone-spun-about-a-line-through-it" = "no sweep of a solid turned about a line through it"
+"swept/worm-wheel-hobbed-by-its-worm" = "no sweep of a solid for a thread under its generating motion"
+"swept/ball-screwed-round-a-tight-helix" = "no sweep of a solid along a helix tighter than the ball"

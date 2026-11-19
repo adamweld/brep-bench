@@ -7,9 +7,9 @@ use crate::solids::*;
 pub fn build() -> Result<Body, crate::Refusal> {
     let cylinder = zcyl(0.0, 0.0, 5.0, -1.0, 10.0)?;
     let (above, _) = solidcraft_kernel::half_space(&cylinder, &Plane::XY, true)?;
-    let above = above.ok_or("nothing of the cylinder lies above z = 0")?;
+    let above = above.ok_or(format!("{EMPTY}nothing of the cylinder lies above z = 0"))?;
     let (s, c) = 30f64.to_radians().sin_cos();
     let slant = Plane { origin: Vec3::ZERO, x: v3(c, 0.0, s), y: Vec3::Y };
     let (hoof, _) = solidcraft_kernel::half_space(&above, &slant, false)?;
-    Ok(hoof.ok_or("nothing of the cylinder lies below the slanting plane")?)
+    Ok(hoof.ok_or(format!("{EMPTY}nothing of the cylinder lies below the slanting plane"))?)
 }
