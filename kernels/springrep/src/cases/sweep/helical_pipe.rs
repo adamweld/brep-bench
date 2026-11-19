@@ -2,8 +2,11 @@
 //! rising 5 a turn from (10, 0, 0), its section square to the path.
 use springrep::topo::Brep;
 
-use crate::shared::sweep::helical_pipe;
-
 pub fn build() -> Result<Brep, String> {
-    helical_pipe()
+    // `sweep::helix` screws a profile drawn in a plane through the axis, a section square to the
+    // path being no such profile; and springrep has no helical curve to sweep along: a path
+    // through points sampled on the helix would be geometry made outside the kernel.
+    Err("springrep has no helical curve to sweep a section along (its screw sweep turns a \
+         profile drawn in a plane through the axis, not one square to the path)"
+        .into())
 }
