@@ -28,3 +28,8 @@
 "thicken/open-box-outward-rounded" = "no thickening with rounded edges"
 "thicken/sphere-skin" = "no thickening of a closed sheet"
 "fillet/conic-edge" = "no conic blend"
+"cnc/flat-end-mill-profile" = "no sweep of a solid"
+"cnc/bull-nose-profile" = "no sweep of a solid"
+"cnc/pocket-with-an-island" = "no sweep of a solid"
+"cnc/ball-end-surface-raster" = "no sweep of a solid"
+"cnc/five-axis-dome" = "no sweep of a solid"
