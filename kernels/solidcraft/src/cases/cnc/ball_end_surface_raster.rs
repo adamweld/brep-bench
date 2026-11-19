@@ -73,12 +73,13 @@ fn pass(centres: &[Vec3]) -> R<Vec<Body>> {
         // the wedge at the corner the move starts from, where the pass bends up: the ball
         // between the last move's end and this move's start
         let last = dirs[i - 1] * (1.0 / dirs[i - 1].len());
-        if (last - unit).z < 0.0 && last.dot(unit).clamp(-1.0, 1.0).acos() > 1e-9 {
+        // (a straight run's moves can differ by rounding: a bend is one of more than 1e-6, well
+        // above that and well below the surface's least, about 4e-3)
+        if (last - unit).z < 0.0 && last.dot(unit).clamp(-1.0, 1.0).acos() > 1e-6 {
             let ball = solidcraft_kernel::sphere(centres[i], 3.0)?;
-            // (where the pass bends so little that the kernel finds no wedge, there is none)
-            if let Some(behind) = beside(&ball, centres[i], unit, false)? {
-                pieces.extend(beside(&behind, centres[i], last, true)?);
-            }
+            let missing = || KernelError::Failed("the kernel finds no wedge at a bend".into());
+            let behind = beside(&ball, centres[i], unit, false)?.ok_or_else(missing)?;
+            pieces.push(beside(&behind, centres[i], last, true)?.ok_or_else(missing)?);
         }
     }
     Ok(pieces)
