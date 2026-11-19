@@ -4,9 +4,9 @@ code as HTML, escaped, its tokens in <span>s whose classes style.css colours:
   c comment (and a Python docstring), s string, n number, k keyword, b a constant (true, None, self, an ALL_CAPS name),
   t a type (a Capitalised name), f a function called or defined, m a macro or an attribute.
 
-A language is told by the file's extension: Rust (.rs), Python (.py), Rhai (.rhai) and
-Firmament (.firmament); any other file comes back escaped and nothing more. `loc(code, path)`
-counts its lines of code by the same lexers, leaving out comments. A lexer here is a
+A language is told by the file's extension: Rust (.rs), Python (.py), Rhai (.rhai),
+Firmament (.firmament) and Solvent (.sv); any other file comes back escaped and nothing more.
+`loc(code, path)` counts its lines of code by the same lexers, leaving out comments. A lexer here is a
 list of patterns tried in order at each place, not a parser: it knows strings and comments from
 code, and names by their spelling and by whether a `(` follows them. Standard library only."""
 import html
@@ -21,6 +21,8 @@ PYTHON_KEYWORDS = """and as assert async await break class continue def del elif
     with yield""".split()
 RHAI_KEYWORDS = """as break catch const continue do else export fn for if import in let loop
     private return switch throw try until while""".split()
+SOLVENT_KEYWORDS = """use unit param component in repeat cycle ring about as when claim fix private
+    construction preview some not and or over at next prev""".split()
 
 NUMBER = r"\b(?:0[xob][0-9a-fA-F_]+|\d[\d_]*(?:\.\d[\d_]*|\.(?![.\w]))?(?:[eE][+-]?\d[\d_]*)?)"
 BLOCK = r"/\*[\s\S]*?\*/"
@@ -62,6 +64,12 @@ LEXERS = {
         ("n", NUMBER + r"(?:[a-zA-Z]+\b)?"),  # a length or an angle with its unit: 5mm, 90deg
         ("id", r"[A-Za-z_]\w*"),
     ], [], ["true", "false"]),
+    ".sv": lexer([
+        ("c", r"//[^\n]*|" + BLOCK),
+        ("s", DQ),
+        ("n", NUMBER + r"(?:[a-zA-Z]+\b)?"),  # a length or an angle with its unit: 5mm, 90deg
+        ("id", r"[A-Za-z_]\w*"),
+    ], SOLVENT_KEYWORDS, ["true", "false"]),
 }
 
 

@@ -331,6 +331,29 @@
       "source": "kernels/springrep/src/cases/{category}/{name_snake}.rs",
       "step": true,
       "binary": ["kernels/springrep/target/release/brep-bench-springrep"]
+    },
+    {
+      "name": "geomsolver",
+      "kernel": "https://github.com/bmander/geomsolver",
+      "license": "MIT",
+      "backend": "Rust",
+      "frontend": "Solvent (geomsolver's constraint language, compiled by solventc)",
+      "build": [
+        "python3",
+        "kernels/geomsolver/build.py"
+      ],
+      "command": [
+        "python3",
+        "kernels/geomsolver/run.py"
+      ],
+      "version": [
+        "python3",
+        "kernels/geomsolver/run.py",
+        "--version"
+      ],
+      "source": "kernels/geomsolver/cases/{category}/{name_snake}.sv",
+      "step": true,
+      "binary": ["kernels/geomsolver/bin/solventc"]
     }
   ]
 }
