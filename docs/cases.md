@@ -15,7 +15,8 @@ words stay the definition.
 - **Primitives:** box, cylinder, cone, sphere, torus, extrusion, revolution.
 - **Booleans:** coincident and partly coincident faces, tangencies, Steinmetz solids, spheres, tori,
   and a run of nine cuts.
-- **Sweeps:** a circle along helices and arcs.
+- **Sweeps:** a circle along helices and arcs, and a square thread wound on a rod, its inner face
+  lying on the rod's side.
 - **Fillets:** one edge, every edge of a box (three meeting at each corner), and a cylinder's rim.
 
 ## Harder ground (`nurbs/`, `tangent/`, `fillet/`, `chamfer/`, `spline/`)
@@ -104,6 +105,8 @@ spire's point; and sections turned as they rise, along spiral and helical guides
 tapering through a half turn and a blade 40 × 0.4 twisted through a whole one. All but the
 square-to-round have closed forms; its cones' area is an elliptic integral, which OCCT and
 cad-kernel agree on.
+A hollow frustum is lofted between two rings, outer circle to outer and inner to inner, and a tube
+padded on its flat top.
 
 ## Offsets (`offset/`)
 
@@ -150,6 +153,9 @@ that falls into two disks, and a ball cut by a plane whose cavity reaches it asl
 pinhole, or not at all.
 A half ball shelled outward and open at its dome has only its flat face to move: it runs on
 until it meets the sphere, leaving a slice of the ball 0.5, 1 or 2 thick under the opening.
+A wall can also be centred on the faces it is grown from, half inside and half outside: a cup
+whose outer rim is rounded where the faces moved outward part, and a box with rounded corners
+open at its top, every edge kept sharp. A cylinder open at both ends shells inward into a tube.
 
 ## Geometry (`geometry/`)
 
@@ -184,6 +190,29 @@ Features that end on a face rather than at a length: a square pad extruded down 
 cylinder, a post extruded up inside a hollow dome until it meets the dome's inside, a rib turned
 about a hub until it meets a stop, and a hole drilled through the first wall it meets and no
 further.
+
+Others, re-described from the geometry of FreeCAD's feature tests (each naming the test in its
+`origin`), with dimensions and closed forms of their own: a square pad run out to a half ring's
+concave inside, and a slanted one run up to a whole block, which it meets across an edge, half on
+the top and half on the side; a disk revolved both ways past a half turn, the sweeps overlapping
+into a whole torus; a block's top face turned 60° about a bottom edge and joined on, and turned a
+whole turn as a groove, which leaves only what lies within reach of the edge; a groove turned about
+a tilted axis that stays sealed inside a drum; and a square frame extruded with a taper, once as a
+draft leans it (the hole closing) and once with the hole flaring like the outside.
+
+## Patterns and mirrors (`pattern/`)
+
+Copies of one solid placed by a rule and joined: a bar patterned six times around a turn, so that
+each copy lies exactly on the one opposite it and the three distinct bars cross in a six-armed
+star, and a box joined to its mirror image across a slanted plane through it, the image turned by
+a 3-4-5 angle so that every crossing is rational.
+
+## Splits (`split/`)
+
+One solid cut by surfaces into several, kept as separate solids that touch along the cuts: a box
+sliced aslant by two parallel planes into three. Its volume is the box's, and its area counts each
+cut twice, once for each piece beside it, so a result that glued the pieces back together, or lost
+one, is wrong.
 
 ## Sweeps along paths with sharp corners (`sweep/`)
 
