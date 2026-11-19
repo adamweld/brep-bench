@@ -307,7 +307,8 @@ def mass_command():
 def mass_of(out_step, timeout):
     """The mass properties of the solid in the STEP file at `out_step` (harness/mass/,
     `mass_command`): {"volume", "area", "centroid", "inertia", ...} (and `by_surface`, the solid
-    with its loops taken by their surfaces' normals, where that differs), or {"invalid": why}
+    with its loops taken by their surfaces' normals, where that differs; `by_seam`, with its loops
+    along seams taken the way they unwrap, where one runs against the standard), or {"invalid": why}
     where the file holds no solid, or {"error": why} where it cannot measure the file. Untimed."""
     command = mass_command()
     if isinstance(command, str):
@@ -439,6 +440,9 @@ NOT_A_SOLID = {"open": "its STEP's faces do not close into a solid",
 BY_SURFACE = ("its STEP's loops run anticlockwise about their surfaces' normals where same_sense is "
               "false, not about the faces' normals as ISO 10303-42 directs: read by the standard, "
               "the faces are the other sides of their loops (read its way, it holds the solid)")
+BY_SEAM = ("its STEP's loops along seams run clockwise about their faces' normals, against "
+           "ISO 10303-42: read by the standard, those faces are the rest of their surfaces, where "
+           "the seams are not (read its way, it holds the solid)")
 
 
 def grade_step(case, measured):
@@ -537,11 +541,12 @@ def settle(command, case, timeout, keep, made, pending, measured):
     are kept for the pictures."""
     if "invalid" in measured:
         return "wrong", f"its STEP is no solid: {measured['invalid']}", None, None
-    other = measured.get("by_surface") or {}
-    if ("error" in measured or grade_step(case, measured)[0] == "wrong") and "volume" in other \
-            and grade_step(case, other)[0] != "wrong":
-        # read as its writer means it, the file holds the solid: that is why it fails
-        return "wrong", BY_SURFACE, {"status": "ok", "measured": "step", **other}, None
+    for key, reason in (("by_surface", BY_SURFACE), ("by_seam", BY_SEAM)):
+        other = measured.get(key) or {}
+        if ("error" in measured or grade_step(case, measured)[0] == "wrong") and "volume" in other \
+                and grade_step(case, other)[0] != "wrong":
+            # read as its writer means it, the file holds the solid: that is why it fails
+            return "wrong", reason, {"status": "ok", "measured": "step", **other}, None
     with tempfile.TemporaryDirectory() as tmp:
         out_stl = os.path.join(tmp, "result.stl")
         if "error" in measured:
@@ -557,7 +562,7 @@ def settle(command, case, timeout, keep, made, pending, measured):
                 keep_file(pictured, keep)
             except (ValueError, OSError):
                 mesh = None
-        measures = {k: v for k, v in measured.items() if k != "by_surface"}
+        measures = {k: v for k, v in measured.items() if k not in ("by_surface", "by_seam")}
         return outcome, why, {"status": "ok", "measured": "step", **measures}, mesh
 
 

@@ -368,7 +368,9 @@ and the faces' normals point out of the solid. Some writers direct a face's loop
 normal whatever `same_sense` says: read by the standard, such a face is the other side of its loops,
 and the solid is not the one meant. Where a file fails so, the harness measures it once more with
 the loops taken the writer's way, to say why: the result is still **wrong**, its reason that the
-loops run against the standard. Many readers repair both faults silently; a file that needs the
+loops run against the standard. So too a face whose loop runs along a seam (an edge both ways) but
+clockwise about its normal: read by the standard it is the rest of its surface, where the seam is
+not. Many readers repair both faults silently; a file that needs the
 repair is not the solid it says it is.
 
 **Welding.** The harness joins only vertices whose coordinates are exactly equal. A runner may weld

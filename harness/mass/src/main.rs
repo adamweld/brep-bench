@@ -32,7 +32,9 @@
 //! normal points, the face's normal its surface's turned by `same_sense`. Where a face's normal is
 //! against its surface's, the answer also has `by_surface`: the solid as it would be with the
 //! loops directed by the surfaces' normals, as some writers direct them; the harness reads it only
-//! to say why a file fails.
+//! to say why a file fails. Where a loop along a seam (an edge run both ways, a turn apart) runs
+//! against the standard, so that the face is the rest of its surface, which the seam is not in, the
+//! answer also has `by_seam`: the solid with those faces the regions their loops unwrap to.
 //!
 //! Supported: planes, cylinders, cones, spheres, tori (degenerate too), B-spline surfaces
 //! (rational too), surfaces of revolution and of linear extrusion; lines, circles, ellipses,
@@ -279,7 +281,7 @@ fn props(
     ]
 }
 
-type Measured = R<(Settled, Option<Settled>)>;
+type Measured = R<(Settled, Option<Settled>, Option<Settled>)>;
 
 /// Each face measured, `threads` at once, in the faces' order. A face after one that could not
 /// be measured may be left out (`None`): Python stops at the first.
@@ -422,17 +424,20 @@ fn measure(text: &[u8], threads: usize) -> R<Json> {
     }
     drop(m);
     let measured = measure_faces(jobs, centre, scale, threads);
-    let mut totals = [[0.0; NM]; 2];
-    let mut failed: [Option<String>; 2] = [None, None];
+    let mut totals = [[0.0; NM]; 3];
+    let mut failed: [Option<String>; 3] = [None, None, None];
+    let mut by_seam = false;
     for ((f, sense), got) in names.iter().zip(measured) {
-        let (standard, other) = match got {
+        let (standard, other, seamed) = match got {
             Some(Ok(parts)) => parts,
             Some(Err(e)) => return Err(of_face(e, f)),
             None => unreachable!("a face left unmeasured before any failed"),
         };
         let sign = if *sense { 1.0 } else { -1.0 };
         let other = other.unwrap_or_else(|| standard.clone());
-        for (key, part) in [standard, other].into_iter().enumerate() {
+        by_seam |= seamed.is_some();
+        let seamed = seamed.unwrap_or_else(|| standard.clone());
+        for (key, part) in [standard, other, seamed].into_iter().enumerate() {
             let part = match part {
                 Ok(part) => part,
                 Err(why) => {
@@ -457,6 +462,18 @@ fn measure(text: &[u8], threads: usize) -> R<Json> {
             Json::Obj(props(
                 &totals[1],
                 failed[1].as_ref(),
+                centre,
+                nsolids,
+                nfaces,
+            )),
+        ));
+    }
+    if by_seam {
+        out.push((
+            "by_seam",
+            Json::Obj(props(
+                &totals[2],
+                failed[2].as_ref(),
                 centre,
                 nsolids,
                 nfaces,
@@ -627,5 +644,83 @@ mod tests {
             );
             assert!(out.ends_with("\"solids\": 1, \"faces\": 6}"), "{}", out);
         }
+    }
+
+    /// A quarter of a torus's tube, capped, its loop along the seam run against the standard (as
+    /// Open CASCADE writes some): read by the standard the face is the other three quarters, and
+    /// `by_seam` holds the quarter.
+    #[test]
+    fn a_seam_loop_run_backwards() {
+        let s = format!(
+            "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n{}\nENDSEC;\nEND-ISO-10303-21;\n",
+            [
+                "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));",
+                "#2=CARTESIAN_POINT('',(0.,0.,0.));",
+                "#3=DIRECTION('',(0.,0.,1.));",
+                "#4=DIRECTION('',(1.,0.,0.));",
+                "#5=AXIS2_PLACEMENT_3D('',#2,#3,#4);",
+                "#6=TOROIDAL_SURFACE('',#5,10.,3.);",
+                "#10=CARTESIAN_POINT('',(10.,0.,3.));",
+                "#11=CARTESIAN_POINT('',(0.,10.,3.));",
+                "#12=VERTEX_POINT('',#10);",
+                "#13=VERTEX_POINT('',#11);",
+                "#20=CARTESIAN_POINT('',(0.,0.,3.));",
+                "#21=AXIS2_PLACEMENT_3D('',#20,#3,#4);",
+                "#22=CIRCLE('',#21,10.);",
+                "#23=EDGE_CURVE('',#12,#13,#22,.T.);",
+                "#30=CARTESIAN_POINT('',(10.,0.,0.));",
+                "#31=DIRECTION('',(0.,1.,0.));",
+                "#32=AXIS2_PLACEMENT_3D('',#30,#31,#3);",
+                "#33=CIRCLE('',#32,3.);",
+                "#34=EDGE_CURVE('',#12,#12,#33,.T.);",
+                "#40=CARTESIAN_POINT('',(0.,10.,0.));",
+                "#41=DIRECTION('',(-1.,0.,0.));",
+                "#42=AXIS2_PLACEMENT_3D('',#40,#41,#3);",
+                "#43=CIRCLE('',#42,3.);",
+                "#44=EDGE_CURVE('',#13,#13,#43,.T.);",
+                "#50=ORIENTED_EDGE('',*,*,#23,.T.);",
+                "#51=ORIENTED_EDGE('',*,*,#44,.F.);",
+                "#52=ORIENTED_EDGE('',*,*,#23,.F.);",
+                "#53=ORIENTED_EDGE('',*,*,#34,.T.);",
+                "#54=EDGE_LOOP('',(#50,#51,#52,#53));",
+                "#55=FACE_BOUND('',#54,.F.);",
+                "#56=ADVANCED_FACE('',(#55),#6,.T.);",
+                "#60=AXIS2_PLACEMENT_3D('',#30,#31,#3);",
+                "#61=PLANE('',#60);",
+                "#62=ORIENTED_EDGE('',*,*,#34,.F.);",
+                "#63=EDGE_LOOP('',(#62));",
+                "#64=FACE_BOUND('',#63,.T.);",
+                "#65=ADVANCED_FACE('',(#64),#61,.F.);",
+                "#70=AXIS2_PLACEMENT_3D('',#40,#41,#3);",
+                "#71=PLANE('',#70);",
+                "#72=ORIENTED_EDGE('',*,*,#44,.T.);",
+                "#73=EDGE_LOOP('',(#72));",
+                "#74=FACE_BOUND('',#73,.T.);",
+                "#75=ADVANCED_FACE('',(#74),#71,.T.);",
+                "#80=CLOSED_SHELL('',(#56,#65,#75));",
+                "#81=MANIFOLD_SOLID_BREP('',#80);",
+            ]
+            .join("\n")
+        );
+        let mut out = String::new();
+        measure(s.as_bytes(), 1).ok().unwrap().dump(&mut out);
+        let seamed = &out[out.find("\"by_seam\"").unwrap()..];
+        let number = |key: &str| -> f64 {
+            let at = seamed.find(key).unwrap() + key.len();
+            seamed[at..]
+                .split(',')
+                .next()
+                .unwrap()
+                .trim()
+                .parse()
+                .unwrap()
+        };
+        let (volume, area) = (45.0 * PI * PI, 30.0 * PI * PI + 18.0 * PI);
+        assert!(
+            (number("\"volume\": ") / volume - 1.0).abs() < 1e-12,
+            "{}",
+            out
+        );
+        assert!((number("\"area\": ") / area - 1.0).abs() < 1e-12, "{}", out);
     }
 }

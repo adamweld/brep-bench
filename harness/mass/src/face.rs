@@ -24,6 +24,8 @@ pub struct Face<'a> {
     s: View,
     vref: f64,
     top: Option<f64>,
+    /// Whether a loop runs along a seam (one edge both ways), which lies inside its face.
+    seam: bool,
     /// The inner integral's breaks.
     cuts: Vec<f64>,
     /// Gauss's nodes and weights over each whole panel between two breaks, once made.
@@ -99,7 +101,7 @@ impl<'a> Face<'a> {
         scale: f64,
         index: usize,
         failed: &'a AtomicUsize,
-    ) -> R<(Settled, Option<Settled>)> {
+    ) -> R<(Settled, Option<Settled>, Option<Settled>)> {
         // the inner integral runs along the parameter no loop winds round; where none winds, along
         // the one whose ends are poles (a sphere's or a revolution's meridian), else v
         let poles = s0.singular();
@@ -127,6 +129,20 @@ impl<'a> Face<'a> {
             transposed,
         };
         let paths: Vec<Vec<Path>> = loops.into_iter().map(|(ps, _)| ps).collect();
+        // a seam: an edge run both ways in one loop, its two runs apart (a turn apart) in (u, v)
+        let seam = paths.iter().any(|ps| {
+            ps.iter().enumerate().any(|(i, p)| {
+                ps[i + 1..].iter().any(|q| match (&p.c, &q.c) {
+                    (Some(a), Some(b)) => {
+                        let (x, y) = (p.start(), q.end());
+                        Arc::ptr_eq(a, b)
+                            && (p.t0, p.t1) == (q.t1, q.t0)
+                            && (x.0 - y.0).abs() + (x.1 - y.1).abs() > 1e-7
+                    }
+                    _ => false,
+                })
+            })
+        });
         let bounded = !paths.is_empty();
         let periods = s.periods();
         let domain = s.domain();
@@ -218,6 +234,7 @@ impl<'a> Face<'a> {
             s,
             vref,
             top,
+            seam,
             cuts: Vec::new(),
             whole: Vec::new(),
             column: None,
@@ -255,18 +272,26 @@ impl<'a> Face<'a> {
         let tau = if transposed { -1.0 } else { 1.0 };
         // the face as the standard reads its loops (by its own normal, sigma), and, where that
         // differs, as a writer who directs them by the surface's normal would mean it (tau)
-        let standard = face.settle(&total, sigma, sigma)?;
+        let standard = face.settle(&total, sigma, sigma, false)?;
         let other = if tau != sigma {
-            Some(face.settle(&total, tau, sigma)?)
+            Some(face.settle(&total, tau, sigma, false)?)
         } else {
             None
         };
-        Ok((standard, other))
+        // and, where a loop along a seam runs against the standard, as its writer means it: the
+        // region the loop unwraps to, which the seam is in
+        let seamed = if face.seam {
+            Some(face.settle(&total, sigma, sigma, true)?).filter(|x| *x != standard)
+        } else {
+            None
+        };
+        Ok((standard, other, seamed))
     }
 
     /// The face's measures from its loops' integrals (`raw`), the loops taken in the sense
-    /// `rho`, the face's normal `sigma`.
-    fn settle(&mut self, raw: &Measures, rho: f64, sigma: f64) -> R<Settled> {
+    /// `rho`, the face's normal `sigma`; `by_seam`, a loop along a seam taken whichever way it
+    /// runs.
+    fn settle(&mut self, raw: &Measures, rho: f64, sigma: f64, by_seam: bool) -> R<Settled> {
         let periods = self.s.periods();
         let mut total = raw.map(|x| rho * x);
         // what the loops leave open on a periodic surface: whole turns of the inner integral
@@ -287,7 +312,11 @@ impl<'a> Face<'a> {
                     let a = full.abs();
                     let turns = div(total[0], a)? - 1e-12;
                     let k = -integer(turns, turns.floor())? * (if full > 0.0 { 1.0 } else { -1.0 });
-                    if k != 0.0 {
+                    if k > 0.0 && self.seam && by_seam {
+                        // the loop runs against the standard: not the rest of the surface (which
+                        // the seam is not in), but the region it unwraps to
+                        total = total.map(|x| -x);
+                    } else if k != 0.0 {
                         let column = match self.column {
                             Some(c) => c,
                             None => {
