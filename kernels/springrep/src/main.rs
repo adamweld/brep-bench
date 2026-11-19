@@ -55,7 +55,11 @@ fn json(s: &str) -> String {
 /// (`kernels/occt/run.py`) — written as binary STL.
 fn stl(b: &Brep, path: &str, volume: f64, area: f64) -> Result<(), String> {
     let size = measure::bbox(b).diagonal();
-    let thickness = if area > 0. && volume > 0. { volume / area } else { size };
+    let thickness = if area > 0. && volume > 0. {
+        volume / area
+    } else {
+        size
+    };
     let opt = MeshOptions {
         linear: (1e-4 * size).min(5e-3 * thickness),
         angular: 0.1,

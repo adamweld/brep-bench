@@ -11,7 +11,12 @@ pub fn e(err: springrep::Error) -> String {
 
 /// The frame at `origin` whose normal is `z` and whose first axis is `x`.
 pub fn frame(origin: [f64; 3], z: [f64; 3], x: [f64; 3]) -> Result<Frame, String> {
-    Frame::new(Vec3::from_array(origin), Vec3::from_array(z), Vec3::from_array(x)).map_err(e)
+    Frame::new(
+        Vec3::from_array(origin),
+        Vec3::from_array(z),
+        Vec3::from_array(x),
+    )
+    .map_err(e)
 }
 
 /// The world frame moved to `origin`.

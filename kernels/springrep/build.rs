@@ -10,7 +10,8 @@ fn main() {
     println!("cargo:rerun-if-changed=src/cases");
     println!("cargo:rerun-if-changed=Cargo.lock");
 
-    let mut categories: Vec<_> = std::fs::read_dir(&cases).expect("src/cases reads")
+    let mut categories: Vec<_> = std::fs::read_dir(&cases)
+        .expect("src/cases reads")
         .map(|e| e.expect("a directory entry").path())
         .filter(|p| p.is_dir())
         .collect();
@@ -18,7 +19,8 @@ fn main() {
     let (mut modules, mut table) = (String::new(), String::new());
     for dir in categories {
         let category = dir.file_name().unwrap().to_str().unwrap().to_string();
-        let mut files: Vec<_> = std::fs::read_dir(&dir).expect("a category reads")
+        let mut files: Vec<_> = std::fs::read_dir(&dir)
+            .expect("a category reads")
             .map(|e| e.expect("a directory entry").path())
             .filter(|p| p.extension().is_some_and(|x| x == "rs"))
             .collect();
@@ -26,24 +28,44 @@ fn main() {
         writeln!(modules, "pub mod r#{category} {{").unwrap();
         for file in files {
             let name = file.file_stem().unwrap().to_str().unwrap().to_string();
-            writeln!(modules, "    #[path = {:?}]\n    pub mod r#{name};", file.display().to_string()).unwrap();
-            writeln!(table, "    (\"{category}/{}\", r#{category}::r#{name}::build),", name.replace('_', "-")).unwrap();
+            writeln!(
+                modules,
+                "    #[path = {:?}]\n    pub mod r#{name};",
+                file.display().to_string()
+            )
+            .unwrap();
+            writeln!(
+                table,
+                "    (\"{category}/{}\", r#{category}::r#{name}::build),",
+                name.replace('_', "-")
+            )
+            .unwrap();
         }
         writeln!(modules, "}}").unwrap();
     }
-    let out = format!("{modules}\n/// Every case by its id, and the function that builds it.\n\
-        pub const CASES: &[(&str, fn() -> Result<springrep::topo::Brep, String>)] = &[\n{table}];\n");
+    let out = format!(
+        "{modules}\n/// Every case by its id, and the function that builds it.\n\
+        pub const CASES: &[(&str, fn() -> Result<springrep::topo::Brep, String>)] = &[\n{table}];\n"
+    );
     let out_dir = std::env::var("OUT_DIR").unwrap();
     std::fs::write(Path::new(&out_dir).join("cases.rs"), out).unwrap();
 
     // the release the lock file resolved springrep to, `version = "0.1.0"`; and from git, the
     // commit too, `source = "git+…#<sha>"`
     let lock = std::fs::read_to_string(root.join("Cargo.lock")).unwrap_or_default();
-    let entry = lock.split("[[package]]").find(|p| p.contains("\nname = \"springrep\"\n"));
-    let field = |k: &str| entry.and_then(|p| p.lines().find_map(|l| l.strip_prefix(k)))
-        .map(|v| v.trim_matches('"').to_string());
+    let entry = lock
+        .split("[[package]]")
+        .find(|p| p.contains("\nname = \"springrep\"\n"));
+    let field = |k: &str| {
+        entry
+            .and_then(|p| p.lines().find_map(|l| l.strip_prefix(k)))
+            .map(|v| v.trim_matches('"').to_string())
+    };
     let version = field("version = ").unwrap_or_else(|| "unknown".into());
-    let rev = match field("source = ").as_deref().and_then(|s| s.split_once('#')) {
+    let rev = match field("source = ")
+        .as_deref()
+        .and_then(|s| s.split_once('#'))
+    {
         Some((_, sha)) => format!("{version} at {}", &sha[..sha.len().min(7)]),
         None => version,
     };
