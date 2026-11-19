@@ -185,6 +185,18 @@ cylinder, a post extruded up inside a hollow dome until it meets the dome's insi
 about a hub until it meets a stop, and a hole drilled through the first wall it meets and no
 further.
 
+## Mechanical features (`hole/`, `pattern/`, `feature/`, and some in `sweep/`, `fillet/`, `chamfer/`)
+
+The everyday features of a machined or molded part, each prompted by a situation in Open
+CASCADE's or FreeCAD's own tests and written afresh with its own dimensions: a tapered blind hole,
+a blind hole at a compound angle, a ball knob bored from below to its centre; a rack's row of
+notches, a flanged hub whose six ribs and eight bolt holes are two rings patterned about its axis,
+and a pillow block mirrored from its half; a leaning post extruded aslant down to a sloping plate, a
+pocket crossed by a channel cut through all, a gusset from one straight line, and a web rib whose
+edge is that line turned about a shaft; a conical spring; a quarter cylinder's rim rounded with a
+radius growing around it; and a stepped block, its coplanar faces merged, chamfered on a convex and
+a concave edge. Every one has a closed form.
+
 ## Sweeps along paths with sharp corners (`sweep/`)
 
 The section is carried around each corner one of two ways: mitered, each run cut by the plane
