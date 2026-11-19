@@ -1,35 +1,88 @@
 //! The brep-bench runner for SolidCraft (https://solidcraft.io), on its B-rep kernel boundary,
-//! the `solidcraft-kernel` crate.
+//! the `solidcraft-kernel` crate, and on the modelling layer under it, solidcore-ops (`ops`).
 //!
 //!     brep-bench-solidcraft CASE OUT.stl [OUT.step]
 //!     brep-bench-solidcraft --version
 //!
 //! Builds the case `CASE` (`boolean/napkin-ring`) with its implementation,
 //! `src/cases/boolean/napkin_ring.rs`, writes the solid's triangles to `OUT.stl` and prints one
-//! line of JSON: the solid's faces by surface kind and whether it passes SolidCraft's own
-//! validity check, or a refusal.
+//! line of JSON: the solid's volume and area, its faces by surface kind and whether it passes
+//! SolidCraft's own validity check, or a refusal.
 //!
 //! Given `OUT.step`, it also writes the solid there as STEP (AP242) with the kernel's own writer,
 //! `solidcraft_kernel::step_export`, the one SolidCraft's app exports a body with. Where the
 //! writer declines the solid, no file is written and the reply says why in `step_error`. A STEP
 //! written is the whole answer: the solid is then not meshed, and `OUT.stl` not written.
 //!
-//! SolidCraft measures a solid from its tessellations (`solidcraft_kernel::measure`: fine and
-//! medium meshes, face by face), so the runner answers `"measured": "mesh"` and the harness takes
-//! the volume and area from the triangles it writes: SolidCraft's own tessellation of the solid.
-//! A kernel error is a refusal: the kernel declined, saying why (it turns a panic in the truck
-//! crates under it into an error of its own, `KernelError::Internal`). A case may also refuse in
-//! its own words, where the kernel has no operation for what it describes. A boolean the kernel
-//! answers is empty is not a refusal but an answer: the runner reports an empty solid.
+//! The kernel under SolidCraft is solidcore, its Rust port of NVIDIA's SMLib, and
+//! `solidcraft_kernel::measure` integrates a solid's volume and area on its exact surfaces
+//! (SMLib's, at a relative accuracy of 1e-8; a mesh body's from its triangles, which the reply
+//! then says, `"measured": "mesh"`), so those are the measures the runner answers; its
+//! triangles are SolidCraft's own mesh of the solid (`Body::mesh`). A kernel error is a refusal:
+//! the kernel declined, saying why (it turns a panic in the kernel under it into an error of its
+//! own, `KernelError::Internal`). A case may also refuse in its own words, where the kernel has no
+//! operation for what it describes. A boolean the kernel answers is empty is not a refusal but an
+//! answer: the runner reports an empty solid.
+//!
+//! A case's `build` returns either kernel's body: a `solidcraft_kernel::Body`, or, for a case
+//! built on solidcore-ops, a `solidcore_ops::Body` (`ops`), which is written as STEP by the same
+//! writer and, where it declines, measured and meshed by solidcore's own tools. Which one is a
+//! case's own choice, made in its file; the runner learns it from the type ([`Layer`]).
 use serde_json::{Value, json};
-use solidcraft_kernel::{Body, FaceSurface, KernelError, face_surface, measure, step_export};
+use solidcraft_geom::prelude::*;
+use solidcraft_kernel::{
+    Body, FaceSurface, KernelError, MeshTolerance, face_surface, measure, step_export,
+};
 use std::collections::BTreeMap;
 use std::process::ExitCode;
 
+#[allow(dead_code)]
+mod bench;
+mod ops;
+#[allow(dead_code, unused_imports)]
+mod shared;
 mod solids;
 
+/// The solid a case built, on either layer.
+pub enum Solid {
+    /// Built through SolidCraft's kernel crate.
+    Craft(Body),
+    /// Built through solidcore-ops, beneath it.
+    Core(solidcore_ops::Body),
+}
+
+/// A body type a case's `build` may return: what the runner sets up before building on its
+/// layer, and the body as a [`Solid`].
+pub trait Layer: Sized {
+    fn prepare() -> Result<(), Refusal> {
+        Ok(())
+    }
+    fn solid(self) -> Solid;
+}
+
+impl Layer for Body {
+    fn solid(self) -> Solid {
+        Solid::Craft(self)
+    }
+}
+
+impl Layer for solidcore_ops::Body {
+    fn prepare() -> Result<(), Refusal> {
+        ops::set_fixes()
+    }
+    fn solid(self) -> Solid {
+        Solid::Core(self)
+    }
+}
+
+/// A case's `build` run on its layer: the layer set up, then the solid built.
+pub fn run<B: Layer, E: Into<Refusal>>(build: fn() -> Result<B, E>) -> Result<Solid, Refusal> {
+    B::prepare()?;
+    build().map(B::solid).map_err(Into::into)
+}
+
 /// A case's implementation: the solid it builds, or why it was not built.
-type Build = fn() -> Result<Body, Refusal>;
+type Build = fn() -> Result<Solid, Refusal>;
 
 /// Why a case was not built: a kernel error, in the kernel's own words, or a case that refuses
 /// in its own because the kernel has no operation for what it describes.
@@ -62,7 +115,7 @@ impl std::fmt::Display for Refusal {
 
 /// One module per case file, and `CASES`, written by `build.rs`.
 mod cases {
-    use super::{Build, Refusal};
+    use super::{Build, run};
     include!(concat!(env!("OUT_DIR"), "/cases.rs"));
 }
 
@@ -73,8 +126,8 @@ fn kind(s: Option<FaceSurface>) -> &'static str {
         Some(FaceSurface::Cone { .. }) => "cone",
         Some(FaceSurface::Sphere { .. }) => "sphere",
         Some(FaceSurface::Torus { .. }) => "torus",
-        // the kernel names only the analytic kinds; the rest are truck's B-spline, NURBS and
-        // swept surfaces
+        // the kernel names only the analytic kinds; the rest are B-spline, NURBS and swept
+        // surfaces
         None => "other",
     }
 }
@@ -106,18 +159,22 @@ fn report(body: &Body, out: &str) -> Result<Value, KernelError> {
         *faces.entry(kind(face_surface(body, f))).or_default() += 1;
     }
     let problems = body.validity();
-    // the chord of the written mesh: as fine as the kernel's own measure goes (5e-5 of the body's
-    // size), and finer for a thin body (a fraction of volume over area, half a tube's radius), so
-    // a thin pipe's volume and area are as close as a block's, well inside the harness' 1e-3
     let m = measure(body)?;
+    // the chord of the written mesh: 5e-5 of the body's size, and finer for a thin body (a
+    // fraction of volume over area, half a tube's radius), so that the harness's checks of the
+    // triangles (closed, the expected volume within 2%) see a thin pipe as well as a block
     let mut tol = body.size() * 5e-5;
     if m.area > 0.0 && m.volume > 0.0 {
         tol = tol.min(5e-4 * m.volume / m.area);
     }
-    let mesh = body.display_mesh(tol.max(1e-5))?;
+    let mesh = body.mesh(&MeshTolerance::chord(tol.max(1e-5)))?;
     std::fs::write(out, stl(&mesh)).expect("the STL file writes");
-    let mut reply = json!({"status": "ok", "measured": "mesh", "faces": faces,
+    let mut reply = json!({"status": "ok", "volume": m.volume, "area": m.area, "faces": faces,
                            "valid": problems.is_empty()});
+    // a mesh body is measured from its own triangles, so its measures are the mesh's
+    if m.measured_by == "mesh" {
+        reply["measured"] = json!("mesh");
+    }
     if !problems.is_empty() {
         reply["problems"] = json!(problems);
     }
@@ -125,8 +182,7 @@ fn report(body: &Body, out: &str) -> Result<Value, KernelError> {
 }
 
 /// `bodies` written as STEP to `path` by SolidCraft's writer, or, where it declines them, why
-/// (and no file). The writer turns a panic in truck's STEP writer under it into an error of its
-/// own, and declines an empty list ("nothing to export").
+/// (and no file).
 fn step(bodies: &[&Body], path: &str) -> Option<String> {
     match step_export(bodies, "SolidCraft") {
         Ok(text) => {
@@ -187,7 +243,24 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
     pause();
-    let reply = match build().and_then(|body| {
+    let reply = match build().and_then(|solid| {
+        let body = match solid {
+            Solid::Craft(body) => body,
+            Solid::Core(body) => {
+                let declined = match out_step {
+                    Some(path) => match ops::step(&body, path) {
+                        None => return Ok(json!({"status": "ok"})),
+                        why => why,
+                    },
+                    None => None,
+                };
+                let mut reply = ops::report(&body, out)?;
+                if let Some(why) = declined {
+                    reply["step_error"] = json!(why);
+                }
+                return Ok(reply);
+            }
+        };
         // given OUT.step, the solid written there is the whole answer (SPEC.md, "A runner"):
         // nothing meshed; only where the writer declines does the runner go on to its triangles
         let declined = match out_step {
@@ -207,13 +280,12 @@ fn main() -> ExitCode {
         // the kernel said the solid is empty: no triangles, and the measures of nothing
         Err(Refusal(why)) if why.contains(solids::EMPTY) => {
             std::fs::write(out, stl(&solidcraft_geom::Mesh::default())).expect("the STL file writes");
-            let mut reply = json!({"status": "ok", "measured": "mesh", "faces": {}, "valid": false,
-                                   "problems": [why]});
-            // and no solid to write as STEP: the writer is given none, and says so
-            if let Some(path) = out_step
-                && let Some(why) = step(&[], path)
-            {
-                reply["step_error"] = json!(why);
+            let mut reply = json!({"status": "ok", "volume": 0.0, "area": 0.0, "faces": {},
+                                   "valid": false, "problems": [why]});
+            // and no solid to write as STEP: no file, and the reply says so, in the runner's
+            // words (the writer is not asked to write nothing)
+            if out_step.is_some() {
+                reply["step_error"] = json!("no solid to write: the kernel's answer is empty");
             }
             reply
         }

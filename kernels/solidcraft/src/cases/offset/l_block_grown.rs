@@ -1,14 +1,21 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp
-//! (which is `l-block-grown-sharp`). Grown by every point within 1, the plate's convex edges become
-//! quarter cylinders and its convex corners eighths of a ball, and the kernel has no offset that
-//! rounds its joins.
+//! The L-shaped plate (the polygon through (0, 0), (20, 0), (20, 5), (5, 5), (5, 15) and (0, 15),
+//! extruded 8 along +z) grown by 1: every point within 1 of it, its convex edges rounded and its
+//! concave one sharp, the kernel's offset with its convex edges rounded.
+use crate::bench::polygon;
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::sweep::{extrude, DraftCorner};
+use solidcore_ops::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins: its offset of a solid, \
-         `offset_faces`, moves the faces and joins them sharp where they meet, so the grown \
-         plate's convex edges and corners would not be rounded"
-        .into())
+    let outline = polygon(&[
+        [0.0, 0.0, 0.0],
+        [20.0, 0.0, 0.0],
+        [20.0, 5.0, 0.0],
+        [5.0, 5.0, 0.0],
+        [5.0, 15.0, 0.0],
+        [0.0, 15.0, 0.0],
+    ]);
+    let plate = extrude(&outline, [0.0, 0.0, 1.0], 8.0, 0.0, DraftCorner::default(), true)?;
+    offset_rounded(&plate, 1.0)
 }

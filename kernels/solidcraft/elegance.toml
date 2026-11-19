@@ -3,3 +3,4 @@
 
 "loft/twisted-tapering-square" = "twist and taper are plain fields of the sweep; one call, no guide curve built"
 "sweep/hollow-reducer" = "sections with holes lofted outline to outline and hole to hole; no inner loft cut away"
+"geometry/hyperboloid-ruled" = "two circles, the upper started a quarter turn on, lofted at degree 1: the case in three lines"

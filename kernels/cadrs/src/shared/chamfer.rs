@@ -103,7 +103,7 @@ pub fn distance_angle_off_ball(
     let balls = k.faces_of(body, SurfaceKind::Sphere)?;
     let rim = k.edges_where(body, &|e| e.faces.iter().flatten().filter(|f| balls.contains(f)).count() == 1)?;
     let mut opts = ChamferOpts::new(ChamferSpec::DistanceAngle { distance, angle });
-    opts.first_on = k.faces_where(body, &|f| f.kind != SurfaceKind::Sphere)?;
+    opts.first_on = k.faces_but(body, SurfaceKind::Sphere)?;
     chamfer_with(k, body, &rim, &opts)
 }
 

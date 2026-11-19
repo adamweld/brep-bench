@@ -8,7 +8,7 @@
 use super::p;
 use super::swept::{less_all, planar, revolved_tool, slide_by, Piece};
 use crate::Refusal;
-use brep_kernel::{revolve_profile_brep, sweep_solid, BrepSolid, ScrewStep, SolidMotion, Vec3};
+use brep_kernel::{boolean_operation_nary, revolve_profile_brep, sweep_solid, BooleanOperation, BrepSolid, ScrewStep, SolidMotion, Vec3};
 use std::f64::consts::{FRAC_PI_2, TAU};
 
 /// A cutter: its meridian from its tip, in (distance from the axis, height above the tip), a
@@ -68,13 +68,49 @@ pub struct Program {
     /// The block's top: a move with its tip at or above it all along cuts nothing.
     top: f64,
     pub swept: Vec<BrepSolid>,
+    /// What each of `swept` is: the move's path seen from above, and how deep.
+    paths: Vec<Path>,
     /// Whether a slide along the axis was built by `lengthened`.
     pub axial: bool,
 }
 
+/// A move as seen from above, and its depth: what decides whether a deeper move of the same
+/// cutter covers it within the block.
+#[derive(Clone, Copy, Debug)]
+enum Path {
+    /// The tip kept at height `z` from `from` to `to`, straight (`about` none) or turned through
+    /// the signed angle `about.1` about the upright line through `about.0`.
+    Level { from: [f64; 2], to: [f64; 2], about: Option<([f64; 2], f64)>, z: f64 },
+    /// The tip slid up or down its axis at `at`, its lower end at `low`.
+    Axial { at: [f64; 2], low: f64 },
+    /// Any other move (aslant): never passed over.
+    Other,
+}
+
+fn near(a: [f64; 2], b: [f64; 2]) -> bool {
+    (a[0] - b[0]).abs() <= 1e-9 && (a[1] - b[1]).abs() <= 1e-9
+}
+
+impl Path {
+    /// Whether two level paths run over the same ground, either way round.
+    fn same_ground(&self, other: &Path) -> bool {
+        match (*self, *other) {
+            (Path::Level { from: a0, to: a1, about: None, .. }, Path::Level { from: b0, to: b1, about: None, .. }) => {
+                (near(a0, b0) && near(a1, b1)) || (near(a0, b1) && near(a1, b0))
+            }
+            (Path::Level { from: a0, to: a1, about: Some((ca, ta)), .. }, Path::Level { from: b0, to: b1, about: Some((cb, tb)), .. }) => {
+                near(ca, cb)
+                    && (((near(a0, b0) && near(a1, b1)) && (ta - tb).abs() <= 1e-9)
+                        || ((near(a0, b1) && near(a1, b0)) && (ta + tb).abs() <= 1e-9))
+            }
+            _ => false,
+        }
+    }
+}
+
 impl Program {
     pub fn new(cutter: Cutter, tip: Vec3, top: f64) -> Program {
-        Program { cutter, tip, top, swept: Vec::new(), axial: false }
+        Program { cutter, tip, top, swept: Vec::new(), paths: Vec::new(), axial: false }
     }
 
     fn tool(&self) -> brep_kernel::SolidTool {
@@ -113,6 +149,14 @@ impl Program {
         }
         if self.reaches(self.tip.z.min(to.z)) {
             let along = d.z.abs() >= d.length() * (1.0 - 1e-12);
+            let (a, b) = ([self.tip.x, self.tip.y], [to.x, to.y]);
+            self.paths.push(if along {
+                Path::Axial { at: a, low: self.tip.z.min(to.z) }
+            } else if d.z.abs() <= 1e-12 {
+                Path::Level { from: a, to: b, about: None, z: self.tip.z }
+            } else {
+                Path::Other
+            });
             match sweep_solid(&self.tool(), &slide_by(d)) {
                 Ok(body) => self.swept.push(body),
                 Err(refusal) if along => {
@@ -161,6 +205,10 @@ impl Program {
                     from: 0.0,
                     to: part,
                 };
+                let (c1, s1) = ((turn / pieces as f64).cos(), (turn / pieces as f64).sin());
+                let (u, v) = (from.x - centre[0], from.y - centre[1]);
+                let end = [centre[0] + c1 * u - s1 * v, centre[1] + s1 * u + c1 * v];
+                self.paths.push(Path::Level { from: [from.x, from.y], to: end, about: Some((centre, turn / pieces as f64)), z: self.tip.z });
                 self.swept.push(sweep_solid(&tool, &motion)?);
             }
         }
@@ -199,6 +247,57 @@ pub fn rounded_loop(program: &mut Program, corners: &[[f64; 2]], radius: f64, z:
     let (f, g) = (corners[0], corners[1 % n]);
     program.line(p((f[0] + g[0]) / 2.0, (f[1] + g[1]) / 2.0, z))?;
     Ok(())
+}
+
+/// The height of the cutter's top above its tip.
+fn height(cutter: &Cutter) -> f64 {
+    cutter.0.iter().fold(0.0f64, |m, piece| match *piece {
+        Piece::Line { from, to } => m.max(from[1]).max(to[1]),
+        Piece::Arc { centre, radius, .. } => m.max(centre[1] + radius),
+    })
+}
+
+/// `block` less everything every program swept, each move cut in turn, in the program's order,
+/// passing over a move whose cut within the block another move of the same cutter makes in full.
+/// For an upright cutter whose top stands above the block's top wherever it cuts (every cutter
+/// here widens, or keeps its width, all the way up):
+///
+/// - a level move cuts, within the block, the ground its tip's path covers from its depth up to
+///   the top, so a move over the same ground deeper covers it;
+/// - a slide along the axis cuts, within the block, the cutter standing at its lower end, which
+///   a level move from or to that point at that depth or deeper, or a deeper slide there, covers.
+///
+/// The moves left are cut one at a time, as the program cuts them.
+pub fn cut_in_turn(block: BrepSolid, top: f64, programs: Vec<Program>) -> Result<BrepSolid, Refusal> {
+    let mut body = block;
+    for program in programs {
+        let reach = height(&program.cutter);
+        let paths = &program.paths;
+        let tops = |low: f64| low + reach >= top - 1e-9;
+        let covered = |i: usize| -> bool {
+            match paths[i] {
+                Path::Level { z, .. } if tops(z) => paths.iter().enumerate().any(|(j, other)| match *other {
+                    Path::Level { z: zj, .. } => {
+                        j != i && paths[i].same_ground(other) && (zj < z - 1e-9 || ((zj - z).abs() <= 1e-9 && j < i))
+                    }
+                    _ => false,
+                }),
+                Path::Axial { at, low } if tops(low) => paths.iter().enumerate().any(|(j, other)| match *other {
+                    Path::Level { from, to, z, .. } => tops(z) && z <= low + 1e-9 && (near(from, at) || near(to, at)),
+                    Path::Axial { at: aj, low: lj } => near(aj, at) && (lj < low - 1e-9 || ((lj - low).abs() <= 1e-9 && j < i)),
+                    Path::Other => false,
+                }),
+                _ => false,
+            }
+        };
+        let keep: Vec<bool> = (0..paths.len()).map(|i| !covered(i)).collect();
+        for (solid, keep) in program.swept.into_iter().zip(keep) {
+            if keep {
+                body = boolean_operation_nary(&[body, solid], BooleanOperation::Subtract)?;
+            }
+        }
+    }
+    Ok(body)
 }
 
 /// `block` less everything every program swept.

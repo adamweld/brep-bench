@@ -2,7 +2,14 @@
 title = "A ball screwed round a helix tighter than itself"
 tags = ["swept", "solid-sweep", "screw", "canal", "helix", "fold", "self-intersecting"]
 origin = "geomsolver #721, box X8 (folds cut where they lie)"
-settled = false
+
+[volume]
+value = 253.449373663
+exact = "no closed form: cad-kernel and cadrs agree to 5e-10; the mean of their values"
+
+[area]
+value = 220.3147392925
+exact = "no closed form: cad-kernel and cadrs agree to 3e-10; the mean of their values"
 +++
 
 The solid a ball fills as its center runs along a helix whose curvature is tighter than the ball, so

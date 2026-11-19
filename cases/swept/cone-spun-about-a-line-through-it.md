@@ -2,7 +2,14 @@
 title = "A cone spun about a line that crosses it aslant"
 tags = ["swept", "solid-sweep", "turn", "cone", "pole", "apex", "axis-crossing"]
 origin = "geomsolver #721, box D3 (crossing a pole under a turn about a meeting axis)"
-settled = false
+
+[volume]
+value = 288.495056967
+exact = "no closed form: cad-kernel and cadrs agree to 2e-9; the mean of their values"
+
+[area]
+value = 267.008823656
+exact = "no closed form: cad-kernel and cadrs agree to 2e-10; the mean of their values"
 +++
 
 The solid a cone fills as it is spun partway about a line that crosses its axis aslant, inside it.

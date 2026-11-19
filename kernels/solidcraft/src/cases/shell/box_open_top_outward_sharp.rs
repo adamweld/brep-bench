@@ -1,18 +1,13 @@
-//! SolidCraft's Shell (`shell`) hollows inward only. Outward, the wall is the box with the five faces
-//! other than the top moved 1 outward by Offset Face (`offset_faces`), which keeps every edge
-//! where its two faces, moved, meet, less the box.
-use crate::solids::*;
+//! The box from the origin to (10, 8, 6) shelled outward to a wall 1 thick, open at its top face,
+//! z = 6, its edges kept sharp: the box from (−1, −1, −1) to (11, 9, 6) less the box. Ops's shell
+//! extends the moved faces until they meet.
+use crate::bench::{face_through, order};
+use crate::Refusal;
+use solidcore_ops::{make_box, shell, Body};
 
-pub fn build() -> R<Body> {
-    let b = block((0.0, 0.0, 0.0), (10.0, 8.0, 6.0))?;
-    // the middle of each face but the top, picking it
-    let faces = [
-        v3(0.0, 4.0, 3.0),
-        v3(10.0, 4.0, 3.0),
-        v3(5.0, 0.0, 3.0),
-        v3(5.0, 8.0, 3.0),
-        v3(5.0, 4.0, 0.0),
-    ];
-    let grown = solidcraft_kernel::offset_faces(&b, &faces, 1.0)?;
-    cut(&grown, &b)
+pub fn build() -> Result<Body, Refusal> {
+    let block = make_box([0.0, 0.0, 0.0], [10.0, 8.0, 6.0])?;
+    let top = face_through(&block, [5.0, 4.0, 6.0])?;
+    shell(&block, &order(&block)?, &[top], 1.0)?;
+    Ok(block)
 }

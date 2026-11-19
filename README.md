@@ -49,16 +49,17 @@ python3 harness/site.py          # render the board: site/
 python3 -m http.server -d site   # serve it
 ```
 
-The harness needs only Python 3.11+ (and, for the drawings' and the viewer's triangles of each STEP
-file, Open CASCADE: `pip install cadquery-ocp`; and, to draw the cases, Rust); each runner needs its
-kernel's toolchain. `build.py NAME` and
+The harness needs Python 3.11+ and Rust (`cargo`, with which it draws the cases and builds its
+measurer of the STEP files, harness/mass/, itself where it must), and, for the drawings' and the
+viewer's triangles of each STEP file, Open CASCADE: `pip install cadquery-ocp`; each runner needs
+its kernel's toolchain. `build.py NAME` and
 `run.py --kernel NAME` build and run one kernel. CI does not run on pull requests, so run your
 changes locally. See [running the bench](docs/running.md) for more.
 
 ## Kernels
 
 Open CASCADE (through Python), arris, cad-kernel, vcad, popkern, SolidCraft, Aetheris, next.BREP,
-kentron, brepkit, solidcore, geop, cadrs and SMLib; monstertruck is listed but has no runner yet. See [the
+kentron, brepkit, geop, cadrs and SMLib; monstertruck is listed but has no runner yet. See [the
 kernels](docs/kernels.md) for links and details.
 
 ## Contributing

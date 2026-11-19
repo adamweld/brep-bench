@@ -1,13 +1,10 @@
-//! Refused. The kernel's one offset of a solid is Offset Face (`offset_faces`): it moves the faces
-//! along their normals and keeps the body's topology, each edge where its moved faces meet, sharp.
-//! Grown by every point within 1, the cylinder's rims become quarters of a torus's tube, and the
-//! kernel has no offset that rounds its joins.
+//! A cylinder of radius 5 on the z axis from z = 0 to z = 10, grown by 1: every point within 1 of
+//! it, its rims the outer quarters of tori, the kernel's offset with its convex edges rounded.
+use crate::shared::offset::offset_rounded;
 use crate::Refusal;
-use crate::solids::Body;
+use solidcore_ops::{make_cylinder, Body};
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no offset with rounded joins: its offset of a solid, \
-         `offset_faces`, moves the faces and joins them sharp where they meet, so the grown \
-         cylinder's rims would not become quarter tori"
-        .into())
+    let drum = make_cylinder([0.0, 0.0, 0.0], 5.0, 10.0)?;
+    offset_rounded(&drum, 1.0)
 }

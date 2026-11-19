@@ -2,7 +2,14 @@
 title = "A rod threaded by a bar whose section is a spline"
 tags = ["swept", "solid-sweep", "screw", "helix", "bspline", "prism", "free-form", "boolean", "cut"]
 origin = "geomsolver #721, box G10 (free-form faces)"
-settled = false
+
+[volume]
+value = 1335.319592427
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 1e-9; the mean of their values"
+
+[area]
+value = 810.568231802
+exact = "no closed form: cad-kernel, next.BREP and cadrs agree to 3e-10; the mean of their values"
 +++
 
 A rod, the cylinder of radius 5 about the z axis from z = 0 to z = 20, threaded by a bar whose

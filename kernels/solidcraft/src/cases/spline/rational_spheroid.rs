@@ -1,5 +1,5 @@
 use crate::solids::*;
-use solidcraft_geom::Seg2;
+use solidcore_record::Seg2;
 
 /// A profile takes no rational B-spline, only its pieces: the double knot at ½ makes the curve
 /// two rational quadratic Bézier segments, each a conic of the profile through three of the
