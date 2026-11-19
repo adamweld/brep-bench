@@ -17,7 +17,7 @@ shared yardstick: hard cases whose answers no single kernel chose, and every ker
 
 Over 300 cases, from textbook primitives, Booleans, sweeps and fillets to tangent contact,
 self-intersecting curves, chamfers, splines, NURBS, quadrics and pinched tori, solid sweeps, lofts,
-offsets, thickened sheets, shells, drafts, form features, singular points, direct edits, filled
+offsets, thickened sheets, shells, drafts, form features, holes, singular points, direct edits, filled
 surfaces, real parts and integration tests: the Utah teapot, and #3DBenchy, whose answer is its
 original CAD file ([a tour](docs/cases.md)).
 

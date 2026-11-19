@@ -185,6 +185,18 @@ cylinder, a post extruded up inside a hollow dome until it meets the dome's insi
 about a hub until it meets a stop, and a hole drilled through the first wall it meets and no
 further.
 
+## Holes (`hole/`)
+
+The holes a mechanical drawing calls for, each with its closed form: counterbored, countersunk at
+90°, blind with a twist drill's 118° point, counterdrilled (a wide bore stepping down to a narrow
+one by its drill's point), tapered 1 in 16 on the diameter as a pipe thread is, and a lathe's
+centre hole in a shaft's end, a 60° countersink over a pilot with a drill point. Then holes off the
+square: one drilled through a plate at 30°, its mouths ellipses; one counterbored square to a
+sloping face and coming out of the bottom aslant; and one spotfaced flat into a slope, the
+spotface's rim an ellipse. Five counterbored holes stand on a bolt circle round a bored disk. A
+cylinder's wall between two planes that do not meet inside it, however tilted, has the area of its
+circumference times its length on its axis, which keeps the slanting ones exact.
+
 ## Sweeps along paths with sharp corners (`sweep/`)
 
 The section is carried around each corner one of two ways: mitered, each run cut by the plane
