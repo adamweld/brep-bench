@@ -7,7 +7,7 @@ use crate::Refusal;
 use crate::solids::Body;
 
 pub fn build() -> Result<Body, Refusal> {
-    Err("solidcraft-kernel has no sweep of a solid and no envelope: turned about the z axis, the \
+    Err("no layer (solidcraft-kernel, solidcore-ops, solidcore) has a sweep of a solid or an envelope: turned about the z axis, the \
          leaning torus sweeps the revolve of its shadow through the axis, whose edge is an \
          envelope and none of the torus's circles"
         .into())
