@@ -16,7 +16,7 @@ tex = '2\cdot \tfrac{2665}{96} + 10\cdot \tfrac{71}{2}'
 
 A cube from (0, 0, 0) to (10, 10, 10), and a block 25/2 by 10 by 10 turned about the upright. One corner of the block is (0, -2, 0), and the block's three edges from that corner run 25/2 along (4/5, 3/5, 0), 10 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube.
 
-Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (0, -2), (10, 11/2), (4, 27/2), (-6, 6): of them 1 on its boundary, 3 outside it.
+Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (0, -2), (10, 11/2), (4, 27/2), (-6, 6): of them 1 on its boundary, 3 outside it. 2 of the cube's corners lie strictly inside the block's footprint.
 
 What is left is two separate solids, each a prism 10 high standing on z = 0: one on the polygon with corners (10, 0), (8/3, 0), (10, 11/2), one on the polygon with corners (10, 10), (10, 11/2), (53/8, 10). The block's corner (10, 11/2) lies on the cube's side with the block inside the cube there, so at it the material left is only a line thick across the block's upright edge: the pieces or walls on either side of it meet along that edge and no more.
 

@@ -16,7 +16,7 @@ tex = '2\cdot \tfrac{2399}{24} + 10\cdot \tfrac{239}{6}'
 
 A cube from (0, 0, 0) to (10, 10, 10), and a block 5 by 5 by 10 turned about the upright. One corner of the block is (-3, -4, 0), and the block's three edges from that corner run 5 along (4/5, 3/5, 0), 5 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube.
 
-Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (-3, -4), (1, -1), (-2, 3), (-6, 0): of them 4 outside it.
+Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (-3, -4), (1, -1), (-2, 3), (-6, 0): of them 4 outside it. One of the cube's corners lies strictly inside the block's footprint.
 
 What is left is a prism 10 high on the polygon with corners (0, 10), (10, 10), (10, 0), (1/4, 0), (0, 1/3), standing on z = 0.
 

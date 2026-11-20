@@ -16,7 +16,7 @@ tex = '2\cdot \tfrac{505}{24} + 10\cdot 29'
 
 A cube from (0, 0, 0) to (10, 10, 10), and a block 25/2 by 10 by 10 turned about the upright. One corner of the block is (5, -4, 0), and the block's three edges from that corner run 25/2 along (4/5, 3/5, 0), 10 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube.
 
-Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (5, -4), (15, 7/2), (9, 23/2), (-1, 4): of them 4 outside it.
+Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (5, -4), (15, 7/2), (9, 23/2), (-1, 4): of them 4 outside it. 2 of the cube's corners lie strictly inside the block's footprint.
 
 What is left is two separate solids, each a prism 10 high standing on z = 0: one on the polygon with corners (0, 10), (7, 10), (0, 19/4), one on the polygon with corners (0, 0), (0, 8/3), (2, 0).
 

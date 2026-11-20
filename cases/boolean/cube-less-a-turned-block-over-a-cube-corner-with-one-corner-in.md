@@ -1,5 +1,5 @@
 +++
-title = "A cube less a turned block that covers a cube corner, one corner in the cube and one on its side"
+title = "A cube less a turned block that covers a cube corner, with one corner in the cube, one on its side and two outside it"
 tags = ["boolean", "cut", "analytic", "planar", "coincident"]
 origin = "OCCT tests/boolean/bopcut_simple/I5"
 
@@ -16,7 +16,7 @@ tex = '2\cdot \tfrac{275}{3} + 10\cdot 40'
 
 A cube from (0, 0, 0) to (10, 10, 10), and a block 5 by 5 by 10 turned about the upright. One corner of the block is (-1, -2, 0), and the block's three edges from that corner run 5 along (4/5, 3/5, 0), 5 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube.
 
-Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (-1, -2), (3, 1), (0, 5), (-4, 2): of them 1 inside the cube's footprint, 1 on its boundary, 2 outside it.
+Both stand on z = 0 and are 10 tall, so their tops lie in one plane and their bottoms in another. On the xy plane the block's corners are (-1, -2), (3, 1), (0, 5), (-4, 2): of them 1 inside the cube's footprint, 1 on its boundary, 2 outside it. One of the cube's corners lies strictly inside the block's footprint.
 
 What is left is a prism 10 high on the polygon with corners (0, 10), (10, 10), (10, 0), (5/3, 0), (3, 1), (0, 5), standing on z = 0.
 

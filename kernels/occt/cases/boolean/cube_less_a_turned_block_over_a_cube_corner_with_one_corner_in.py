@@ -1,4 +1,4 @@
-"""A cube less a turned block that covers a cube corner, one corner in the cube and one on its side. A cube from (0, 0, 0) to (10, 10, 10), and a block 5 by 5 by 10 turned about the upright. One corner of the block is (-1, -2, 0), and the block's three edges from that corner run 5 along (4/5, 3/5, 0), 5 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube."""
+"""A cube less a turned block that covers a cube corner, with one corner in the cube, one on its side and two outside it. A cube from (0, 0, 0) to (10, 10, 10), and a block 5 by 5 by 10 turned about the upright. One corner of the block is (-1, -2, 0), and the block's three edges from that corner run 5 along (4/5, 3/5, 0), 5 along (−3/5, 4/5, 0) and 10 straight up. Cut the block away from the cube."""
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
 from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCP.gp import gp, gp_Ax2, gp_Dir, gp_Pnt
