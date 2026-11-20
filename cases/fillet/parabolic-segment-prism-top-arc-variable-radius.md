@@ -17,8 +17,8 @@ Round the one edge where the curved wall meets the top, the arc of the parabola 
 end, (6, 0, 4). At each point of the edge the round's section, in the vertical plane through that
 point square to the edge (the plane that contains the wall's horizontal normal there), is the quarter
 circle of radius r tangent to the top and to the wall. The largest radius, 3/2, is less than the
-parabola's least radius of curvature, 2, so the round does not fold. The round meets the flat side
-y = 0 in a quarter circle of radius 3/2 at one end and of radius 1/2 at the other, cutting it
-obliquely; the flat side's own top edge stays sharp.
+parabola's least radius of curvature, 2, so the round does not fold. The round ends in the flat side y = 0, which cuts it obliquely: the normal sections meet y = 0 at a slant, so
+the cut is not a quarter circle of radius 3/2 at one end or 1/2 at the other (it is about 1.57 and 0.53
+wide). The flat side's own top edge stays sharp.
 
 The round's volume and area have no closed form, so the case is unsettled until two kernels agree.

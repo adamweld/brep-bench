@@ -24,7 +24,9 @@ At each point of an edge the round's section, in the plane through that point sq
 the circular arc of radius r that lies inside the tube and touches the end face and the long face
 there, each in its trace in that plane (for the edges on the planes y = ±2 both traces are straight
 lines and the section is a quarter circle; for the edges on the faces z = ±1 the long face's trace is
-slightly curved, the offset of the path).
+slightly curved, the offset of the path). Near z = −1 the long face z = −1 rises along the tube, so the
+quarter-circle sections of the edges on y = ±2 would stick out of the tube there, within about 0.01 of
+z = −1; they are clipped to the tube.
 
 The tube's four long edges, where the long faces meet, stay sharp. So at each corner of the rim two
 rounds meet a sharp long edge, and do not close the corner with a patch of their own: each round runs

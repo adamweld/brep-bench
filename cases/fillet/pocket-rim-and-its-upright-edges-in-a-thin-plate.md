@@ -32,6 +32,6 @@ box less the pocket and what each round removes.
 
 $$[0, 30] \times [0, 20] \times [0, 2] \setminus \Bigl(\{\,\rho \le 5,\ x \ge 0,\ z \ge \tfrac12\,\} \cup \{\,5 \le \rho \le \tfrac{11}{2},\ x \ge 0,\ z \ge \tfrac32,\ (\rho - \tfrac{11}{2})^2 + (z - \tfrac32)^2 \ge \tfrac14\,\} \cup \{\,z \ge \tfrac12\,\} \times (U_- \cup U_+)\Bigr)$$
 
-where U₋ = { 0 ≤ x ≤ 1, y_c ≤ y ≤ 10, ρ ≥ 5, (x − 1)² + (y − y_c)² ≥ 1 } with y_c = 10 − √35, and U₊ is its mirror image in the plane y = 10.
+where U₋ = { x ≥ 0, y_c ≤ y ≤ 10, 1 − x ≥ (y − y_c)/√35, ρ ≥ 5, (x − 1)² + (y − y_c)² ≥ 1 } with y_c = 10 − √35, and U₊ is its mirror image in the plane y = 10. U₋ is the corner between the side, the wall and the arc: the wedge from the arc's center c = (1, y_c) between the direction toward the side's tangent point, (−1, 0), and the direction toward the wall's tangent point, (−1, √35)/6, less the disc.
 
 The case has no closed form worked out, so it is unsettled until two kernels agree.

@@ -18,7 +18,8 @@ to radius 1, and the two upright edges, to radius 3/2.
 - The top round is the blend a ball of radius 1 sweeps rolling along the arc, touching the top and the
   curved wall from inside. Its ends are cut by the plane y = 0 obliquely.
 - Each upright round is a vertical surface, a circular arc in plan of radius 3/2 tangent to the flat
-  side and to the wall (it turns through 108.43°), running from the bottom to the top.
+  side and to the wall (the wall is curved, so the arc turns through a little more than the corner's 108.43°),
+  running from the bottom to the top.
 
 The top edge of the flat side, along y = 0 at z = 4, is not rounded. So at each top corner, (±6, 0, 4),
 the top round and the upright round do not close the corner with a patch of their own: each runs the
