@@ -32,3 +32,16 @@ def rounded(solid, radius, edges, what):
     if not fillet.IsDone():
         raise Refused(f"BRepFilletAPI_MakeFillet could not round {what}")
     return fillet.Shape()
+
+
+def rounded_together(solid, rounds):
+    """`solid` with several sets of edges rounded in one fillet, `rounds` a list of (radius, edges);
+    Refused if OCCT declines."""
+    fillet = BRepFilletAPI_MakeFillet(solid)
+    for radius, edges in rounds:
+        for edge in edges:
+            fillet.Add(radius, edge)
+    fillet.Build()
+    if not fillet.IsDone():
+        raise Refused("BRepFilletAPI_MakeFillet could not round the edges together")
+    return fillet.Shape()
