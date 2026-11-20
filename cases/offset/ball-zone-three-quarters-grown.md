@@ -20,6 +20,9 @@ narrowed to the quadrant x ≥ 1, y ≤ −1, and its inside edge on that line i
 edge. The edges where the flats meet the sphere and the top become pieces of tubes of radius 1
 about them, as for a convex solid.
 
+In the missing quarter the reach is 1 about the cut faces and their edges only: the side is
+grown only over its own 270°, so the result is not the full grown solid less a quadrant.
+
 The volume and area have no closed form stated here. The case is unsettled until two kernels
 agree.
 

@@ -20,6 +20,9 @@ with a sharp reentrant edge on that line. The edges where the triangles meet the
 become pieces of tubes of radius 1 about them, and the apex a piece of a ball of radius 1 about
 it.
 
+In the missing quarter the reach is 1 about the cut faces and their edges only: the side is
+grown only over its own 270°, so the result is not the full grown solid less a quadrant.
+
 The volume and area have no closed form stated here. The case is unsettled until two kernels
 agree.
 

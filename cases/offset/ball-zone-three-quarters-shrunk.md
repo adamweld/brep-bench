@@ -15,7 +15,7 @@ which meet along the z axis in a reentrant edge. Shrink it by 1: the solid of ev
 
 The sphere moves in to the sphere of radius 4 and the top down to z = 2. The flats move 1 into the
 solid, to the planes y = 1 and x = −1. Those planes do not meet: the missing quarter's neighbourhood
-within 1 of it is the quadrant x ≥ −1, y ≤ 1 with its corner at the origin rounded, and the
+within 1 of it is the quadrant x ≥ −1, y ≤ 1 with its corner at (−1, 1) rounded, by an arc of radius 1 centred on the origin, and the
 solid's reentrant edge becomes a concave quarter of a cylinder of radius 1 about the z axis, joining
 the two moved flats, with the sphere cutting it at the bottom and the top at z = 2. The south pole
 is gone.

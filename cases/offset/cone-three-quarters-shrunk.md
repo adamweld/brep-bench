@@ -15,7 +15,7 @@ axis in a reentrant edge. Shrink it by 1: the solid of every point at least 1 fr
 The base moves up to z = 1 and the side in along its normal by 1, to the cone of the same angle
 with radius 19/4 − 3z/4 at height z. The triangles move 1 into the solid, to the planes y = 1 and
 x = −1, which do not meet: the part of space within 1 of the missing quarter is the quadrant
-x ≥ −1, y ≤ 1 with its corner at the origin rounded, and the solid's reentrant edge becomes a
+x ≥ −1, y ≤ 1 with its corner at (−1, 1) rounded, by an arc of radius 1 centred on the origin, and the solid's reentrant edge becomes a
 concave quarter of a cylinder of radius 1 about the z axis, joining the two moved triangles. The
 moved cone's apex, on the z axis at z = 19/3, lies inside that rounding, so the result has no
 apex.
