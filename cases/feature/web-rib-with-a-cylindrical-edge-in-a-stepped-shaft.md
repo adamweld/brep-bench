@@ -1,7 +1,7 @@
 +++
 title = "A web rib with a cylindrical edge in the corner of a stepped shaft"
 tags = ["feature", "rib", "revolve", "union", "cylinder", "analytic"]
-origin = "OCCT tests/feat/featrf/A9, OCCT tests/feat/featrf/B4"
+origin = "OCCT tests/feat/featrf/A9"
 
 [volume]
 value = 54356.24643894275

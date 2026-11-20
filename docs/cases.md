@@ -185,7 +185,7 @@ cylinder, a post extruded up inside a hollow dome until it meets the dome's insi
 about a hub until it meets a stop, a hole drilled through the first wall it meets and no
 further, web ribs turned about a shaft's axis (cylinder, torus and cone edges, against a
 shoulder, a waist or a square boss), beads turned on a drum's top and over its rim, and ribs, ridges
-and blocks swept straight through a leaning side, over its top edge, across a plate's side and over
+and blocks swept straight through a leaning side, over its top and rounded edges, across a plate's side and over
 a plate's concave corner.
 
 ## Sweeps along paths with sharp corners (`sweep/`)

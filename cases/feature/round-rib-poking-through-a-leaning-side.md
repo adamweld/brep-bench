@@ -1,7 +1,7 @@
 +++
 title = "A round rib poking through a block's leaning side"
 tags = ["feature", "rib", "linear", "union", "cylinder", "planar", "draft", "analytic"]
-origin = "OCCT tests/feat/featlf/A1, OCCT tests/feat/featlf/A2, OCCT tests/feat/featlf/C1, OCCT tests/feat/featlf/C2, OCCT tests/feat/featlf/C3, OCCT tests/feat/featlf/C4"
+origin = "OCCT tests/feat/featlf/A1, OCCT tests/feat/featlf/A2"
 
 [volume]
 value = 24095.552397262018
