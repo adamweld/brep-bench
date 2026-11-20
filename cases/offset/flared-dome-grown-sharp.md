@@ -23,3 +23,13 @@ and runs on down to the base's new plane; the dome moves out as the surface of e
 the ellipsoid; and at the crease, a concave edge, the moved cone and dome cross and are trimmed. The
 base's rim, where the cone meets the base, stays a sharp edge, the circle ρ = 11 + √2 at z = −1. The
 offset of an ellipse has no closed form, so the case is unsettled until two kernels agree.
+
+In set terms, with P the half-plane region described above (taken with its mirror image in the axis,
+so that it is symmetric), D the disk of radius 1, and K the kite at the base's convex rim, the
+convex hull of (ρ, z) = (10, 0), (10, −1), (11 + √2, −1) and (10 + 1/√2, 1/√2): the grown profile is
+the dilated profile P ⊕ D, whose boundary already has the moved cone and dome crossing at the
+crease, together with K, which squares off the rim that the dilation would round.
+
+**As a set:**
+
+$$\{\, (\rho, z) \in (P \oplus D) \cup K \,\}$$

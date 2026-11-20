@@ -28,3 +28,15 @@ two cut faces move out 1, the first to the plane y = −1 (for x ≥ 1) and the 
 1 (for y ≤ −1), and are extended until they meet each other along the line x = 1, y = −1, so the
 missing quarter shrinks to the part with x ≥ 1 and y ≤ −1. The offset of an ellipse has no closed
 form, so the case is unsettled until two kernels agree.
+
+In set terms, with P the half-plane region described above (taken with its mirror image in the axis,
+so that it is symmetric), D the disk of radius 1, and K the kite at the base's convex rim, the
+convex hull of (ρ, z) = (10, 0), (10, −1), (11 + √2, −1) and (10 + 1/√2, 1/√2): the grown profile is
+the dilated profile P ⊕ D, whose boundary already has the moved cone and dome crossing at the
+crease, together with K, which squares off the rim that the dilation would round. The cut planes
+then clip the whole turned grown solid, the cut faces running on through the dome: the grown solid
+is that full turned solid less the part with x > 1 and y < −1.
+
+**As a set:**
+
+$$\{\, (\rho, z) \in (P \oplus D) \cup K \,\} \setminus \{\, x > 1,\ y < -1 \,\}$$

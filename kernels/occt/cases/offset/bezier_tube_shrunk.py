@@ -4,7 +4,7 @@ plane z = 0, of length about 27.73, whose least radius of curvature, about 12.5,
 the tube's radius. At each point of the curve the disk lies in the plane perpendicular to the
 curve and is centered on it. The tube's faces are its side, the surface of every point 2 from the
 curve, and two flat disks of radius 2 at its ends, perpendicular to the curve there: in the plane
-x = 0 at the start and in the plane y = 12 at the end."""
+x = 0 at the start and in the plane x = 24 at the end."""
 from offset import offset
 from turned import tube
 
