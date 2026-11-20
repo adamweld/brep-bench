@@ -20,7 +20,7 @@ A block with x from −5 to 3, y from −5 to 5 and z from 0 to 10: it is as tal
 
 The block's faces x = −5, y = −5 and y = 5 each touch the post's wall along a line, where block and post are tangent. Its face x = 3 cuts across the post, along a chord 8 long from y = −4 to y = 4. Its corners at (3, ±5) are outside the post.
 
-What is left is the block less its part inside the post: two pieces, one in y ≥ 0 and one in y ≤ 0, that touch along the line where the post's wall meets the face x = −5, at (−5, 0). The part left can be in several pieces, even pieces that touch only along a line; build it all as one result, and measure it whole.
+What is left is the block less its part inside the post: four pieces: in y ≥ 0 a corner piece at (−5, 5) and another at (3, 5) above the arc, and their mirror images in y ≤ 0 at (−5, −5) and (3, −5). The pieces at (−5, ±5) touch the pieces at (3, ±5) along the lines where the post's wall meets the faces y = ±5, at (0, ±5), and the two at (−5, 5) and (−5, −5) touch each other along the line at (−5, 0). The part left can be in several pieces, even pieces that touch only along a line; build it all as one result, and measure it whole.
 
 **As a set:**
 
