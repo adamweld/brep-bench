@@ -12,8 +12,9 @@ circle's points at 45°, 135°, 225° and 315° to the square's corners. Its end
 = 0 and the flat square in z = 10.
 
 Shell it inward to a wall 1/2 thick, open at both ends, a pipe. The outside of the wall is the
-loft's side; the inside is the set of points of the loft at least 1/2 from that side, which runs on
-from z = 0 to z = 10 to meet the planes of the openings, so the rims are flat in those planes. The
+loft's side; the inside is the parallel surface of that side, 1/2 in along its normals, with the
+side's four ruled faces continued along their lines past both end planes so that the parallel
+surface runs on through them, and cut by the planes z = 0 and z = 10, where the rims are flat. The
 side is not developable and the inner surface is its parallel surface, with no closed form, so the
 case is unsettled until two kernels agree."""
 from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakePolygon, BRepBuilderAPI_MakeWire
