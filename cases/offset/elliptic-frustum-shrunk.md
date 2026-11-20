@@ -16,3 +16,11 @@ and z = 7; the side moves in along its normals by 1, onto a surface that is no c
 above 1). The edges stay sharp. The solid has no
 simple closed form: the offset of an elliptic cone is not a quadric, and its volume and
 area are left unsettled.
+
+The result is the part of the frustum at least 1 from its outside, between the planes z = 1 and
+z = 7 and inside the surface 1 in from the side, so that it has three faces: that offset surface
+and the two flat ends, each trimmed by the other.
+
+**As a set:**
+
+$$\{\,(x, y, z) \text{ in the frustum}\,\} \ominus B_{1}$$
