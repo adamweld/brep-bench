@@ -185,6 +185,11 @@ cylinder, a post extruded up inside a hollow dome until it meets the dome's insi
 about a hub until it meets a stop, and a hole drilled through the first wall it meets and no
 further.
 
+## Patterns (`pattern/`)
+
+Copies of a feature placed by a rule and united: bars set along an L-shaped path, each turned to follow
+it, overlapping into one solid with a flush corner. Every one has a closed form.
+
 ## Sweeps along paths with sharp corners (`sweep/`)
 
 The section is carried around each corner one of two ways: mitered, each run cut by the plane
