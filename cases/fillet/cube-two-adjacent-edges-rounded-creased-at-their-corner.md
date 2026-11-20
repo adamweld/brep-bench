@@ -9,9 +9,9 @@ exact = "10³ − 2·10·r²(1 − π/4) + (5/3 − π/2)r³, r = 2: the two rem
 tex = '10^3 - 2\cdot 10\,r^2\left(1 - \tfrac{\pi}{4}\right) + \left(\tfrac{5}{3} - \tfrac{\pi}{2}\right)r^3,\quad r = 2'
 
 [area]
-value = 582.2654824574367
-exact = "3·10² + (10 − r)² + 2·10(10 − r) + 2[(π/2)·r·10 − r²(π/2 − 1)], r = 2: five whole or trimmed planes, and two quarter cylinders each less the strip the other round takes"
-tex = '3\cdot 10^2 + (10-r)^2 + 2\cdot 10(10-r) + 2\left[\tfrac{\pi}{2}\,10\,r - r^2\left(\tfrac{\pi}{2} - 1\right)\right],\quad r = 2'
+value = 580.5486677646163
+exact = "3·10² − 2r²(1 − π/4) + (10 − r)² + 2·10(10 − r) + 2[(π/2)·r·10 − r²(π/2 − 1)], r = 2: the bottom face whole; the faces x = 0 and y = 10, each less one round's corner r²(1 − π/4); the top, trimmed on both sides, (10 − r)²; the faces x = 10 and y = 0, each cut at z = 10 − r, 10(10 − r); and two quarter cylinders each less the strip the other round takes"
+tex = '3\cdot 10^2 - 2r^2\left(1-\tfrac{\pi}{4}\right) + (10-r)^2 + 2\cdot 10(10-r) + 2\left[\tfrac{\pi}{2}\,10\,r - r^2\left(\tfrac{\pi}{2} - 1\right)\right],\quad r = 2'
 +++
 
 A cube of side 10 between the origin and (10, 10, 10). Two of its edges meet at the corner

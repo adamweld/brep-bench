@@ -1,6 +1,10 @@
 """Three quarters of a cylinder with every convex edge rounded, its inside edge left sharp. The
 points with rho <= 10 and 0 <= z <= 8 except x > 0, y < 0; the eight convex edges rounded to
-radius 1, the concave edge up the axis left as it is."""
+radius 1, the concave edge up the axis left as it is.
+
+Finding: MakeFillet closes the corners with patches of its own, so its solid deviates a little from
+the union of balls the case defines (about 6e-4 in volume for the frustum, 8e-5 for the torus patch,
+2.4e-5 for the three-quarter cylinder; the zone agrees to 2e-8)."""
 import math
 
 from OCP.BRepPrimAPI import BRepPrimAPI_MakeCylinder
