@@ -1,7 +1,7 @@
 +++
 title = "A half-elliptic prism with its curved top edge rounded"
 tags = ["fillet", "elliptic-cylinder", "planar", "analytic"]
-origin = "OCCT tests/blend/simple/F4, OCCT tests/blend/simple/F6, OCCT tests/blend/simple/F8, OCCT tests/blend/simple/G1, OCCT tests/blend/simple/J6"
+origin = "OCCT tests/blend/simple/F4, OCCT tests/blend/simple/F6, OCCT tests/blend/simple/J6"
 
 [volume]
 value = 110.12919013401433

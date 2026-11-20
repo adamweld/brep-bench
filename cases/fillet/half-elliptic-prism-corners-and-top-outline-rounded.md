@@ -2,7 +2,7 @@
 title = "A half-elliptic prism with its two upright corners rounded, then its whole top outline"
 tags = ["fillet", "corner", "elliptic-cylinder", "planar", "chain"]
 settled = false
-origin = "OCCT tests/blend/simple/F5, OCCT tests/blend/simple/F7, OCCT tests/blend/simple/F9, OCCT tests/blend/simple/G2"
+origin = "OCCT tests/blend/simple/F5, OCCT tests/blend/simple/F7"
 +++
 
 The half of an elliptic cylinder: the half-ellipse x²/64 + y²/16 ≤ 1 with y ≥ 0, semi-axes 8 and 4,
