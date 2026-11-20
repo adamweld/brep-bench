@@ -182,8 +182,11 @@ which leaves a hip roof. Every one has a closed form.
 
 Features that end on a face rather than at a length: a square pad extruded down until it meets a
 cylinder, a post extruded up inside a hollow dome until it meets the dome's inside, a rib turned
-about a hub until it meets a stop, and a hole drilled through the first wall it meets and no
-further.
+about a hub until it meets a stop, a hole drilled through the first wall it meets and no
+further, web ribs turned about a shaft's axis (cylinder, torus and cone edges, against a
+shoulder, a waist or a square boss), beads turned on a drum's top and over its rim, and ribs, ridges
+and blocks swept straight through a leaning side, over its top edge, across a plate's side and over
+a plate's concave corner.
 
 ## Sweeps along paths with sharp corners (`sweep/`)
 
