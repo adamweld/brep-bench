@@ -18,9 +18,11 @@ A cylinder of radius 10 about the z axis, from z = 0 to z = 20. Draft its top fa
 pull direction +x and the neutral plane x = 0: the top face lies along the pull direction already, so
 it turns about the line where it crosses the neutral plane, the diameter x = 0, z = 20 of its circle,
 until it leans 8° from the x direction. It rises toward +x, becoming the plane
-z = 20 + x·tan 8°. The side and the floor are not drafted; the side is cut off by the new top.
+z = 20 + x·tan 8°. The side and the floor are not drafted. The top is replaced by the tilted plane:
+the side is extended up to it on the +x half, where the plane is above z = 20, and cut down to it
+on the −x half, where it is below.
 
-The result is the cylinder under a slanted top: its side is 20 + x·tan 8° high at the point
+The result is the cylinder up to a slanted top: its side is 20 + x·tan 8° high at the point
 (x, y) of the circle, and its top face is an ellipse through the diameter at z = 20.
 
 **As a set:**

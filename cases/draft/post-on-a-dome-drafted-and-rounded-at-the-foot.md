@@ -18,6 +18,8 @@ dome, a little below the pole's height, and about 3.63 at its flat top, z = 22. 
 with the dome.
 
 The foot: the edge where the post's cone leaves the dome's sphere, a circle, is rounded with a
-constant radius of 1.5, adding material: a ball of radius 1.5 rolling outside the sphere and outside
-the cone, touching both, and the round is the band it sweeps between its two circles of contact.
+constant radius of 1.5, adding material in the concave corner between dome and post: a ball of
+radius 1.5 rolls in that corner, outside the dome's sphere and outside the post's cone (in the air
+above the dome beside the post), touching both; the round is the material between the ball and the
+corner, bounded by the ball's two circles of contact, one on the sphere and one on the cone.
 Nothing else is rounded.

@@ -21,8 +21,9 @@ whose half-angle is 15°, ρ = 10 − z·tan 15°, up to z = 20, where its top f
 Draft its top face by 10°, with the pull direction +x and the neutral plane x = 0: the top face lies
 along the pull direction already, so it turns about the line where it crosses the neutral plane, the
 diameter x = 0, z = 20 of its circle, until it leans 10° from the x direction. It rises toward +x,
-becoming the plane z = 20 + x·tan 10°. The side and the floor are not drafted; the side is cut off
-by the new top, which crosses it in an ellipse.
+becoming the plane z = 20 + x·tan 10°. The side and the floor are not drafted. The top is replaced
+by the tilted plane: the cone is extended up to it on the +x half, where the plane is above z = 20,
+and cut down to it on the −x half, where it is below; the plane crosses the cone in an ellipse.
 
 **As a set:**
 
