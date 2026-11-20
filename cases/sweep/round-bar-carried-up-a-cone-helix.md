@@ -11,7 +11,7 @@ The path c(θ) starts at (5, 0, 0) and turns right-handed (from +x toward +y) th
 
 The section is the disc of radius 1 about (5, 0, 0) in the plane y = 0.
 
-Each section is carried along the path by the path's own frame, with the z axis held in it: at each point of the path, T is the unit tangent, B is the z axis with its component along T taken out (made unit), and N = B × T. The section keeps its coordinates in (T, N, B): a point p of the starting section goes to c(θ) + R(θ)(p − c(0)), where c(θ) is the point of the path and R(θ) the rotation taking the starting frame to the frame at c(θ). On a cylinder this is a plain screw and the section stays in a plane through the axis; on the cone the path's tangent leans outward as it climbs, so the section leans with it, and does not stay in a plane through the axis.
+Each section is carried along the path by the path's own frame, with the z axis held in it: at each point of the path, T is the unit tangent (the full three-dimensional tangent of the path, with its outward lean, at the start as everywhere), B is the z axis with its component along T taken out (made unit), and N = B × T. The section keeps its coordinates in (T, N, B): a point p of the starting section goes to c(θ) + R(θ)(p − c(0)), where c(θ) is the point of the path and R(θ) the rotation taking the starting frame to the frame at c(θ). On a cylinder this is a plain screw and the section stays in a plane through the axis; on the cone the path's tangent leans outward as it climbs, so the section leans with it, and does not stay in a plane through the axis.
 
 The bar's ends are flat discs. Its turns are 4 apart in height and 1 apart in radius while the disc is 2 wide, so they do not touch. It has no closed form.
 
