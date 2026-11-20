@@ -116,3 +116,59 @@ def leaning_boxes_fused(rectangles, height, degrees):
     unify = ShapeUpgrade_UnifySameDomain(whole, True, True, False)
     unify.Build()
     return unify.Shape()
+
+
+def united(base, boss):
+    """`base` fused with `boss`."""
+    fuse = BRepAlgoAPI_Fuse(base, boss)
+    fuse.Build()
+    if not fuse.IsDone():
+        raise Refused("BRepAlgoAPI_Fuse declined the post")
+    return fuse.Shape()
+
+
+def turned_block(axis, rho0, rho1, z0, z1, degrees):
+    """The rectangle between radii `rho0` and `rho1` from the vertical line through `axis` (x, y),
+    and heights `z0` and `z1`, in the vertical plane running from the line toward +x, turned
+    `degrees` counterclockwise (seen from +z) about the line."""
+    from OCP.BRepBuilderAPI import BRepBuilderAPI_MakePolygon
+    from OCP.BRepPrimAPI import BRepPrimAPI_MakeRevol
+    from OCP.gp import gp_Ax1
+    x, y = axis
+    wire = BRepBuilderAPI_MakePolygon()
+    for r, z in [(rho0, z0), (rho1, z0), (rho1, z1), (rho0, z1)]:
+        wire.Add(gp_Pnt(x + r, y, z))
+    wire.Close()
+    face = BRepBuilderAPI_MakeFace(wire.Wire()).Face()
+    return BRepPrimAPI_MakeRevol(face, gp_Ax1(gp_Pnt(x, y, 0), gp_Dir(0, 0, 1)),
+                                 math.radians(degrees)).Shape()
+
+
+def revolved_bezier_block(poles, floor_radius):
+    """The solid turned a full turn about the z axis from the region under the quadratic or cubic
+    Bézier arc with `poles` (radius, height) pairs, between the axis and radius `floor_radius`,
+    above z = 0."""
+    from OCP.BRepBuilderAPI import BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeWire
+    from OCP.BRepPrimAPI import BRepPrimAPI_MakeRevol
+    from OCP.Geom import Geom_BezierCurve
+    from OCP.collections import Array1_gp_Pnt
+    from OCP.gp import gp_Ax1
+    arr = Array1_gp_Pnt(1, len(poles))
+    for i, (r, z) in enumerate(poles):
+        arr.SetValue(i + 1, gp_Pnt(r, 0, z))
+    arc = BRepBuilderAPI_MakeEdge(Geom_BezierCurve(arr)).Edge()
+    (r0, z0), (r1, z1) = poles[0], poles[-1]
+    wire = BRepBuilderAPI_MakeWire()
+    wire.Add(arc)
+    for a, b in [((r1, 0, z1), (r1, 0, 0)), ((r1, 0, 0), (r0, 0, 0)), ((r0, 0, 0), (r0, 0, z0))]:
+        wire.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(*a), gp_Pnt(*b)).Edge())
+    face = BRepBuilderAPI_MakeFace(wire.Wire()).Face()
+    return BRepPrimAPI_MakeRevol(face, gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1))).Shape()
+
+
+def frustum_sector():
+    """The quarter of the frustum about the z axis, radius 20 at z = 0 to 12 at z = 20, with
+    x ≥ 0 and y ≥ 0."""
+    from OCP.BRepPrimAPI import BRepPrimAPI_MakeCone
+    from OCP.gp import gp
+    return BRepPrimAPI_MakeCone(gp.XOY_s(), 20, 12, 20, math.pi / 2).Shape()
