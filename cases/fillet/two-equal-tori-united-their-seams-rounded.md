@@ -11,7 +11,10 @@ first one's centre. Both lie flat, in the xy plane. United, they are one solid.
 
 Where the two surfaces cross they leave creases: the curves of the first torus's surface that are
 inside the second, and so on, which all run in the one solid's boundary. Round every one of those
-crossing curves to radius 1: the blend a ball of radius 1 sweeps as it rolls touching both
+crossing curves, which are fourteen: four near (5, ±10.98, ±2.18), four near (1.33, ±8.05, ±2.37),
+four near (8.67, ±8.05, ±2.37), and two near (5, ±4.90, 0); not the tori's own seam circles
+(through (17, 0, 0), (7, 0, 0), (−13, 0, 0), (−3, 0, 0) and the like), which are not creases. Round
+them to radius 1: the blend a ball of radius 1 sweeps as it rolls touching both
 surfaces, adding material where the crease is concave and taking it away where it is convex. The
 two tori have exactly the same minor radius, which makes their crossing curves meet one another
 in a symmetric way, in the plane x = 5, where a kernel's intersection easily goes wrong.
