@@ -5,7 +5,7 @@ origin = "OCCT tests/bugs/modalg_7/bug29580_2"
 settled = false
 +++
 
-In the xz plane, take the disc of radius 5 centered at (0, 0) less the disc of radius 5 centered at
+In the xy plane, take the disc of radius 5 centered at (0, 0) less the disc of radius 5 centered at
 (6, 0): a crescent, whose tips are (3, ±4) and which lies wholly in x ≤ 3. Turn it about the line
 x = 3, z = 0, parallel to the y axis (the line through the tips), by 270°, right-handed about +y:
 its far side starts on the −x side of the line, goes first toward +z, then +x, and stops at −z.

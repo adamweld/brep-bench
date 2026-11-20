@@ -1,7 +1,8 @@
 """A thin post standing on a cross post, the saddle edge between them chamfered by equal distances.
 The cylinder of radius 6 about the x axis from x = −15 to 15, joined to the cylinder of radius 3 on
 the z axis from z = 0 to 12; the edge where the thin post leaves the thick one is chamfered 1 on
-each."""
+each: at each point P of the edge, in the plane square to the edge, the chamfer meets each post at
+the point of its side at straight-line distance 1 from P, away from the other post."""
 import math
 
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse

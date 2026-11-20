@@ -11,11 +11,11 @@ to a post, the cylinder of radius 4 on the z axis from z = −5 to z = 12. The p
 slanted top face in an ellipse, a concave edge whose dihedral angle varies round it, sharper on one
 side of the post than on the other.
 
-Chamfer that edge with equal distances, 1 on each face. At every point of the edge the distance is
-measured, on each face, in a straight line from the edge point in the plane square to the edge there:
-the chamfer meets the top face at the point of the face 1 from the edge, on the side away from the
-post, and meets the post at the point of the post's side 1 from the edge, up the post. A concave
-chamfer adds material: the chamfer's face is the surface ruled between the two curves those points
+Chamfer that edge with equal distances, 1 on each face. At every point P of the edge, take the plane
+through P square to the edge there. In that plane the chamfer meets the top face at the point of the
+face at straight-line distance 1 from P, on the side away from the post, and meets the post at the
+point of the post's side at straight-line distance 1 from P, the upper one of the two such points
+(the other lies down inside the block). A concave chamfer adds material: the chamfer's face is the surface ruled between the two curves those points
 trace, and it fills the groove between the post and the face.
 
 The chamfer's face is not a cone or a plane, and no closed form for the volume is given.

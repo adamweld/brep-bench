@@ -14,7 +14,7 @@ exact = "2(25π + 24 − 50 atan(4/3)) the two end faces + (3π/2)(30π − 60 a
 tex = '45\pi^2 + 170\pi + 48 - (100 + 90\pi)\arctan\tfrac43'
 +++
 
-In the xz plane, take the disc of radius 5 centered at (0, 0) less the disc of radius 5 centered at
+In the xy plane, take the disc of radius 5 centered at (0, 0) less the disc of radius 5 centered at
 (6, 0): a crescent. The two circles cross at (3, ±4), the crescent's two tips, and the crescent lies
 wholly in x ≤ 3. Turn it about the line x = 3, z = 0, parallel to the y axis (the line through
 the tips), by 270°, right-handed about +y: the crescent's far side, which starts on the −x side of

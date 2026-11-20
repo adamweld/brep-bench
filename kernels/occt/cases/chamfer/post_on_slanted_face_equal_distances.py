@@ -1,7 +1,8 @@
 """A post on a slanted face, the elliptical edge between them chamfered by equal distances. A block
 from (−20, −20, −20) to (20, 20, 0), turned by 20° about the y axis, joined to the cylinder of
 radius 4 on the z axis from z = −5 to z = 12; the edge where the post meets the slanted top is
-chamfered 1 on each face."""
+chamfered 1 on each face: at each point P of the edge, in the plane square to the edge, the chamfer
+meets each face at the point of it at straight-line distance 1 from P (on the post, the upper one)."""
 import math
 
 from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
