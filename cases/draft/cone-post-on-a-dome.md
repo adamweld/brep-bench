@@ -24,7 +24,7 @@ cone's side shows only above the sphere.
 Draft the post's side by 4°, with the pull direction +z and the neutral plane z = 0, the dome's
 flat base: the side turns about the circle of radius 6 where it crosses the neutral plane, until it
 leans 4° from the z direction, inward as it rises. It becomes the cone through that circle with
-radius 6 − z·tan 4°, no longer widening but narrowing. It still runs down into the dome, now
+radius 6 − z·tan 4°, no longer widening but narrowing. The solid to build is this result: the post's wall narrows upward, radius 6 − z·tan 4°; the widening cone above is only a starting point. It still runs down into the dome, now
 meeting the sphere where (6 − z·tan 4°)² + z² = 400, at z₀ ≈ 19.454, and the top shrinks to meet
 it, to radius 6 − 30·tan 4° ≈ 3.902. The dome and the post's top are not drafted.
 

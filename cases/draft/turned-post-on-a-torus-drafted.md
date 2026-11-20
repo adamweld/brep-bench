@@ -7,7 +7,7 @@ origin = "OCCT tests/draft/angle/G2"
 
 The torus: the solid swept by the disk of radius 5 centered on (15, 0, 0) in the plane y = 0,
 turned a full turn about the z axis. The middle circle of its tube lies in the plane z = 0, and it
-reaches up to z = 5.
+reaches up to z = 5. The whole torus is kept, including its half below z = 0 (down to z = −5).
 
 A post stands on its tube, turned about the same z axis: the region 13 ≤ ρ ≤ 17, 0 ≤ z ≤ 12 of the
 half plane y = 0, x > 0, turned 120° about the z axis from +x toward +y. It is a curved block

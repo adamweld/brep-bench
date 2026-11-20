@@ -7,7 +7,7 @@ origin = "OCCT tests/draft/angle/F7"
 
 The torus: the solid swept by the disk of radius 5 centered on (15, 0, 0) in the plane y = 0,
 turned a full turn about the z axis. The middle circle of its tube lies in the plane z = 0, and it
-reaches up to z = 5.
+reaches up to z = 5. The whole torus is kept, including its half below z = 0 (down to z = −5).
 
 A post stands on its tube: the box [11, 19] × [−4, 4] × [0, 14], united with the torus. The box's
 floor lies inside the tube; its sides show only above the tube's surface, and its top, at z = 14,

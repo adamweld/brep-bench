@@ -17,7 +17,7 @@ frustum's slanting side and partly on its top face, and it rises 6 above the fru
 Draft the post's side by 5°, with the pull direction +z and the neutral plane z = 0, the base's
 floor: the side turns about the circle of radius 3 about (10, 6) where it crosses the neutral
 plane, until it leans 5° from the z direction, inward as it rises. It becomes the cone through that
-circle with radius 3 − z·tan 5° about the vertical line, about 1.73 at z = 26. The base and the
+circle with radius 3 − z·tan 5° about the vertical line, about 1.73 at z = 26. The solid to build is this result: the post's wall narrows upward, radius 3 − z·tan 5°; the widening cone above is only a starting point. The base and the
 post's top are not drafted; the top is cut back to meet the cone. It has no closed form that has been checked.
 
 **As a set:**
