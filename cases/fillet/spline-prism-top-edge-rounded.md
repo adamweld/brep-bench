@@ -2,7 +2,7 @@
 title = "A prism bounded by a cubic B-spline and its chord, the curved top edge rounded"
 tags = ["fillet", "nurbs", "spline", "planar"]
 settled = false
-origin = "OCCT tests/blend/simple/G3, OCCT tests/blend/simple/G5, OCCT tests/blend/simple/G7, OCCT tests/blend/simple/G9, OCCT tests/blend/simple/F8, OCCT tests/blend/simple/G1"
+origin = "OCCT tests/blend/simple/G3, OCCT tests/blend/simple/G5, OCCT tests/blend/simple/G7, OCCT tests/blend/simple/G9"
 +++
 
 In the plane z = 0, the clamped cubic B-spline curve C with the five control points
