@@ -77,6 +77,14 @@ def loft(sections, ruled, name):
     return thru.Shape()
 
 
+def bezier_wire(poles, z):
+    """The closed Bezier curve of the planar control points `poles` in the plane z."""
+    pts = Array1_gp_Pnt(1, len(poles))
+    for i, (x, y) in enumerate(poles, 1):
+        pts.SetValue(i, gp_Pnt(x, y, z))
+    return BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(Geom_BezierCurve(pts)).Edge()).Wire()
+
+
 def polygon(n, circumradius, corner_deg, z):
     """The regular n-gon as a closed polyline of 24 stations, one at each azimuth 15 j degrees."""
     step = 2 * math.pi / n

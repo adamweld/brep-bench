@@ -71,6 +71,14 @@ def loft(sections, ruled, name):
     return thru.Shape()
 
 
+def bezier_wire(poles, z):
+    """The closed Bezier curve of the planar control points `poles` in the plane z."""
+    pts = Array1_gp_Pnt(1, len(poles))
+    for i, (x, y) in enumerate(poles, 1):
+        pts.SetValue(i, gp_Pnt(x, y, z))
+    return BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(Geom_BezierCurve(pts)).Edge()).Wire()
+
+
 def build():
     # OCCT's smooth ThruSections through a vertex, a circle and a vertex interpolates
     # exactly this law
