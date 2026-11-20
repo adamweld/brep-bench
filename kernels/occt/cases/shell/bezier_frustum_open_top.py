@@ -9,7 +9,7 @@ from OCP.collections import Array1_gp_Pnt
 from OCP.gp import gp_Pnt
 
 from bench import Refused
-from shell import face_through, shell
+from shell import shell_to_plane
 
 HEIGHT = 8
 THICKNESS = 1
@@ -29,12 +29,21 @@ def loop(z, a, k):
     return wire.Wire()
 
 
-def build():
+def frustum(top):
+    """The loft up to z = `top`: each pole runs straight from its place at z = 0 to its place at
+    z = 8 and on past it."""
+    f = top / HEIGHT
+    # the poles are (a, 0), (a, ka), (ka, a), (0, a): a runs 6 to 3 and ka runs 3.6 to 2.1
+    a, ka = 6 + (3 - 6) * f, 3.6 + (2.1 - 3.6) * f
     loft = BRepOffsetAPI_ThruSections(True, True)  # a solid, ruled between the sections
     loft.AddWire(loop(0, 6, 0.6))
-    loft.AddWire(loop(HEIGHT, 3, 0.7))
+    loft.AddWire(loop(top, a, ka / a))
     loft.Build()
     if not loft.IsDone():
         raise Refused("BRepOffsetAPI_ThruSections could not loft the Bézier loops")
-    solid = loft.Shape()
-    return shell(solid, [face_through(solid, (0, 0, HEIGHT))], THICKNESS)
+    return loft.Shape()
+
+
+def build():
+    # the cavity is the solid continued to z = 10, shrunk by 1 and cut off at z = 8
+    return shell_to_plane(frustum(HEIGHT), frustum(10), THICKNESS, HEIGHT)

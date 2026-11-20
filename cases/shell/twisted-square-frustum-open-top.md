@@ -14,13 +14,16 @@ corner of the same signs, and each upper edge to the lower edge between the corr
 by straight lines between points at the same fraction along the two edges. Each side face is the
 bilinear patch between a lower and an upper edge: a saddle, not a plane.
 
-Shell it inward to a wall 0.5 thick, open at its top face, z = 8. The cavity is every point of
-the solid at least 0.5 from its side faces and at least 0.5 above its bottom, running up to the top
-plane, which is the opening; the wall is everything else in the solid. The result is the solid
-less that cavity.
+Shell it inward to a wall 0.5 thick, open at its top face, z = 8. The side's moved faces run on
+past the plane of the opening and are cut by it: the sides are taken as continued beyond z = 8,
+and the rim is where their offset meets the plane z = 8. Exactly: let E be the solid continued
+up to z = 10 by the same loft, each corner's line run on past z = 8 to z = 10 and the squares
+between them closing it. The cavity is E shrunk by 0.5, every point of E at least 0.5 from E's
+boundary (its sides, its floor and its far end), cut off at the plane z = 8; the far end is more
+than 0.5 above it. The result is the solid less that cavity.
 
 The inward offset of a saddle patch has no closed form, so no volume or area is stated.
 
 **As a set:**
 
-$$S \setminus \{\, p \in S : d(p,\ \partial S \cap \{z < 8\}) \ge \tfrac12 \,\}, \quad S \text{ the lofted solid}$$
+$$S \setminus \bigl((E \ominus B_{1/2}) \cap \{z \le 8\}\bigr), \quad E \text{ the solid continued to } z = 10,\ S = E \cap \{z \le 8\}$$

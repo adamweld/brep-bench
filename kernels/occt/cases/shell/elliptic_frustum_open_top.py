@@ -6,7 +6,7 @@ from OCP.BRepOffsetAPI import BRepOffsetAPI_ThruSections
 from OCP.gp import gp_Ax2, gp_Dir, gp_Elips, gp_Pnt
 
 from bench import Refused
-from shell import face_through, shell
+from shell import shell_to_plane
 
 HEIGHT = 8
 THICKNESS = 1
@@ -17,12 +17,18 @@ def ellipse(z, major, minor):
     return BRepBuilderAPI_MakeWire(edge.Edge()).Wire()
 
 
-def build():
+def frustum(top):
+    """The loft up to z = `top`, the ellipses' axes running linearly from 6, 4 at z = 0 to 3, 2 at
+    z = 8 and on past it."""
     loft = BRepOffsetAPI_ThruSections(True, True)  # a solid, ruled between the sections
     loft.AddWire(ellipse(0, 6, 4))
-    loft.AddWire(ellipse(HEIGHT, 3, 2))
+    loft.AddWire(ellipse(top, 6 - 3 * top / 8, 4 - top / 4))
     loft.Build()
     if not loft.IsDone():
         raise Refused("BRepOffsetAPI_ThruSections could not loft the frustum")
-    frustum = loft.Shape()
-    return shell(frustum, [face_through(frustum, (0, 0, HEIGHT))], THICKNESS)
+    return loft.Shape()
+
+
+def build():
+    # the cavity is the frustum continued to z = 10, shrunk by 1 and cut off at z = 8
+    return shell_to_plane(frustum(HEIGHT), frustum(10), THICKNESS, HEIGHT)

@@ -13,17 +13,21 @@ the hollow. A closed hollow is made by `hollow`, the solid's shell and its offse
 two shells of one solid.
 """
 from OCP.BRep import BRep_Builder
+from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
 from OCP.BRepOffset import BRepOffset_Skin
+from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCP.BRepOffsetAPI import BRepOffsetAPI_MakeOffsetShape, BRepOffsetAPI_MakeThickSolid
 from OCP.GeomAbs import GeomAbs_Arc
 from OCP.TopAbs import TopAbs_SHELL
 from OCP.TopExp import TopExp_Explorer
 from OCP.TopoDS import TopoDS_Solid
 from OCP.collections import List_TopoDS_Shape
+from OCP.gp import gp_Pnt
 
 from bench import Refused, face_through
+from offset import offset
 
-__all__ = ["face_through", "hollow", "shell"]  # face_through, as the shell cases pick faces
+__all__ = ["face_through", "hollow", "shell", "shell_to_plane"]  # face_through, as the shell cases pick faces
 
 TOLERANCE = 1e-7
 
@@ -67,3 +71,19 @@ def only_shell(shape):
     shells.Next()
     assert not shells.More(), "more than one shell"
     return found
+
+
+def shell_to_plane(solid, extended, thickness, z):
+    """`solid` hollowed to a wall `thickness` thick, open at its face in the plane z = `z`, where
+    `extended` is the same solid with its side continued past that plane. The cavity is `extended`
+    shrunk by `thickness`, cut off at the plane; the result is `solid` less it, so the moved side
+    runs on to the plane of the opening, which is the rim."""
+    cavity = offset(extended, -thickness)
+    above = BRepPrimAPI_MakeBox(gp_Pnt(-1000, -1000, z), gp_Pnt(1000, 1000, 1000)).Shape()
+    trimmed = BRepAlgoAPI_Cut(cavity, above)
+    if not trimmed.IsDone():
+        raise Refused("BRepAlgoAPI_Cut could not cut the cavity at the opening's plane")
+    result = BRepAlgoAPI_Cut(solid, trimmed.Shape())
+    if not result.IsDone():
+        raise Refused("BRepAlgoAPI_Cut could not cut the cavity from the solid")
+    return result.Shape()

@@ -9,7 +9,7 @@ from OCP.BRepOffsetAPI import BRepOffsetAPI_ThruSections
 from OCP.gp import gp_Pnt
 
 from bench import Refused
-from shell import face_through, shell
+from shell import shell_to_plane
 
 HEIGHT = 8
 THICKNESS = 0.5
@@ -24,15 +24,23 @@ def square(corners):
     return polygon.Wire()
 
 
-def build():
+def frustum(top):
+    """The loft up to z = `top`, each corner running straight on past z = 8."""
     c, s = math.cos(math.radians(30)), math.sin(math.radians(30))
-    upper = [(2 * sx, 2 * sy, HEIGHT) for sx, sy in SIGNS]
-    lower = [(1 + c * 4 * sx - s * 4 * sy, s * 4 * sx + c * 4 * sy, 0) for sx, sy in SIGNS]
+    upper = [(2 * sx, 2 * sy) for sx, sy in SIGNS]
+    lower = [(1 + c * 4 * sx - s * 4 * sy, s * 4 * sx + c * 4 * sy) for sx, sy in SIGNS]
+    f = top / HEIGHT
+    end = [(lx + (ux - lx) * f, ly + (uy - ly) * f, top)
+           for (lx, ly), (ux, uy) in zip(lower, upper)]
     loft = BRepOffsetAPI_ThruSections(True, True)  # a solid, ruled between the sections
-    loft.AddWire(square(lower))
-    loft.AddWire(square(upper))
+    loft.AddWire(square([(x, y, 0) for x, y in lower]))
+    loft.AddWire(square(end))
     loft.Build()
     if not loft.IsDone():
         raise Refused("BRepOffsetAPI_ThruSections could not loft the twisted frustum")
-    solid = loft.Shape()
-    return shell(solid, [face_through(solid, (0, 0, HEIGHT))], THICKNESS)
+    return loft.Shape()
+
+
+def build():
+    # the cavity is the solid continued to z = 10, shrunk by 0.5 and cut off at z = 8
+    return shell_to_plane(frustum(HEIGHT), frustum(10), THICKNESS, HEIGHT)
